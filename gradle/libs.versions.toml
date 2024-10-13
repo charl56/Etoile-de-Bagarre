@@ -18,9 +18,7 @@ hilt-navigation = "1.2.0"
 androidx-preference = "1.2.1"
 kotlinx-coroutines-play-services = "1.7.3"
 firebaseBom = "33.4.0"
-material = "1.12.0"
 runtimeLivedata = "1.7.3"
-gdxVersion= "1.9.12"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -54,34 +52,6 @@ firebase-perf = {group="com.google.firebase", name="firebase-perf"}
 firebase-config = {group="com.google.firebase", name="firebase-config"}
 firebase-messaging = {group="com.google.firebase", name="firebase-messaging"}
 androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "runtimeLivedata" }
-# LibGDX
-#noinspection SimilarGradleDependency
-#gdx-platform = { group = "com.badlogicgames.gdx", name = "gdx-platform", version.ref = "gdxVersion", classifier = "natives-desktop" }
-##noinspection SimilarGradleDependency
-#gdx-box2d-platform = { group = "com.badlogicgames.gdx", name = "gdx-box2d-platform", version.ref = "gdxVersion", classifier = "natives-desktop" }
-#gdx-backend-android = { group = "com.badlogicgames.gdx", name = "gdx-backend-android", version.ref = "gdxVersion" }
-#gdx-box2d = { group = "com.badlogicgames.gdx", name = "gdx-box2d", version.ref = "gdxVersion" }
-#gdx = { group = "com.badlogicgames.gdx", name = "gdx", version.ref = "gdxVersion" }
-#gdx-backend-lwjgl = { group = "com.badlogicgames.gdx", name = "gdx-backend-lwjgl", version.ref = "gdxVersion" }
-##noinspection SimilarGradleDependency
-#gdx-platform-armeabi = { group = "com.badlogicgames.gdx", name = "gdx-platform", version.ref = "gdxVersion", classifier = "natives-armeabi" }
-##noinspection SimilarGradleDependency
-#gdx-platform-armeabi-v7a = { group = "com.badlogicgames.gdx", name = "gdx-platform", version.ref = "gdxVersion", classifier = "natives-armeabi-v7a" }
-##noinspection SimilarGradleDependency
-#gdx-platform-arm64-v8a = { group = "com.badlogicgames.gdx", name = "gdx-platform", version.ref = "gdxVersion", classifier = "natives-arm64-v8a" }
-##noinspection SimilarGradleDependency
-#gdx-platform-x86 = { group = "com.badlogicgames.gdx", name = "gdx-platform", version.ref = "gdxVersion", classifier = "natives-x86" }
-##gdx-platform-x86_64 = { group = "com.badlogicgames.gdx", name = "gdx-platform", version.ref = "gdx.gdxVersion", classifier = "natives-x86_64" }
-##noinspection SimilarGradleDependency
-#gdx-box2d-platform-armeabi = { group = "com.badlogicgames.gdx", name = "gdx-box2d-platform", version.ref = "gdxVersion", classifier = "natives-armeabi" }
-##noinspection SimilarGradleDependency
-#gdx-box2d-platform-armeabi-v7a = { group = "com.badlogicgames.gdx", name = "gdx-box2d-platform", version.ref = "gdxVersion", classifier = "natives-armeabi-v7a" }
-##noinspection SimilarGradleDependency
-#gdx-box2d-platform-arm64-v8a = { group = "com.badlogicgames.gdx", name = "gdx-box2d-platform", version.ref = "gdxVersion", classifier = "natives-arm64-v8a" }
-##noinspection SimilarGradleDependency
-#gdx-box2d-platform-x86 = { group = "com.badlogicgames.gdx", name = "gdx-box2d-platform", version.ref = "gdxVersion", classifier = "natives-x86" }
-##gdx-box2d-platform-x86_64 = { group = "com.badlogicgames.gdx", name = "gdx-box2d-platform", version.ref = "gdx.gdxVersion", classifier = "natives-x86_64" }
-
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

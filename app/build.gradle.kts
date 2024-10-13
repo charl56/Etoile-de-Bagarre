@@ -1,0 +1,179 @@
+plugins {
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.gms)
+    alias(libs.plugins.firebase.perf)
+    alias(libs.plugins.firebase.crashlytics)
+    alias(libs.plugins.dagger.hilt.android)
+}
+
+val appName = "nomdujeu"
+val gdxVersion = "1.12.1"
+val roboVMVersion = "2.3.12"
+val box2DLightsVersion = "1.5"
+val ashleyVersion = "1.7.3"
+val aiVersion = "1.8.2"
+
+android {
+    namespace = "fr.eseo.ld.android.cp.nomdujeu"
+    compileSdk = 34
+
+    defaultConfig {
+        applicationId = "fr.eseo.ld.android.cp.nomdujeu"
+        minSdk = 24
+        targetSdk = 34
+        versionCode = 1
+        versionName = "1.0"
+
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables {
+            useSupportLibrary = true
+        }
+    }
+
+    buildTypes {
+        release {
+            isMinifyEnabled = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+    }
+
+
+
+    sourceSets {
+        getByName("main") {
+            java.srcDirs("src/main/kotlin")
+            jniLibs.srcDirs("libs")
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+    kotlinOptions {
+        jvmTarget = "17"
+    }
+    buildFeatures {
+        compose = true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.3"
+    }
+    packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
+}
+
+configurations {
+    create("natives")
+}
+
+dependencies {
+
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.activity.compose)
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.ui)
+    implementation(libs.androidx.ui.graphics)
+    implementation(libs.androidx.ui.tooling.preview)
+    implementation(libs.androidx.material3)
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(libs.androidx.ui.test.junit4)
+    debugImplementation(libs.androidx.ui.tooling)
+    debugImplementation(libs.androidx.ui.test.manifest)
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.hilt.navigation)
+    implementation(libs.androidx.preference)
+    implementation(libs.kotlinx.coroutines.play.services)
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.ksp)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
+    implementation(libs.firebase.crashytics)
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.firestore)
+    implementation(libs.firebase.perf)
+    implementation(libs.firebase.config)
+    implementation(libs.firebase.messaging)
+    implementation(libs.androidx.runtime.livedata)
+//    LibGDX
+    implementation("com.badlogicgames.gdx:gdx-backend-android:$gdxVersion")
+
+//    add("natives", "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi")
+    add("natives", "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a")
+    add("natives", "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-arm64-v8a")
+    add("natives", "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86")
+    add("natives", "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86_64")
+
+    // Box2D natives
+//    add("natives", "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-armeabi")
+    add("natives", "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-armeabi-v7a")
+    add("natives", "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-arm64-v8a")
+    add("natives", "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-x86")
+    add("natives", "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-x86_64")
+
+    // Dépendances principales de GDX
+    implementation("com.badlogicgames.gdx:gdx:$gdxVersion")
+    implementation("com.badlogicgames.gdx:gdx-box2d:$gdxVersion")
+}
+
+// To be sure native libs are copied before start application
+tasks.named("preBuild").configure {
+    dependsOn("copyAndroidNatives")
+}
+
+
+tasks.register("copyAndroidNatives") {
+    doFirst {
+        val libsDir = file("libs")
+        libsDir.mkdirs()
+
+        // Chemin vers les bibliothèques natives
+        val nativeLibsDir = file("$layout.buildDirectory/libs")
+        nativeLibsDir.mkdirs()
+
+        val armeabiV7aDir = file("libs/armeabi-v7a").apply { mkdirs() }
+        val arm64V8aDir = file("libs/arm64-v8a").apply { mkdirs() }
+        val x86Dir = file("libs/x86").apply { mkdirs() }
+        val x8664Dir = file("libs/x86_64").apply { mkdirs() }
+
+        configurations["natives"].resolvedConfiguration.files.forEach { jar ->
+            val outputDir = when {
+                jar.name.endsWith("natives-armeabi-v7a.jar") -> armeabiV7aDir
+                jar.name.endsWith("natives-arm64-v8a.jar") -> arm64V8aDir
+                jar.name.endsWith("natives-x86.jar") -> x86Dir
+                jar.name.endsWith("natives-x86_64.jar") -> x8664Dir
+                else -> null
+            }
+
+            outputDir?.let {
+                copy {
+                    from(zipTree(jar))
+                    into(it)
+                    include("*.so")
+                }
+                // Vérification des fichiers copiés
+                it.listFiles()?.forEach { file ->
+                    if (file.name.endsWith(".so")) {
+                        println("Fichier natif copié : ${file.name} dans ${it.absolutePath}")
+                    } else {
+                        println("Fichier non copié : ${file.name}")
+                    }
+                }
+            }
+        }
+    }
+}
+
