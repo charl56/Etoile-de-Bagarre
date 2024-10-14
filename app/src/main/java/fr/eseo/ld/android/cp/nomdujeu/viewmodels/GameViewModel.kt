@@ -23,7 +23,7 @@ import kotlinx.coroutines.launch
 class GameViewModel : ViewModel() {
 
     private var gameLaunched = false
-    private val handler = Handler(Looper.getMainLooper()) // TODO : a supprimer, permet de lancer endGame après 5 sec
+    private val handler = Handler(Looper.getMainLooper()) // TODO : à supprimer, permet de lancer endGame après 5 sec
 
     fun launchGame(context: Context, navController: NavController) {
         if (!gameLaunched) {
@@ -32,7 +32,7 @@ class GameViewModel : ViewModel() {
             gameLaunched = true
 
 
-            // TODO : a supprimer, permet de lancer endGame après 5 sec
+            // TODO : à supprimer, permet de lancer endGame après 5 sec
             handler.postDelayed({
                 endGame(navController)
             }, 5000)

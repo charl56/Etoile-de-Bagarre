@@ -1,5 +1,6 @@
 package fr.eseo.ld.android.cp.nomdujeu.game
 
+import com.badlogic.gdx.Application
 import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.ApplicationListener
 import com.badlogic.gdx.Gdx
@@ -15,6 +16,7 @@ import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Array
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.ScreenUtils
+
 
 class Main : ApplicationAdapter(), ApplicationListener {
     private lateinit var backgroundTexture: Texture
@@ -32,11 +34,10 @@ class Main : ApplicationAdapter(), ApplicationListener {
     private lateinit var dropRectangle: Rectangle
 
     override fun create() {
-        println("oncreate")
+        Gdx.app.logLevel = Application.LOG_DEBUG
+
         backgroundTexture = Texture("background.png")
-        println("backgroundTexture")
         bucketTexture = Texture("bucket.png")
-        println("bucketTexture")
         dropTexture = Texture("drop.png")
         dropSound = Gdx.audio.newSound(Gdx.files.internal("drop.mp3"))
         music = Gdx.audio.newMusic(Gdx.files.internal("music.mp3"))
