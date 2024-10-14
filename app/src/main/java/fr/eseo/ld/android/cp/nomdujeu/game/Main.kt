@@ -1,4 +1,4 @@
-package fr.eseo.ld.android.cp.nomdujeu
+package fr.eseo.ld.android.cp.nomdujeu.game
 
 import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.ApplicationListener
@@ -32,9 +32,11 @@ class Main : ApplicationAdapter(), ApplicationListener {
     private lateinit var dropRectangle: Rectangle
 
     override fun create() {
-
+        println("oncreate")
         backgroundTexture = Texture("background.png")
+        println("backgroundTexture")
         bucketTexture = Texture("bucket.png")
+        println("bucketTexture")
         dropTexture = Texture("drop.png")
         dropSound = Gdx.audio.newSound(Gdx.files.internal("drop.mp3"))
         music = Gdx.audio.newMusic(Gdx.files.internal("music.mp3"))
