@@ -42,7 +42,7 @@ class GameViewModel : ViewModel() {
 
     fun endGame(navController: NavController) {
         gameLaunched = false
-        AndroidLauncher.instance?.finish()
+        AndroidLauncher.exitGame()
         navController.navigate(NomDuJeuScreens.END_GAME_SCREEN.id)
     }
 }
