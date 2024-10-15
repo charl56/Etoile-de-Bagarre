@@ -15,6 +15,7 @@ val box2DLightsVersion = "1.5"
 val ashleyVersion = "1.7.3"
 val aiVersion = "1.8.2"
 val ktxVersion = "1.11.0-rc2"
+val fleksVersion = "2.9"
 
 android {
     namespace = "fr.eseo.ld.android.cp.nomdujeu"
@@ -134,6 +135,9 @@ dependencies {
     implementation("io.github.libktx:ktx-scene2d:$ktxVersion")
     implementation("io.github.libktx:ktx-style:$ktxVersion")
     implementation("io.github.libktx:ktx-tiled:$ktxVersion")
+
+    // FLEKS : A fast, lightweight, entity component system library written in Kotlin
+    implementation("io.github.quillraven.fleks:Fleks:$fleksVersion")
 
 }
 

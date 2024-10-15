@@ -15,14 +15,6 @@ import ktx.app.KtxScreen
 // and KtxGame to use ktx library. So we use AndroidApplication and we implement KtxGame in the class.
 class AndroidLauncher : AndroidApplication() {
 
-    companion object {
-        private var instance: AndroidLauncher? = null
-
-        fun exitGame() {
-            instance?.ktxGame?.dispose()
-            instance?.finish() // Ferme l'activité en cours
-        }
-    }
 
     private lateinit var ktxGame: KtxGame<KtxScreen>
 
@@ -40,28 +32,18 @@ class AndroidLauncher : AndroidApplication() {
         initialize(ktxGame)
     }
 
+    companion object {
+        private var instance: AndroidLauncher? = null
+
+        fun exitGame() {
+            instance?.ktxGame?.dispose()
+            instance?.finish() // Ferme l'activité en cours
+        }
+    }
+
+
     override fun onDestroy() {
         super.onDestroy()
         instance = null
     }
 }
-
-//    companion object {
-//        var instance: AndroidLauncher? = null
-//    }
-//
-//    override fun create() {
-//        instance = this
-//        addScreen(GameScreen())
-//        setScreen<GameScreen>()
-//    }
-//
-//    override fun dispose() {
-//        super.dispose()
-//        instance = null
-//    }
-//
-//    fun exitGame() {
-//        dispose()
-//        Gdx.app.exit()
-//    }
