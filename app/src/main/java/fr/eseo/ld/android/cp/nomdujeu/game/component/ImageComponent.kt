@@ -6,7 +6,6 @@ import com.github.quillraven.fleks.Component
 import com.github.quillraven.fleks.ComponentType
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.World
-import ktx.actors.stage
 
 class ImageComponent (
     private val stage: Stage

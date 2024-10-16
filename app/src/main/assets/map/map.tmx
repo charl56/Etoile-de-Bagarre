@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="35" height="35" tilewidth="16" tileheight="16" infinite="0" nextlayerid="5" nextobjectid="1">
+ <tileset firstgid="1" source="../graphics/map.tsx"/>
+ <layer id="2" name="water" width="35" height="35" locked="1">
+  <data encoding="base64" compression="zlib">
+   eJztwwENAAAMw6D6dzoXF3JIWDVVVVVVffwAkU9bLg==
+  </data>
+ </layer>
+ <layer id="1" name="island" width="35" height="35">
+  <data encoding="base64" compression="zlib">
+   eJztl8EJhDAQRWewHhvZEhY8bWc2YheyLXiwBxMwCMFkJ/GPiWzAdxGDzz9jwixEtDyYFxOZi9bEdR/Ge8x0wCTzsutGcBZzhJhXv39DapapDjEvh7ufk02ugwRpNpoOUp+7HH75+P9GSZ++oIvfy82luTSXNL6GN9fhcnY2/bvLWX0sk2GoIJOS2YTO6hIuoWxqd7H91fEBuqdCLpP3Xovf5+4ZpFPObKPphJhVUHsBam662vOhPe/ueiE9ruSj5ZHjguqRWK2kaGXS0GUDxh3pkA==
+  </data>
+ </layer>
+ <layer id="3" name="bgd_1" width="35" height="35" locked="1">
+  <data encoding="base64" compression="zlib">
+   eJzt0rsJACAMAFFdwq2cxzndyD6k0OIQ5R4ErPK1FEmSGBPMPULs6pXpJXtH5D6y+id7EasB/+6GX+Z4nXeQJImxAI2GBe4=
+  </data>
+ </layer>
+ <layer id="4" name="fgd_1" width="35" height="35" locked="1">
+  <data encoding="base64" compression="zlib">
+   eJzt0YEJAEAIAzHd1P2n+CUexJJMcKVVAAB5prcL/kjZcZ0fACDfA45fASQ=
+  </data>
+ </layer>
+</map>
