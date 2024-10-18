@@ -15,6 +15,22 @@ import fr.eseo.ld.android.cp.nomdujeu.game.event.MapChangeEvent
 import ktx.graphics.use
 import ktx.tiled.forEachLayer
 
+
+/**
+ * \file RenderSystem.kt
+ * \brief Système pour gérer le rendu des entités et des couches de tuiles dans une scène de jeu libGDX.
+ *
+ * Ce fichier définit un système `RenderSystem` pour rendre les entités et les couches de tuiles dans le cadre de l'utilisation de la bibliothèque `fleks` avec `libGDX`.
+ * Le système est responsable de la gestion du rendu des entités possédant un `ImageComponent` et des couches de tuiles d'une carte.
+ *
+ * \details
+ * - La classe `RenderSystem` étend `IteratingSystem` et traite les entités correspondant à une famille spécifique.
+ * - La méthode `onTick` est appelée à chaque mise à jour de frame pour gérer le rendu des couches de tuiles et des acteurs.
+ * - La méthode `onTickEntity` est appelée pour chaque entité à chaque mise à jour de frame pour gérer le rendu des entités.
+ * - La méthode `handle` gère les événements de changement de carte pour mettre à jour les couches de tuiles de premier plan et de second plan.
+ * - Les couches de tuiles sont rendues en utilisant un `OrthogonalTiledMapRenderer`.
+ * - La caméra orthographique est utilisée pour définir la vue de rendu.
+ */
 class RenderSystem (
     private val stage:Stage,
 
@@ -66,6 +82,7 @@ class RenderSystem (
                 fgdLayers.clear()   // Vide la liste des layers de premier plan
                 bgdLayers.clear()   // Vide la liste des layers de second plan
 
+                // Permet d'afficher les graphiques devant ou derrière le joueur, en fonction des élements
                 event.map.forEachLayer<TiledMapTileLayer> { layer ->
                     if(layer.name.startsWith("fgd_")){
                         fgdLayers.add(layer)

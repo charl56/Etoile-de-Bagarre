@@ -14,7 +14,20 @@ import ktx.app.gdxError
 import ktx.collections.map
 import ktx.log.logger
 
-
+/**
+ * \file AnimationSystem.kt
+ * \brief Système pour gérer les animations des entités dans une scène de jeu libGDX.
+ *
+ * Ce fichier définit un système `AnimationSystem` pour mettre à jour les animations des entités dans le cadre de l'utilisation de la bibliothèque `fleks` avec `libGDX`.
+ * Le système est responsable de la gestion des animations des entités possédant à la fois un `ImageComponent` et un `AnimationComponent`.
+ *
+ * \details
+ * - La classe `AnimationSystem` étend `IteratingSystem` et traite les entités correspondant à une famille spécifique.
+ * - La méthode `onTickEntity` est appelée pour chaque entité à chaque mise à jour de frame pour gérer l'animation.
+ * - La méthode `animation` crée une animation à partir de l'atlas de textures pour un chemin clé donné.
+ * - Les animations sont mises en cache pour éviter de les recréer à chaque fois.
+ * - La classe inclut un objet compagnon définissant un logger et une durée de frame par défaut pour les animations.
+ */
 class AnimationSystem (
     private val textureAtlas: TextureAtlas,
 
