@@ -176,14 +176,6 @@ tasks.register("copyAndroidNatives") {
                     into(it)
                     include("*.so")
                 }
-                // Vérification des fichiers copiés
-                it.listFiles()?.forEach { file ->
-                    if (file.name.endsWith(".so")) {
-                        println("Fichier natif copié : ${file.name} dans ${it.absolutePath}")
-                    } else {
-                        println("Fichier non copié : ${file.name}")
-                    }
-                }
             }
         }
     }

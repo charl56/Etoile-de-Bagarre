@@ -32,6 +32,7 @@ class AnimationSystem (
     private val textureAtlas: TextureAtlas,
 
 ) : IteratingSystem(
+    // "Réagit" a toutes les entités ayant un ImageComponent et un AnimationComponent
     family = family { all(ImageComponent).all(AnimationComponent) },
     comparator = compareEntityBy(ImageComponent)
 ) {

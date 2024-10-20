@@ -18,6 +18,12 @@ import com.github.quillraven.fleks.ComponentType
  * - La méthode `nextAnimation` permet de définir la prochaine animation à jouer.
  * - Les propriétés `stateTime` et `playMode` gèrent le temps d'état et le mode de lecture de l'animation.
  */
+enum class AnimationModel {
+    player, ENEMY, UNDEFINED;       // TODO : player en majuscule, et donc dossier en maj et refaire manip création du fichier gameTexture
+
+    val atlasKey: String = this.toString().lowercase()
+}
+
 enum class AnimationType {
     IDLE,
     WALK,
@@ -29,7 +35,7 @@ enum class AnimationType {
 }
 
 data class AnimationComponent (
-    var atlasKey: String = "",
+    var model: AnimationModel = AnimationModel.UNDEFINED,
     var stateTime: Float = 0f,
     var playMode: Animation.PlayMode = Animation.PlayMode.LOOP,
 
@@ -37,9 +43,9 @@ data class AnimationComponent (
     lateinit var animation: Animation<TextureRegionDrawable>
     var nextAnimation: String = ""
 
-    fun nextAnimation(atlasKey: String, type: AnimationType){
-        this.atlasKey = atlasKey
-        nextAnimation = "$atlasKey/${type.atlasKey}"
+    fun nextAnimation(model: AnimationModel, type: AnimationType){
+        this.model = model
+        nextAnimation = "$model/${type.atlasKey}"
     }
 
     companion object : ComponentType<AnimationComponent>() {

@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.github.quillraven.fleks.*
 import com.github.quillraven.fleks.World.Companion.family
 import com.github.quillraven.fleks.collection.compareEntityBy
+import fr.eseo.ld.android.cp.nomdujeu.game.AndroidLauncher.Companion.UNIT_SCALE
 import fr.eseo.ld.android.cp.nomdujeu.game.component.ImageComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.event.MapChangeEvent
 import ktx.graphics.use
@@ -41,7 +42,7 @@ class RenderSystem (
 
     private val bgdLayers = mutableListOf<TiledMapTileLayer>()
     private val fgdLayers = mutableListOf<TiledMapTileLayer>()
-    private val mapRenderer = OrthogonalTiledMapRenderer(null, 1/16f, stage.batch)
+    private val mapRenderer = OrthogonalTiledMapRenderer(null, UNIT_SCALE, stage.batch)
     private val orthoCam = stage.camera as OrthographicCamera
 
     override fun onTick() {

@@ -1,12 +1,8 @@
 package fr.eseo.ld.android.cp.nomdujeu.game
 
-import android.content.Context
-import android.content.Intent
-import android.os.Bundle
-import com.badlogic.gdx.Gdx
 
+import android.os.Bundle
 import com.badlogic.gdx.backends.android.AndroidApplication
-import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration
 import fr.eseo.ld.android.cp.nomdujeu.game.screens.GameScreen
 import ktx.app.KtxGame
 import ktx.app.KtxScreen
@@ -33,6 +29,8 @@ class AndroidLauncher : AndroidApplication() {
     }
 
     companion object {
+        const val UNIT_SCALE = 1/16f
+
         private var instance: AndroidLauncher? = null
 
         fun exitGame() {
