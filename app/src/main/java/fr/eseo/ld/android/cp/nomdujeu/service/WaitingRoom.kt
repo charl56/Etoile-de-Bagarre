@@ -1,6 +1,5 @@
 package fr.eseo.ld.android.cp.nomdujeu.service
 
-
 import com.google.firebase.database.*
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -15,13 +14,13 @@ class WaitingRoom(private val database: FirebaseDatabase) {
 
     suspend fun joinAndWait(): Boolean {
         try {
-            // Ajouter le joueur à la salle d'attente
+            // Add user to wait list
             playerRef = addPlayerToRoom()
 
-            // Attendre que 5 joueurs soient connectés
+            // Wait for 5 players to join
             return waitForPlayers()
         } catch (e: Exception) {
-            println("Erreur lors de la connexion à la salle d'attente: ${e.message}")
+            println("Erreur when connexion to waiting room: ${e.message}")
             return false
         }
     }
