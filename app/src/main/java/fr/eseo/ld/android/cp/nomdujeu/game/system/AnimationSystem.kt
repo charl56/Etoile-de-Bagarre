@@ -45,6 +45,7 @@ class AnimationSystem (
         } else {
             aniCmp.animation = animation(aniCmp.nextAnimation)
             aniCmp.stateTime = 0f
+            aniCmp.nextAnimation = NO_ANIMATION
         }
 
         aniCmp.animation.playMode = aniCmp.playMode
