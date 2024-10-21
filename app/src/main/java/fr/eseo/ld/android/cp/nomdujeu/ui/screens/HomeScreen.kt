@@ -105,15 +105,17 @@ fun HomeScreen(navController: NavController, authenticationViewModel: Authentica
                     // Play/Cancel button at the bottom right
                     Button(
                         onClick = {
-                            coroutineScope.launch {
-                                handlePlayButtonClick(
-                                    context = context,
-                                    navController = navController,
-                                    isInWaitingRoom = isInWaitingRoom,
-                                    waitingRoom = waitingRoom,
-                                    gameViewModel = gameViewModel
-                                )
-                            }
+                            gameViewModel.launchGame(context, navController)
+//
+//                            coroutineScope.launch {
+//                                handlePlayButtonClick(
+//                                    context = context,
+//                                    navController = navController,
+//                                    isInWaitingRoom = isInWaitingRoom,
+//                                    waitingRoom = waitingRoom,
+//                                    gameViewModel = gameViewModel
+//                                )
+//                            }
                         },
                         modifier = Modifier
                             .align(Alignment.BottomEnd)
