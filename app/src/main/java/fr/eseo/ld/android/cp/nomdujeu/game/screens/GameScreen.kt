@@ -7,16 +7,20 @@ import com.badlogic.gdx.scenes.scene2d.EventListener
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.viewport.ExtendViewport
 import com.github.quillraven.fleks.world
-import fr.eseo.ld.android.cp.nomdujeu.game.component.ImageComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.component.ImageComponent.Companion.ImageComponentListener
+import fr.eseo.ld.android.cp.nomdujeu.game.component.PhysicComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.event.MapChangeEvent
 import fr.eseo.ld.android.cp.nomdujeu.game.event.fire
 import fr.eseo.ld.android.cp.nomdujeu.game.system.AnimationSystem
+import fr.eseo.ld.android.cp.nomdujeu.game.system.DebugSystem
 import fr.eseo.ld.android.cp.nomdujeu.game.system.EntitySpawnSystem
+import fr.eseo.ld.android.cp.nomdujeu.game.system.PhysicSystem
 import fr.eseo.ld.android.cp.nomdujeu.game.system.RenderSystem
 import ktx.app.KtxScreen
 import ktx.assets.disposeSafely
+import ktx.box2d.createWorld
 import ktx.log.logger
+import ktx.math.vec2
 
 
 // Principal component to see the game
@@ -26,31 +30,38 @@ class GameScreen : KtxScreen {
     private val textureAtlas = TextureAtlas("graphics/gameTextures.atlas")
     private var currentMap : TiledMap? = null
 
+    // Create physic world with no gravity
+    private val phWorld = createWorld(gravity = vec2()).apply {
+        autoClearForces = false
+    }
+
     // Init game world with configutation
-    private val world = world {
+    private val eWorld = world {
         injectables {
             add(stage)
             add(textureAtlas)
+            add(phWorld)
         }
 
         components{
             add<ImageComponentListener>()
+            add<PhysicComponent.PhysicComponentListener>()
         }
 
         systems {
             add<EntitySpawnSystem>()
+            add<PhysicSystem>()
             add<AnimationSystem>()
             add<RenderSystem>()
+            add<DebugSystem>()
         }
-
-
     }
 
     override fun show() {
         log.debug { "Game screen is shown" }
 
         // Add event listeners to the stage, if any system is an EventListener
-        world.systems.forEach{ system ->
+        eWorld.systems.forEach{ system ->
             if(system is EventListener){
                 stage.addListener(system)
             }
@@ -66,7 +77,7 @@ class GameScreen : KtxScreen {
 
     // Rendu du jeu
     override fun render(delta: Float) {
-        world.update(delta)
+        eWorld.update(delta.coerceAtMost(0.25f))
     }
 
     // Stop tous les "services" du jeu
@@ -75,7 +86,7 @@ class GameScreen : KtxScreen {
         textureAtlas.disposeSafely()
         currentMap?.disposeSafely()
         try {
-            world.dispose()
+            eWorld.dispose()
         } catch (e: Exception) {
             log.error(e) { "Error while disposing game world" }
         }
