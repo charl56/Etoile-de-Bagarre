@@ -1,6 +1,6 @@
 package fr.eseo.ld.android.cp.nomdujeu.model
 
-data class User(
+data class Player(
     var id: String = "",
     val email: String = "",
     val pseudo: String = "",

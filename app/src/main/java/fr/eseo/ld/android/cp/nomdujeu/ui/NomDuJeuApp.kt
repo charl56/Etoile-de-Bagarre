@@ -17,12 +17,16 @@ import fr.eseo.ld.android.cp.nomdujeu.ui.screens.HomeScreen
 import fr.eseo.ld.android.cp.nomdujeu.ui.screens.WaitingScreen
 import fr.eseo.ld.android.cp.nomdujeu.ui.screens.EndGameScreen
 import fr.eseo.ld.android.cp.nomdujeu.viewmodels.GameViewModel
+import fr.eseo.ld.android.cp.nomdujeu.viewmodels.UserViewModel
 
 
 @Composable
 fun NomDuJeuApp() {
     val navController: NavHostController = rememberNavController()
+    val userViewModel : UserViewModel = hiltViewModel()
     val authenticationViewModel : AuthenticationViewModel = hiltViewModel()
+    // Init userViewModel into authenticationViewModel, ot have access to methods
+    authenticationViewModel.userViewModel = userViewModel
     val gameViewModel : GameViewModel = hiltViewModel()
 
     NavHost(navController , startDestination = "start") {
@@ -47,7 +51,7 @@ fun NomDuJeuApp() {
         }
 
         composable(NomDuJeuScreens.HOME_SCREEN.id) {
-            HomeScreen(navController, authenticationViewModel, gameViewModel)
+            HomeScreen(navController, authenticationViewModel, gameViewModel, userViewModel)
         }
 
         composable(NomDuJeuScreens.WAITING_SCREEN.id) {
