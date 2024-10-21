@@ -5,6 +5,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import fr.eseo.ld.android.cp.nomdujeu.model.Player
+import fr.eseo.ld.android.cp.nomdujeu.repository.AuthenticationRepository
 import fr.eseo.ld.android.cp.nomdujeu.repository.FirestoreRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -12,9 +13,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 
 @HiltViewModel
-class UserViewModel @Inject constructor(
+class PlayerViewModel @Inject constructor(
     application: Application,
-    private val repository: FirestoreRepository
+    private val repository: FirestoreRepository,
+    private val authenticationRepository: AuthenticationRepository
 
 ) : AndroidViewModel(application) {
 
@@ -24,23 +26,29 @@ class UserViewModel @Inject constructor(
     private val _players = MutableStateFlow<List<Player>>(emptyList())
     val players : StateFlow<List<Player>> = _players.asStateFlow()
 
-
-    fun addUser(email: String, pseudo: String) {
-        val player = Player(email = email, pseudo = pseudo)
-        repository.addUser(player)
-        getUserByEmail(email)
+    init {
+        // Update value when application is launched (here actual player)
+        getPlayerByEmail(authenticationRepository.getCurrentUser()?.email!!)
     }
 
 
-    fun getUserByEmail(email: String) {
-        repository.getUserByEmail(email) { user ->
+
+    fun addUser(email: String, pseudo: String) {
+        val player = Player(email = email, pseudo = pseudo)
+        repository.addPlayer(player)
+        getPlayerByEmail(email)
+    }
+
+
+    fun getPlayerByEmail(email: String) {
+        repository.getPlayerByEmail(email) { user ->
             _player.value = user
         }
     }
 
     // TODO : call when a player win a game
     fun addWinToUserWithId(userId : String) {
-        repository.addWinToUserWithId(userId)
+        repository.addWinToPlayerWithId(userId)
     }
 
     fun setUserNull(){

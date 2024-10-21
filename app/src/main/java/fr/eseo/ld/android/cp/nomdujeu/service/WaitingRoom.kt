@@ -36,7 +36,14 @@ class WaitingRoom(private val database: FirebaseDatabase) {
     private suspend fun waitForPlayers(): Boolean = suspendCancellableCoroutine { continuation ->
         val valueEventListener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                val playersList = snapshot.children.mapNotNull { it.getValue(Player::class.java) }
+                val playersList = snapshot.children.mapNotNull {
+                    try {
+                        it.getValue(Player::class.java)
+                    } catch (e: DatabaseException) {
+                        println("Données incorrectes détectées : ${e.message}")
+                        null // Ignorer les entrées invalides
+                    }
+                }
                 _players.value = playersList
                 if (playersList.size >= 5) {
                     roomRef.removeEventListener(this)

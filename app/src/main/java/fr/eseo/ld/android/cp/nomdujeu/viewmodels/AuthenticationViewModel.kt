@@ -9,37 +9,38 @@ import fr.eseo.ld.android.cp.nomdujeu.repository.AuthenticationRepository
 import javax.inject.Inject
 
 @HiltViewModel
-class AuthenticationViewModel @Inject constructor(private val authenticationRepository: AuthenticationRepository) : ViewModel() {
+class AuthenticationViewModel @Inject constructor(
+    private val authenticationRepository: AuthenticationRepository,
+) : ViewModel() {
 
-    lateinit var userViewModel: UserViewModel
+    lateinit var playerViewModel: PlayerViewModel
 
-    // User firebase (email, password, Id) != User app
     private val _user = MutableLiveData<FirebaseUser?>()
     val user : MutableLiveData<FirebaseUser?>
         get() = _user
 
+    // Update value when application is launched
     init{
-        // Update value when application is launched
         _user.value = authenticationRepository.getCurrentUser()
-
         if(_user.value == null){
-            // TODO : besoin de faire qqch ici ?
+            // TODO : besoin de faire qqch ici ? retour page login ? Sachant que on ne peut pas se connecter sans passer par la page de login
         }
     }
+
 
 
     fun signupWithEmail(email : String, password : String, pseudo: String) {
         authenticationRepository.signUpWithEmail(email, password)
             .addOnCompleteListener { task ->
                 if(task.isSuccessful) {
-                    // Firebase User != game user
+                    // Firebase User = use for auth with password and email
                     _user.value = authenticationRepository.getCurrentUser()
-                    // Create User game, with email, pseudo, wins...
-                    userViewModel.addUser(email, pseudo)
+                    // Create Player, with email, pseudo, wins...
+                    playerViewModel.addUser(email, pseudo)
                 }
                 else {
                     _user.value = null
-                    userViewModel.setUserNull()
+                    playerViewModel.setUserNull()
                 }
             }
     }
@@ -48,20 +49,21 @@ class AuthenticationViewModel @Inject constructor(private val authenticationRepo
         authenticationRepository.loginWithEmail(email, password).addOnCompleteListener{
                 task ->
             if(task.isSuccessful) {
-                // Firebase User != game user
+                // Firebase User = use for auth with password and email
                 _user.value = authenticationRepository.getCurrentUser()
-                // Get User game, with email, pseudo, wins...
-                userViewModel.getUserByEmail(email)
+                // Get Player, with email, pseudo, wins...
+                playerViewModel.getPlayerByEmail(email)
             }
             else {
                 _user.value = null
-                userViewModel.setUserNull()
+                playerViewModel.setUserNull()
             }
         }
     }
 
     fun logout() {
         authenticationRepository.logout()
+        playerViewModel.setUserNull()
     }
 
 }

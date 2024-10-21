@@ -55,7 +55,7 @@ fun ConnectionScreen(
             navController.popBackStack()
         },
         onSignupClick = {
-            authenticationViewModel.signupWithEmail(email, password)
+            authenticationViewModel.signupWithEmail(email, password, username)
             navController.popBackStack()
         }
     )

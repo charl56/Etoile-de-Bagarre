@@ -27,26 +27,29 @@ import fr.eseo.ld.android.cp.nomdujeu.service.WaitingRoom
 import fr.eseo.ld.android.cp.nomdujeu.ui.navigation.NomDuJeuScreens
 import fr.eseo.ld.android.cp.nomdujeu.viewmodels.AuthenticationViewModel
 import fr.eseo.ld.android.cp.nomdujeu.viewmodels.GameViewModel
-import fr.eseo.ld.android.cp.nomdujeu.viewmodels.UserViewModel
+import fr.eseo.ld.android.cp.nomdujeu.viewmodels.PlayerViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+
 @Composable
-fun HomeScreen(
+fun HomeScreen (
     navController: NavController,
     authenticationViewModel: AuthenticationViewModel,
     gameViewModel: GameViewModel,
-    userViewModel: UserViewModel
+    playerViewModel: PlayerViewModel
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val isInWaitingRoom = remember { mutableStateOf(false) }
     val waitingRoom = remember { WaitingRoom(FirebaseDatabase.getInstance("https://nom-du-jeu-default-rtdb.europe-west1.firebasedatabase.app")) }
     val players by waitingRoom.players.collectAsState()
-    val currentUser by userViewModel.player.collectAsState()
+    val currentUser by playerViewModel.player.collectAsState()
 
+
+    println("HomeScreen: $currentUser")
 
     BackHandler {
         // Doing nothing here, so the back button in android is disabled
@@ -79,14 +82,14 @@ fun HomeScreen(
                     }
 
                     Text(
-                        text = "Pseudo ici",
+                        text = currentUser?.pseudo ?: "Pseudo loading...",
                         style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier
                             .align(Alignment.TopCenter)
                             .padding(top = 16.dp)
                     )
                     Text(
-                        text = "Wins ici",
+                        text = "${currentUser?.wins ?: 0 } Win(s)",
                         style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier
                             .align(Alignment.TopEnd)
@@ -109,29 +112,27 @@ fun HomeScreen(
                                 .align(Alignment.BottomCenter)
                                 .padding(bottom = 16.dp)
                         )
-                        players.forEach { player ->
-                            Text(text = "${player.pseudo} (Victoires : ${player.wins})")
-                        }
-
                     }
 
                     // Play/Cancel button at the bottom right
                     Button(
                         onClick = {
-                            if(currentUser != null) {
-                                coroutineScope.launch {
-                                    HandlePlay().handlePlayButtonClick(
-                                        context = context,
-                                        navController = navController,
-                                        isInWaitingRoom = isInWaitingRoom,
-                                        waitingRoom = waitingRoom,
-                                        gameViewModel = gameViewModel,
-                                        currentPlayer = currentUser!!
-                                    )
-                                }
-                            } else {
-                                Toast.makeText(context, "Error when trying to connect to match making. Try to restart game or relog in", Toast.LENGTH_SHORT).show()
-                            }
+                            // TODO : Remove the function : usage to start game when dev
+                            gameViewModel.launchGame(context, navController)
+//                            if(currentUser != null) {
+//                                coroutineScope.launch {
+//                                    HandlePlay().handlePlayButtonClick(
+//                                        context = context,
+//                                        navController = navController,
+//                                        isInWaitingRoom = isInWaitingRoom,
+//                                        waitingRoom = waitingRoom,
+//                                        gameViewModel = gameViewModel,
+//                                        currentPlayer = currentUser!!
+//                                    )
+//                                }
+//                            } else {
+//                                Toast.makeText(context, "Error when trying to connect to match making. Try to restart game or relog in", Toast.LENGTH_SHORT).show()
+//                            }
                         },
                         modifier = Modifier
                             .align(Alignment.BottomEnd)
