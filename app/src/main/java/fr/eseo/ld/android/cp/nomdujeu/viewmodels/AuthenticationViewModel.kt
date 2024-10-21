@@ -16,17 +16,18 @@ class AuthenticationViewModel @Inject constructor(private val authenticationRepo
         get() = _user
 
     init{
+        // Update value when application is launched
         _user.value = authenticationRepository.getCurrentUser()
+
         if(_user.value == null){
-            // TODO : rediriger vers la page de connection ? Ou cela se fait tout seul ?
+            // TODO : besoin de faire qqch ici ?
         }
     }
 
 
     fun signupWithEmail(email : String, password : String) {
         authenticationRepository.signUpWithEmail(email, password)
-            .addOnCompleteListener {
-                    task ->
+            .addOnCompleteListener { task ->
                 if(task.isSuccessful) {
                     _user.value = authenticationRepository.getCurrentUser()
                 }

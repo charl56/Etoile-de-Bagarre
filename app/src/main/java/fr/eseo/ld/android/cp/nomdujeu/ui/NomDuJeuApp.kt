@@ -16,16 +16,15 @@ import fr.eseo.ld.android.cp.nomdujeu.ui.navigation.NomDuJeuScreens
 import fr.eseo.ld.android.cp.nomdujeu.ui.screens.ConnectionScreen
 import fr.eseo.ld.android.cp.nomdujeu.ui.screens.HomeScreen
 import fr.eseo.ld.android.cp.nomdujeu.ui.screens.WaitingScreen
-import fr.eseo.ld.android.cp.nomdujeu.ui.screens.GameScreen
 import fr.eseo.ld.android.cp.nomdujeu.ui.screens.EndGameScreen
-
+import fr.eseo.ld.android.cp.nomdujeu.viewmodels.GameViewModel
 
 
 @Composable
 fun NomDuJeuApp() {
     val navController: NavHostController = rememberNavController()
-    val viewModel : NomDuJeuViewModel = hiltViewModel()
     val authenticationViewModel : AuthenticationViewModel = hiltViewModel()
+    val gameViewModel : GameViewModel = hiltViewModel()
 
     NavHost(navController , startDestination = "start") {
 
@@ -49,19 +48,15 @@ fun NomDuJeuApp() {
         }
 
         composable(NomDuJeuScreens.HOME_SCREEN.id) {
-            HomeScreen(navController, authenticationViewModel)
+            HomeScreen(navController, authenticationViewModel, gameViewModel)
         }
 
         composable(NomDuJeuScreens.WAITING_SCREEN.id) {
             WaitingScreen(navController, authenticationViewModel)
         }
 
-        composable(NomDuJeuScreens.GAME_SCREEN.id) {
-            GameScreen(navController, authenticationViewModel)
-        }
-
         composable(NomDuJeuScreens.END_GAME_SCREEN.id) {
-            EndGameScreen(navController, authenticationViewModel)
+            EndGameScreen(navController, authenticationViewModel, gameViewModel)
         }
     }
 }

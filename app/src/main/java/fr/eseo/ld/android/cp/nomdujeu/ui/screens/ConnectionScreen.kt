@@ -22,7 +22,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import fr.eseo.ld.android.cp.nomdujeu.ui.navigation.NomDuJeuScreens
 import fr.eseo.ld.android.cp.nomdujeu.viewmodels.AuthenticationViewModel
+import fr.eseo.ld.android.cp.nomdujeu.viewmodels.GameViewModel
 
 @Composable
 fun ConnectionScreen(navController: NavController, authenticationViewModel: AuthenticationViewModel) {
@@ -61,7 +63,8 @@ fun ConnectionScreen(navController: NavController, authenticationViewModel: Auth
                     }
                     Button(onClick = {
                         authenticationViewModel.signupWithEmail(email, password)
-                        navController.popBackStack()                    }) {
+                        navController.popBackStack()
+                    }) {
                         Text(text = "Sign up")
                     }
                 }

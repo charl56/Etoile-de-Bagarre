@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="35" height="35" tilewidth="16" tileheight="16" infinite="0" nextlayerid="6" nextobjectid="11">
+ <tileset firstgid="1" source="../graphics/map.tsx"/>
+ <tileset firstgid="530" name="entities" tilewidth="48" tileheight="48" tilecount="1" columns="0">
+  <grid orientation="orthogonal" width="1" height="1"/>
+  <tile id="0">
+   <image source="../player/idle_00.png" width="48" height="48"/>
+  </tile>
+ </tileset>
+ <layer id="2" name="water" width="35" height="35" locked="1">
+  <data encoding="base64" compression="zlib">
+   eJztwwENAAAMw6D6dzoXF3JIWDVVVVVVffwAkU9bLg==
+  </data>
+ </layer>
+ <layer id="1" name="island" width="35" height="35">
+  <data encoding="base64" compression="zlib">
+   eJztl8EJhDAQRWewHhvZEhY8bWc2YheyLXiwBxMwCMFkJ/GPiWzAdxGDzz9jwixEtDyYFxOZi9bEdR/Ge8x0wCTzsutGcBZzhJhXv39DapapDjEvh7ufk02ugwRpNpoOUp+7HH75+P9GSZ++oIvfy82luTSXNL6GN9fhcnY2/bvLWX0sk2GoIJOS2YTO6hIuoWxqd7H91fEBuqdCLpP3Xovf5+4ZpFPObKPphJhVUHsBam662vOhPe/ueiE9ruSj5ZHjguqRWK2kaGXS0GUDxh3pkA==
+  </data>
+ </layer>
+ <objectgroup id="5" name="entities">
+  <object id="6" name="Player" gid="530" x="93" y="332" width="48" height="48">
+   <properties>
+    <property name="type" value="Player"/>
+   </properties>
+  </object>
+  <object id="7" name="Player" gid="530" x="128.667" y="123.333" width="48" height="48">
+   <properties>
+    <property name="type" value="Player"/>
+   </properties>
+  </object>
+  <object id="8" name="Player" gid="530" x="425.333" y="165.333" width="48" height="48">
+   <properties>
+    <property name="type" value="Player"/>
+   </properties>
+  </object>
+  <object id="9" name="Player" gid="530" x="240.788" y="453.03" width="48" height="48">
+   <properties>
+    <property name="type" value="Player"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <layer id="3" name="bgd_1" width="35" height="35" locked="1">
+  <data encoding="base64" compression="zlib">
+   eJzt0rsJACAMAFFdwq2cxzndyD6k0OIQ5R4ErPK1FEmSGBPMPULs6pXpJXtH5D6y+id7EasB/+6GX+Z4nXeQJImxAI2GBe4=
+  </data>
+ </layer>
+ <layer id="4" name="fgd_1" width="35" height="35" locked="1">
+  <data encoding="base64" compression="zlib">
+   eJzt0YEJAEAIAzHd1P2n+CUexJJMcKVVAAB5prcL/kjZcZ0fACDfA45fASQ=
+  </data>
+ </layer>
+</map>

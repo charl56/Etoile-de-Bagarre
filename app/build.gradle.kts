@@ -8,6 +8,15 @@ plugins {
     alias(libs.plugins.dagger.hilt.android)
 }
 
+val appName = "nomdujeu"
+val gdxVersion = "1.12.1"
+val roboVMVersion = "2.3.12"
+val box2DLightsVersion = "1.5"
+val ashleyVersion = "1.7.3"
+val aiVersion = "1.8.2"
+val ktxVersion = "1.11.0-rc2"
+val fleksVersion = "2.9"
+
 android {
     namespace = "fr.eseo.ld.android.cp.nomdujeu"
     compileSdk = 34
@@ -34,6 +43,16 @@ android {
             )
         }
     }
+
+
+
+    sourceSets {
+        getByName("main") {
+            java.srcDirs("src/main/kotlin")
+            jniLibs.srcDirs("libs")
+        }
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -54,8 +73,11 @@ android {
     }
 }
 
-dependencies {
+configurations {
+    create("natives")
+}
 
+dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -87,5 +109,75 @@ dependencies {
     implementation(libs.firebase.config)
     implementation(libs.firebase.messaging)
     implementation(libs.androidx.runtime.livedata)
+
+//    LibGDX
+    implementation("com.badlogicgames.gdx:gdx-backend-android:$gdxVersion")
+    add("natives", "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a")
+    add("natives", "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-arm64-v8a")
+    add("natives", "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86")
+    add("natives", "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86_64")
+    add("natives", "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-armeabi-v7a")
+    add("natives", "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-arm64-v8a")
+    add("natives", "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-x86")
+    add("natives", "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-x86_64")
+    implementation("com.badlogicgames.gdx:gdx:$gdxVersion")
+    implementation("com.badlogicgames.gdx:gdx-box2d:$gdxVersion")
+
+    // Ktx extensions of LibGDX
+    implementation("io.github.libktx:ktx-actors:$ktxVersion")
+    implementation("io.github.libktx:ktx-app:$ktxVersion")
+    implementation("io.github.libktx:ktx-assets:$ktxVersion")
+    implementation("io.github.libktx:ktx-box2d:$ktxVersion")
+    implementation("io.github.libktx:ktx-collections:$ktxVersion")
+    implementation("io.github.libktx:ktx-graphics:$ktxVersion")
+    implementation("io.github.libktx:ktx-log:$ktxVersion")
+    implementation("io.github.libktx:ktx-math:$ktxVersion")
+    implementation("io.github.libktx:ktx-scene2d:$ktxVersion")
+    implementation("io.github.libktx:ktx-style:$ktxVersion")
+    implementation("io.github.libktx:ktx-tiled:$ktxVersion")
+
+    // FLEKS : A fast, lightweight, entity component system library written in Kotlin
+    implementation("io.github.quillraven.fleks:Fleks:$fleksVersion")
+
+}
+
+// To be sure native libs are copied before start application
+tasks.named("preBuild").configure {
+    dependsOn("copyAndroidNatives")
+}
+
+
+tasks.register("copyAndroidNatives") {
+    doFirst {
+        val libsDir = file("libs")
+        libsDir.mkdirs()
+
+        // Chemin vers les bibliothèques natives
+        val nativeLibsDir = file("$layout.buildDirectory/libs")
+        nativeLibsDir.mkdirs()
+
+        val armeabiV7aDir = file("libs/armeabi-v7a").apply { mkdirs() }
+        val arm64V8aDir = file("libs/arm64-v8a").apply { mkdirs() }
+        val x86Dir = file("libs/x86").apply { mkdirs() }
+        val x8664Dir = file("libs/x86_64").apply { mkdirs() }
+
+        configurations["natives"].resolvedConfiguration.files.forEach { jar ->
+            val outputDir = when {
+                jar.name.endsWith("natives-armeabi-v7a.jar") -> armeabiV7aDir
+                jar.name.endsWith("natives-arm64-v8a.jar") -> arm64V8aDir
+                jar.name.endsWith("natives-x86.jar") -> x86Dir
+                jar.name.endsWith("natives-x86_64.jar") -> x8664Dir
+                else -> null
+            }
+
+            outputDir?.let {
+                copy {
+                    from(zipTree(jar))
+                    into(it)
+                    include("*.so")
+                }
+            }
+        }
+    }
 }
 
