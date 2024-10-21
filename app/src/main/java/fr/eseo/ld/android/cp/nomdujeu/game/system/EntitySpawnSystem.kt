@@ -2,6 +2,8 @@ package fr.eseo.ld.android.cp.nomdujeu.game.system
 
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.physics.box2d.BodyDef
+import com.badlogic.gdx.physics.box2d.World
 import com.badlogic.gdx.scenes.scene2d.Event
 import com.badlogic.gdx.scenes.scene2d.EventListener
 import com.badlogic.gdx.scenes.scene2d.ui.Image
@@ -15,10 +17,12 @@ import fr.eseo.ld.android.cp.nomdujeu.game.component.AnimationComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.component.AnimationModel
 import fr.eseo.ld.android.cp.nomdujeu.game.component.AnimationType
 import fr.eseo.ld.android.cp.nomdujeu.game.component.ImageComponent
+import fr.eseo.ld.android.cp.nomdujeu.game.component.PhysicComponent.Companion.physicCmpFromImage
 import fr.eseo.ld.android.cp.nomdujeu.game.component.SpawnCfg
 import fr.eseo.ld.android.cp.nomdujeu.game.component.SpawnComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.event.MapChangeEvent
 import ktx.app.gdxError
+import ktx.box2d.box
 import ktx.math.vec2
 import ktx.tiled.layer
 import ktx.tiled.type
@@ -27,6 +31,7 @@ import ktx.tiled.y
 
 @AllOf([SpawnComponent::class])
 class EntitySpawnSystem (
+    private val phWorld: World,
     private val spawnCmps: ComponentMapper<SpawnComponent>,
     private val atlas: TextureAtlas,
 
@@ -44,15 +49,23 @@ class EntitySpawnSystem (
             val relativeSize = size(cfg.model)
 
             world.entity {
-                    add<ImageComponent>{
+                    val imageCmp = add<ImageComponent>{
                         image = Image().apply{
                             setScaling(Scaling.fill)
                             setSize(relativeSize.x, relativeSize.y )
                             setPosition(lication.x , lication.y)        // Lication : the name is write like this in the lib
                         }
                     }
+
                     add<AnimationComponent>{
                         nextAnimation(cfg.model, AnimationType.IDLE)
+                    }
+
+                    physicCmpFromImage(phWorld, imageCmp.image, BodyDef.BodyType.DynamicBody) {
+                        phCmp, width, height ->
+                        box(width, height) {
+                            isSensor = false
+                        }
                     }
             }
         }
