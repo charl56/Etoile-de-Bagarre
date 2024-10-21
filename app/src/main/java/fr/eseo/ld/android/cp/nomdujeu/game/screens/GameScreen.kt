@@ -6,8 +6,9 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader
 import com.badlogic.gdx.scenes.scene2d.EventListener
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.viewport.ExtendViewport
-import com.github.quillraven.fleks.World
-import com.github.quillraven.fleks.configureWorld
+import com.github.quillraven.fleks.world
+import fr.eseo.ld.android.cp.nomdujeu.game.component.ImageComponent
+import fr.eseo.ld.android.cp.nomdujeu.game.component.ImageComponent.Companion.ImageComponentListener
 import fr.eseo.ld.android.cp.nomdujeu.game.event.MapChangeEvent
 import fr.eseo.ld.android.cp.nomdujeu.game.event.fire
 import fr.eseo.ld.android.cp.nomdujeu.game.system.AnimationSystem
@@ -17,37 +18,32 @@ import ktx.app.KtxScreen
 import ktx.assets.disposeSafely
 import ktx.log.logger
 
-/**
- * \file AnimationComponent.kt
- * \brief Composant pour gérer les animations des entités dans une scène de jeu libGDX.
- *
- * Ce fichier définit un composant `AnimationComponent` pour une entité dans le cadre de l'utilisation de la bibliothèque `fleks` avec `libGDX`.
- * Le composant gère les animations (`Animation`) associées aux entités (personnages par exemple).
- *
- * \details
- * - La classe `AnimationComponent` implémente l'interface `Component` de `fleks`.
- * - La propriété `animation` est une instance de `Animation` de `libGDX` qui sera utilisée pour animer l'entité.
- * - La méthode `nextAnimation` permet de définir la prochaine animation à jouer.
- * - Les propriétés `stateTime` et `playMode` gèrent le temps d'état et le mode de lecture de l'animation.
- */
+
+// Principal component to see the game
 class GameScreen : KtxScreen {
 
     private val stage: Stage = Stage(ExtendViewport(16f, 9f))
     private val textureAtlas = TextureAtlas("graphics/gameTextures.atlas")
     private var currentMap : TiledMap? = null
 
-    // Create game world with configutation
-    private val world:World = configureWorld {
-        // Je crois : var qu'on peut récup de n'importe où
+    // Init game world with configutation
+    private val world = world {
         injectables {
             add(stage)
             add(textureAtlas)
         }
-        systems {
-            add(RenderSystem(stage))
-            add(AnimationSystem(textureAtlas))
-            add(EntitySpawnSystem(textureAtlas, stage))
+
+        components{
+            add<ImageComponentListener>()
         }
+
+        systems {
+            add<EntitySpawnSystem>()
+            add<AnimationSystem>()
+            add<RenderSystem>()
+        }
+
+
     }
 
     override fun show() {
