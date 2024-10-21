@@ -1,7 +1,7 @@
 package fr.eseo.ld.android.cp.nomdujeu.repository
 
 import com.google.firebase.firestore.FirebaseFirestore
-import fr.eseo.ld.android.cp.nomdujeu.model.User
+import fr.eseo.ld.android.cp.nomdujeu.model.Player
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -11,27 +11,27 @@ class FirestoreRepository @Inject constructor(private val firestore: FirebaseFir
     private val usersCollection = firestore.collection("users")
 
 
-    fun addUser(user : User) {
-        if (user.id.isEmpty()) {
-            user.id = usersCollection.document().id
+    fun addUser(player : Player) {
+        if (player.id.isEmpty()) {
+            player.id = usersCollection.document().id
         }
-        usersCollection.document(user.id).set(user)
+        usersCollection.document(player.id).set(player)
     }
 
-    fun getUsers(callback : (List<User>) -> Unit) {
+    fun getUsers(callback : (List<Player>) -> Unit) {
         usersCollection.get().addOnSuccessListener {
-            result -> val users = result.map{
-                it.toObject(User::class.java)
+            result -> val players = result.map{
+                it.toObject(Player::class.java)
             }
-            callback(users)
+            callback(players)
         }
     }
 
-    fun getUserByEmail(email : String, callback : (User?) -> Unit) {
+    fun getUserByEmail(email : String, callback : (Player?) -> Unit) {
         usersCollection.whereEqualTo("email", email).get().addOnSuccessListener {
                 result ->
-            val user = result.documents.firstOrNull()?.toObject(User::class.java)
-            callback(user)
+            val player = result.documents.firstOrNull()?.toObject(Player::class.java)
+            callback(player)
         }
     }
 

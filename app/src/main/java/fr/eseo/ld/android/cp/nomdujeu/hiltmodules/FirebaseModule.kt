@@ -18,5 +18,5 @@ class FirebaseModule {
 
     @Provides
     @Singleton
-    fun provideFirebaseFirestore() = FirebaseFirestore.getInstance()
+    fun provideFirebaseFirestore()  = FirebaseFirestore.getInstance()
 }

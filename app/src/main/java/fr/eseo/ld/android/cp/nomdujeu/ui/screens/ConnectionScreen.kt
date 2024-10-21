@@ -62,7 +62,7 @@ fun ConnectionScreen(navController: NavController, authenticationViewModel: Auth
                         Text(text = "Login")
                     }
                     Button(onClick = {
-                        authenticationViewModel.signupWithEmail(email, password)
+                        authenticationViewModel.signupWithEmail(email, password, pseudo = "ee")
                         navController.popBackStack()
                     }) {
                         Text(text = "Sign up")

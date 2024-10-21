@@ -1,6 +1,7 @@
 package fr.eseo.ld.android.cp.nomdujeu.service
 
 import com.google.firebase.database.*
+import fr.eseo.ld.android.cp.nomdujeu.model.Player
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -13,35 +14,31 @@ class WaitingRoom(private val database: FirebaseDatabase) {
 
     private val roomRef = database.getReference("waiting_room")
     private lateinit var playerRef: DatabaseReference
-//    private var playerCount = 0
-    private val _playerCount = MutableStateFlow(0)
-    val playerCount: StateFlow<Int> = _playerCount.asStateFlow()
+    private val _players = MutableStateFlow<List<Player>>(emptyList())
+    val players: StateFlow<List<Player>> = _players.asStateFlow()
 
-    suspend fun joinAndWait(): Boolean {
+    suspend fun joinAndWait(currentPlayer: Player): Boolean {
         try {
-            // Add user to wait list
-            playerRef = addPlayerToRoom()
-
-            // Wait for 5 players to join
+            playerRef = addPlayerToRoom(currentPlayer)
             return waitForPlayers()
         } catch (e: Exception) {
-            println("Erreur when connexion to waiting room: ${e.message}")
+            println("Erreur lors de la connexion à la salle d'attente: ${e.message}")
             return false
         }
     }
 
-    private suspend fun addPlayerToRoom(): DatabaseReference {
+    private suspend fun addPlayerToRoom(player: Player): DatabaseReference {
         val newPlayerRef = roomRef.push()
-        newPlayerRef.setValue(true).await()
+        newPlayerRef.setValue(player).await()
         return newPlayerRef
     }
 
     private suspend fun waitForPlayers(): Boolean = suspendCancellableCoroutine { continuation ->
         val valueEventListener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                val count = snapshot.childrenCount.toInt()
-                _playerCount.value = count
-                if (count >= 5) {
+                val playersList = snapshot.children.mapNotNull { it.getValue(Player::class.java) }
+                _players.value = playersList
+                if (playersList.size >= 5) {
                     roomRef.removeEventListener(this)
                     continuation.resume(true)
                 }

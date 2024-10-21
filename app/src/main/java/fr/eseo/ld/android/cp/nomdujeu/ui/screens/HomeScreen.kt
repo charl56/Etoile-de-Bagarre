@@ -22,22 +22,31 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.google.firebase.database.FirebaseDatabase
+import fr.eseo.ld.android.cp.nomdujeu.model.Player
 import fr.eseo.ld.android.cp.nomdujeu.service.WaitingRoom
 import fr.eseo.ld.android.cp.nomdujeu.ui.navigation.NomDuJeuScreens
 import fr.eseo.ld.android.cp.nomdujeu.viewmodels.AuthenticationViewModel
 import fr.eseo.ld.android.cp.nomdujeu.viewmodels.GameViewModel
+import fr.eseo.ld.android.cp.nomdujeu.viewmodels.UserViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @Composable
-fun HomeScreen(navController: NavController, authenticationViewModel: AuthenticationViewModel, gameViewModel: GameViewModel) {
+fun HomeScreen(
+    navController: NavController,
+    authenticationViewModel: AuthenticationViewModel,
+    gameViewModel: GameViewModel,
+    userViewModel: UserViewModel
+) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val isInWaitingRoom = remember { mutableStateOf(false) }
     val waitingRoom = remember { WaitingRoom(FirebaseDatabase.getInstance("https://nom-du-jeu-default-rtdb.europe-west1.firebasedatabase.app")) }
-    val playerCount by waitingRoom.playerCount.collectAsState()
+    val players by waitingRoom.players.collectAsState()
+    val currentUser by userViewModel.player.collectAsState()
+
 
     BackHandler {
         // Doing nothing here, so the back button in android is disabled
@@ -95,24 +104,33 @@ fun HomeScreen(navController: NavController, authenticationViewModel: Authentica
                     // Loader when waiting, centered on the screen
                     if (isInWaitingRoom.value) {
                         Text(
-                            text = "Joueurs en attente : $playerCount / 5",
+                            text = "Joueurs en attente : ${players.size} / 5",
                             modifier = Modifier
                                 .align(Alignment.BottomCenter)
                                 .padding(bottom = 16.dp)
                         )
+                        players.forEach { player ->
+                            Text(text = "${player.pseudo} (Victoires : ${player.wins})")
+                        }
+
                     }
 
                     // Play/Cancel button at the bottom right
                     Button(
                         onClick = {
-                            coroutineScope.launch {
-                                handlePlayButtonClick(
-                                    context = context,
-                                    navController = navController,
-                                    isInWaitingRoom = isInWaitingRoom,
-                                    waitingRoom = waitingRoom,
-                                    gameViewModel = gameViewModel
-                                )
+                            if(currentUser != null) {
+                                coroutineScope.launch {
+                                    HandlePlay().handlePlayButtonClick(
+                                        context = context,
+                                        navController = navController,
+                                        isInWaitingRoom = isInWaitingRoom,
+                                        waitingRoom = waitingRoom,
+                                        gameViewModel = gameViewModel,
+                                        currentPlayer = currentUser!!
+                                    )
+                                }
+                            } else {
+                                Toast.makeText(context, "Error when trying to connect to match making. Try to restart game or relog in", Toast.LENGTH_SHORT).show()
                             }
                         },
                         modifier = Modifier
@@ -128,36 +146,38 @@ fun HomeScreen(navController: NavController, authenticationViewModel: Authentica
 }
 
 
-suspend fun handlePlayButtonClick(
-    context: Context,
-    navController: NavController,
-    isInWaitingRoom: MutableState<Boolean>,
-    waitingRoom: WaitingRoom,
-    gameViewModel: GameViewModel
+class HandlePlay(
+    private val dispatcherIo: CoroutineDispatcher = Dispatchers.IO,
+    private val dispatcherMain: CoroutineDispatcher = Dispatchers.Main
 ) {
-
-    val dispatcherIo: CoroutineDispatcher = Dispatchers.IO
-    val dispatcherMain: CoroutineDispatcher = Dispatchers.Main
-
-    if (isInWaitingRoom.value) {
-        withContext(dispatcherIo) {
-            waitingRoom.leaveRoom()
-        }
-        isInWaitingRoom.value = false
-    } else {
-        isInWaitingRoom.value = true
-        withContext(dispatcherIo) {
-            val isReady = waitingRoom.joinAndWait()
-            withContext(dispatcherMain) {
-                if (isReady) {
-                    gameViewModel.launchGame(context, navController)
-                } else {
-                    Toast.makeText(
-                        context,
-                        "Erreur lors de la connection à la salle d'attente",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    isInWaitingRoom.value = false
+    suspend fun handlePlayButtonClick(
+        context: Context,
+        navController: NavController,
+        isInWaitingRoom: MutableState<Boolean>,
+        waitingRoom: WaitingRoom,
+        gameViewModel: GameViewModel,
+        currentPlayer: Player
+    ) {
+        if (isInWaitingRoom.value) {
+            withContext(dispatcherIo) {
+                waitingRoom.leaveRoom()
+            }
+            isInWaitingRoom.value = false
+        } else {
+            isInWaitingRoom.value = true
+            withContext(dispatcherIo) {
+                val isReady = waitingRoom.joinAndWait(currentPlayer)  // Passez l'utilisateur actuel
+                withContext(dispatcherMain) {
+                    if (isReady) {
+                        gameViewModel.launchGame(context, navController)
+                    } else {
+                        Toast.makeText(
+                            context,
+                            "Erreur lors de la connexion à la salle d'attente",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        isInWaitingRoom.value = false
+                    }
                 }
             }
         }
