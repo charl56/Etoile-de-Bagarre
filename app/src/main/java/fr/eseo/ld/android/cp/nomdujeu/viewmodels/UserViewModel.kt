@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 
 @HiltViewModel
-class NomDuJeuViewModel @Inject constructor(
+class UserViewModel @Inject constructor(
     application: Application,
     private val repository: FirestoreRepository
 
@@ -21,9 +21,19 @@ class NomDuJeuViewModel @Inject constructor(
     private val _user = MutableStateFlow<User?>(null)
     val user : StateFlow<User?> = _user.asStateFlow()
 
+    private val _users = MutableStateFlow<List<User>>(emptyList())
+    val users : StateFlow<List<User>> = _users.asStateFlow()
+
+
     // TODO : call this method after sign up with authentication,and result OK
     fun add(note: User) {
         repository.addUser(note)
+    }
+
+    fun getUsers() {
+        repository.getUsers { notes ->
+            _users.value = notes
+        }
     }
 
     // TODO : call this method after login with authentication and return OK, before change screen. Save data in a companion object (global var)

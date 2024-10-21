@@ -10,11 +10,21 @@ class FirestoreRepository @Inject constructor(private val firestore: FirebaseFir
 
     private val usersCollection = firestore.collection("users")
 
+
     fun addUser(user : User) {
         if (user.id.isEmpty()) {
             user.id = usersCollection.document().id
         }
         usersCollection.document(user.id).set(user)
+    }
+
+    fun getUsers(callback : (List<User>) -> Unit) {
+        usersCollection.get().addOnSuccessListener {
+            result -> val users = result.map{
+                it.toObject(User::class.java)
+            }
+            callback(users)
+        }
     }
 
     fun getUserByEmail(email : String, callback : (User?) -> Unit) {

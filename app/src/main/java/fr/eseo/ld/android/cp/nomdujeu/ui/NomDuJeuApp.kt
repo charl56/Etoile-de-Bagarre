@@ -11,7 +11,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import fr.eseo.ld.android.cp.nomdujeu.viewmodels.AuthenticationViewModel
-import fr.eseo.ld.android.cp.nomdujeu.viewmodels.NomDuJeuViewModel
 import fr.eseo.ld.android.cp.nomdujeu.ui.navigation.NomDuJeuScreens
 import fr.eseo.ld.android.cp.nomdujeu.ui.screens.ConnectionScreen
 import fr.eseo.ld.android.cp.nomdujeu.ui.screens.HomeScreen

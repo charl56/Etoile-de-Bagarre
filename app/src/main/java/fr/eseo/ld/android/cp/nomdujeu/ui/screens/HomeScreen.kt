@@ -1,5 +1,6 @@
 package fr.eseo.ld.android.cp.nomdujeu.ui.screens
 
+import android.content.Context
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,11 +16,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
+import com.google.firebase.database.FirebaseDatabase
 import fr.eseo.ld.android.cp.nomdujeu.model.User
 import fr.eseo.ld.android.cp.nomdujeu.repository.FirestoreRepository
+import fr.eseo.ld.android.cp.nomdujeu.service.WaitingRoom
 import fr.eseo.ld.android.cp.nomdujeu.ui.navigation.NomDuJeuScreens
 import fr.eseo.ld.android.cp.nomdujeu.viewmodels.AuthenticationViewModel
 import fr.eseo.ld.android.cp.nomdujeu.viewmodels.GameViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @Composable
 fun HomeScreen(navController: NavController, authenticationViewModel: AuthenticationViewModel, gameViewModel: GameViewModel) {
@@ -47,7 +52,7 @@ fun HomeScreen(navController: NavController, authenticationViewModel: Authentica
                         style  = MaterialTheme.typography.bodyLarge,
                     )
                     Button(onClick = {
-                            gameViewModel.launchGame(context, navController)
+//                        EnterWaitingRoom(gameViewModel, context, navController)
                     }) {
                         Text(text = "Lancer une partie")
                     }
@@ -69,4 +74,24 @@ fun HomeScreen(navController: NavController, authenticationViewModel: Authentica
             }
         )
     }
+}
+
+
+suspend fun EnterWaitingRoom(
+    gameViewModel: GameViewModel,
+    context: Context,
+    navController: NavController
+){
+    val database = FirebaseDatabase.getInstance()
+    val waitingRoom = WaitingRoom(database)
+
+    withContext(Dispatchers.IO) {
+        val isReady = waitingRoom.joinAndWait()
+        if (isReady) {
+            gameViewModel.launchGame(context, navController)
+        } else {
+//            handleConnectionFailure()
+        }
+    }
+
 }

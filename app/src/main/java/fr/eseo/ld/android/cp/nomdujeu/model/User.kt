@@ -5,4 +5,6 @@ data class User(
     val email: String = "",
     val pseudo: String = "",
     val wins: Int = 0,
+    val x : Float = 0f,
+    val y : Float = 0f
 )
