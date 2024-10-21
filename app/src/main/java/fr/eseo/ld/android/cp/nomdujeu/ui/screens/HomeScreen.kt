@@ -15,6 +15,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
+import fr.eseo.ld.android.cp.nomdujeu.model.User
+import fr.eseo.ld.android.cp.nomdujeu.repository.FirestoreRepository
 import fr.eseo.ld.android.cp.nomdujeu.ui.navigation.NomDuJeuScreens
 import fr.eseo.ld.android.cp.nomdujeu.viewmodels.AuthenticationViewModel
 import fr.eseo.ld.android.cp.nomdujeu.viewmodels.GameViewModel
@@ -23,6 +25,7 @@ import fr.eseo.ld.android.cp.nomdujeu.viewmodels.GameViewModel
 fun HomeScreen(navController: NavController, authenticationViewModel: AuthenticationViewModel, gameViewModel: GameViewModel) {
 
     val context = LocalContext.current
+
 
     BackHandler {
         // Ne rien faire ici permet de désactiver la fonction "retour en arrière" sur Android
@@ -55,6 +58,12 @@ fun HomeScreen(navController: NavController, authenticationViewModel: Authentica
                         }
                     ) {
                         Text(text = "Deconnection")
+                    }
+                    Button(
+                        onClick = {
+                        }
+                    ) {
+                        Text(text = "Classement")
                     }
                 }
             }
