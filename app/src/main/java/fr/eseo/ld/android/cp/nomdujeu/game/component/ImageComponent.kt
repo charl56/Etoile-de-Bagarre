@@ -6,9 +6,7 @@ import com.github.quillraven.fleks.ComponentListener
 import com.github.quillraven.fleks.Entity
 
 
-class ImageComponent (
-    private val stage: Stage
-) : Comparable<ImageComponent> {
+class ImageComponent : Comparable<ImageComponent> {
     lateinit var image: Image
 
     // Compare the y position of the image first and then the x position

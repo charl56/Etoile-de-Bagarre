@@ -63,7 +63,7 @@ class EntitySpawnSystem (
         println("spawnCfg Type : $type")
 
         when (type) {
-            "Player" -> SpawnCfg(AnimationModel.player)
+            "Player" -> SpawnCfg(AnimationModel.PLAYER)
             else -> gdxError("Unknown entity type $type")
         }
     }

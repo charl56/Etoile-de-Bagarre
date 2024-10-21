@@ -57,23 +57,25 @@ fun HomeScreen(navController: NavController, authenticationViewModel: Authentica
                     )
                     Button(
                         onClick = {
-                            coroutineScope.launch {
-                                if (isInWaitingRoom.value) {
+                            gameViewModel.launchGame(context, navController)
 
-                                    waitingRoom.leaveRoom()
-                                    isInWaitingRoom.value = false
-                                } else {
-                                    isInWaitingRoom.value = true
-                                    val isReady = waitingRoom.joinAndWait()
-                                    if (isReady) {
-                                        gameViewModel.launchGame(context, navController)
-                                    } else {
-                                        // Show error message
-                                        Toast.makeText(context, "Erreur lors de la connection à la salle d'attente", Toast.LENGTH_SHORT).show()
-                                        isInWaitingRoom.value = false
-                                    }
-                                }
-                            }
+//                            coroutineScope.launch {
+//                                if (isInWaitingRoom.value) {
+//
+//                                    waitingRoom.leaveRoom()
+//                                    isInWaitingRoom.value = false
+//                                } else {
+//                                    isInWaitingRoom.value = true
+//                                    val isReady = waitingRoom.joinAndWait()
+//                                    if (isReady) {
+//                                        gameViewModel.launchGame(context, navController)
+//                                    } else {
+//                                        // Show error message
+//                                        Toast.makeText(context, "Erreur lors de la connection à la salle d'attente", Toast.LENGTH_SHORT).show()
+//                                        isInWaitingRoom.value = false
+//                                    }
+//                                }
+//                            }
                         }
                     ) {
                         Text(text = if (isInWaitingRoom.value) "Annuler" else "Lancer une partie")
