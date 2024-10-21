@@ -28,7 +28,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
         setContent {
-            NomDuJeuTheme {
+            NomDuJeuTheme(darkTheme = false, dynamicColor = false) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
