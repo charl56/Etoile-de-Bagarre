@@ -29,11 +29,9 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import fr.eseo.ld.android.cp.nomdujeu.R
-import fr.eseo.ld.android.cp.nomdujeu.ui.theme.NomDuJeuTheme
 import fr.eseo.ld.android.cp.nomdujeu.viewmodels.AuthenticationViewModel
 
 @Composable
@@ -43,12 +41,15 @@ fun ConnectionScreen(
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var username by remember { mutableStateOf("") }
 
     ConnectionScreenContent(
         email = email,
         onEmailChange = { email = it },
         password = password,
         onPasswordChange = { password = it },
+        username = username,
+        onUsernameChange = { username = it },
         onLoginClick = {
             authenticationViewModel.loginWithEmail(email, password)
             navController.popBackStack()
@@ -56,8 +57,7 @@ fun ConnectionScreen(
         onSignupClick = {
             authenticationViewModel.signupWithEmail(email, password)
             navController.popBackStack()
-        },
-
+        }
     )
 }
 
@@ -68,7 +68,9 @@ fun ConnectionScreenContent(
     password: String,
     onPasswordChange: (String) -> Unit,
     onLoginClick: () -> Unit,
-    onSignupClick: () -> Unit
+    onSignupClick: () -> Unit,
+    username: String,
+    onUsernameChange: (String) -> Unit
 ) {
     var isLoginScreen by remember { mutableStateOf(true) }
 
@@ -105,7 +107,9 @@ fun ConnectionScreenContent(
                                 password = password,
                                 onPasswordChange = onPasswordChange,
                                 onSignupClick = onSignupClick,
-                                onNavigateToLogin = { isLoginScreen = true }
+                                onNavigateToLogin = { isLoginScreen = true },
+                                username = username,
+                                onUsernameChange = onUsernameChange
                             )
                         }
                     }
@@ -146,7 +150,7 @@ fun LoginContent(
                 modifier = Modifier.padding(16.dp)
             )
             Button(onClick = onNavigateToSignUp) {
-                Text(stringResource(id = R.string.signup))
+                Text(text = stringResource(id = R.string.signup), style=MaterialTheme.typography.bodyMedium)
             }
         }
     }
@@ -193,7 +197,7 @@ fun LoginContent(
             )
             Spacer(modifier = Modifier.padding(8.dp))
             Button(onClick = onLoginClick) {
-                Text(stringResource(id = R.string.login))
+                Text(text = stringResource(id = R.string.login), style=MaterialTheme.typography.bodyMedium)
             }
         }
     }
@@ -205,6 +209,8 @@ fun SignUpContent(
     onEmailChange: (String) -> Unit,
     password: String,
     onPasswordChange: (String) -> Unit,
+    username: String,
+    onUsernameChange: (String) -> Unit,
     onSignupClick: () -> Unit,
     onNavigateToLogin: () -> Unit
 ) {
@@ -231,7 +237,7 @@ fun SignUpContent(
                 modifier = Modifier.padding(16.dp)
             )
             Button(onClick = onNavigateToLogin) {
-                Text(stringResource(id = R.string.login))
+                Text(text = stringResource(id = R.string.login), style=MaterialTheme.typography.bodyLarge)
             }
         }
     }
@@ -248,6 +254,20 @@ fun SignUpContent(
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.padding(16.dp)
             )
+            TextField(
+                value = username,
+                onValueChange = onUsernameChange,
+                label = { Text(stringResource(id = R.string.username)) },
+                colors = TextFieldDefaults.colors(
+                    focusedIndicatorColor = MaterialTheme.colorScheme.primary,
+                    unfocusedIndicatorColor = MaterialTheme.colorScheme.tertiary,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                    focusedContainerColor = MaterialTheme.colorScheme.surface,
+                    unfocusedLabelColor = MaterialTheme.colorScheme.tertiary,
+                    focusedLabelColor = MaterialTheme.colorScheme.tertiary
+                )
+            )
+            Spacer(modifier = Modifier.padding(8.dp))
             TextField(
                 value = email,
                 onValueChange = onEmailChange,
@@ -278,25 +298,12 @@ fun SignUpContent(
             )
             Spacer(modifier = Modifier.padding(8.dp))
             Button(onClick = onSignupClick) {
-                Text(stringResource(id = R.string.signup))
+                Text(text = stringResource(id = R.string.signup), style=MaterialTheme.typography.bodyMedium)
             }
         }
     }
-
 }
 
-@Preview(showBackground = true, widthDp = 720, heightDp = 360)
-@Composable
-fun PreviewConnectionScreen() {
-    NomDuJeuTheme(darkTheme = false, dynamicColor = false) {
-        ConnectionScreenContent(
-            email = "",
-            onEmailChange = {},
-            password = "",
-            onPasswordChange = {},
-            onLoginClick = {},
-            onSignupClick = {}
-        )
 
-    }
-}
+
+

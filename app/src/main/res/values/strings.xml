@@ -8,4 +8,5 @@
     <string name="loginMessage">To keep connected with us please login with your personal info</string>
     <string name="signUpTitle">Hello Friend !</string>
     <string name="signUpMessage">Enter your personal details and dive into the world with us!</string>
+    <string name="username">Username</string>
 </resources>
