@@ -33,7 +33,7 @@
     <property name="type" value="Player"/>
    </properties>
   </object>
-  <object id="9" name="Player" gid="530" x="241.333" y="462.666" width="48" height="48">
+  <object id="9" name="Player" gid="530" x="240.788" y="453.03" width="48" height="48">
    <properties>
     <property name="type" value="Player"/>
    </properties>
