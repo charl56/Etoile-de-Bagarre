@@ -1,12 +1,16 @@
 package fr.eseo.ld.android.cp.nomdujeu.ui.screens
 
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -15,20 +19,25 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
-import fr.eseo.ld.android.cp.nomdujeu.model.User
-import fr.eseo.ld.android.cp.nomdujeu.repository.FirestoreRepository
+import com.google.firebase.database.FirebaseDatabase
+import fr.eseo.ld.android.cp.nomdujeu.service.WaitingRoom
 import fr.eseo.ld.android.cp.nomdujeu.ui.navigation.NomDuJeuScreens
 import fr.eseo.ld.android.cp.nomdujeu.viewmodels.AuthenticationViewModel
 import fr.eseo.ld.android.cp.nomdujeu.viewmodels.GameViewModel
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(navController: NavController, authenticationViewModel: AuthenticationViewModel, gameViewModel: GameViewModel) {
-
     val context = LocalContext.current
-
+    val coroutineScope = rememberCoroutineScope()
+    val isInWaitingRoom = remember { mutableStateOf(false) }
+    val waitingRoom = remember { WaitingRoom(FirebaseDatabase.getInstance()) }
 
     BackHandler {
-        // Ne rien faire ici permet de désactiver la fonction "retour en arrière" sur Android
+        // Doing nothing here, so the back button in android is disabled
     }
 
     Surface(
@@ -36,20 +45,38 @@ fun HomeScreen(navController: NavController, authenticationViewModel: Authentica
             .statusBarsPadding()
             .navigationBarsPadding()
             .fillMaxSize()
-    ){
+    ) {
         Scaffold(
-            content = {innerPadding ->
+            content = { innerPadding ->
                 Column(
                     modifier = Modifier.padding(innerPadding),
                 ) {
                     Text(
                         text = "Bienvenue sur NomDuJeu",
-                        style  = MaterialTheme.typography.bodyLarge,
+                        style = MaterialTheme.typography.bodyLarge,
                     )
-                    Button(onClick = {
-                            gameViewModel.launchGame(context, navController)
-                    }) {
-                        Text(text = "Lancer une partie")
+                    Button(
+                        onClick = {
+                            coroutineScope.launch {
+                                if (isInWaitingRoom.value) {
+
+                                    waitingRoom.leaveRoom()
+                                    isInWaitingRoom.value = false
+                                } else {
+                                    isInWaitingRoom.value = true
+                                    val isReady = waitingRoom.joinAndWait()
+                                    if (isReady) {
+                                        gameViewModel.launchGame(context, navController)
+                                    } else {
+                                        // Show error message
+                                        Toast.makeText(context, "Erreur lors de la connection à la salle d'attente", Toast.LENGTH_SHORT).show()
+                                        isInWaitingRoom.value = false
+                                    }
+                                }
+                            }
+                        }
+                    ) {
+                        Text(text = if (isInWaitingRoom.value) "Annuler" else "Lancer une partie")
                     }
                     Button(
                         onClick = {
@@ -58,12 +85,6 @@ fun HomeScreen(navController: NavController, authenticationViewModel: Authentica
                         }
                     ) {
                         Text(text = "Deconnection")
-                    }
-                    Button(
-                        onClick = {
-                        }
-                    ) {
-                        Text(text = "Classement")
                     }
                 }
             }
