@@ -7,14 +7,13 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.navigation.NavController
 import fr.eseo.ld.android.cp.nomdujeu.ui.navigation.NomDuJeuScreens
 import fr.eseo.ld.android.cp.nomdujeu.viewmodels.AuthenticationViewModel
@@ -40,7 +39,10 @@ fun HomeScreen(navController: NavController, authenticationViewModel: Authentica
                 Column(
                     modifier = Modifier.padding(innerPadding),
                 ) {
-                    Text(text = "Bienvenue sur NomDuJeu")
+                    Text(
+                        text = "Bienvenue sur NomDuJeu",
+                        style  = MaterialTheme.typography.bodyLarge,
+                    )
                     Button(onClick = {
                             gameViewModel.launchGame(context, navController)
                     }) {
