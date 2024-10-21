@@ -3,10 +3,10 @@ package fr.eseo.ld.android.cp.nomdujeu.game.system
 import com.badlogic.gdx.graphics.g2d.Animation
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
+import com.github.quillraven.fleks.AllOf
+import com.github.quillraven.fleks.ComponentMapper
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
-import com.github.quillraven.fleks.World.Companion.family
-import com.github.quillraven.fleks.collection.compareEntityBy
 import fr.eseo.ld.android.cp.nomdujeu.game.component.AnimationComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.component.AnimationComponent.Companion.NO_ANIMATION
 import fr.eseo.ld.android.cp.nomdujeu.game.component.ImageComponent
@@ -16,43 +16,39 @@ import ktx.log.logger
 
 /**
  * \file AnimationSystem.kt
- * \brief Système pour gérer les animations des entités dans une scène de jeu libGDX.
+ * \brief System to manage entity animations in a libGDX game scene.
  *
- * Ce fichier définit un système `AnimationSystem` pour mettre à jour les animations des entités dans le cadre de l'utilisation de la bibliothèque `fleks` avec `libGDX`.
- * Le système est responsable de la gestion des animations des entités possédant à la fois un `ImageComponent` et un `AnimationComponent`.
+ * This file defines an `AnimationSystem` system to update the animations of entities in the context of using the `fleks` library with `libGDX`.
+ * The system is responsible for managing the animations of entities having both an `ImageComponent` and an `AnimationComponent`. * Le système est responsable de la gestion des animations des entités possédant à la fois un `ImageComponent` et un `AnimationComponent`.
  *
  * \details
- * - La classe `AnimationSystem` étend `IteratingSystem` et traite les entités correspondant à une famille spécifique.
- * - La méthode `onTickEntity` est appelée pour chaque entité à chaque mise à jour de frame pour gérer l'animation.
- * - La méthode `animation` crée une animation à partir de l'atlas de textures pour un chemin clé donné.
- * - Les animations sont mises en cache pour éviter de les recréer à chaque fois.
- * - La classe inclut un objet compagnon définissant un logger et une durée de frame par défaut pour les animations.
+ * - The `AnimationSystem` class extends `IteratingSystem` and processes entities matching a specific family.
+ * - The `onTickEntity` method is called for each entity at each frame update to handle the animation.
+ * - The `animation` method creates an animation from the texture atlas for a given key path.
+ * - Animations are cached to avoid recreating them each time.
+ * - The class includes a companion object defining a logger and a default frame duration for animations.
  */
+@AllOf([ImageComponent::class, AnimationComponent::class])
 class AnimationSystem (
     private val textureAtlas: TextureAtlas,
-
-) : IteratingSystem(
-    // "Réagit" a toutes les entités ayant un ImageComponent et un AnimationComponent
-    family = family { all(ImageComponent).all(AnimationComponent) },
-    comparator = compareEntityBy(ImageComponent)
-) {
-
+    private val animationComponents: ComponentMapper<AnimationComponent>,
+    private val imageComponents: ComponentMapper<ImageComponent>
+) : IteratingSystem() {
     private val cachedAnimations = mutableMapOf<String, Animation<TextureRegionDrawable>>()
 
     // On tick == on update, for each frame
     override fun onTickEntity(entity: Entity) {
-        val aniCmp = entity[AnimationComponent]
+        val aniCmp = animationComponents[entity]
 
         if(aniCmp.nextAnimation == NO_ANIMATION){
             aniCmp.stateTime += deltaTime
         } else {
             aniCmp.animation = animation(aniCmp.nextAnimation)
             aniCmp.stateTime = 0f
-            aniCmp.nextAnimation = NO_ANIMATION
         }
 
         aniCmp.animation.playMode = aniCmp.playMode
-        entity[ImageComponent].image.drawable = aniCmp.animation.getKeyFrame(aniCmp.stateTime)
+        imageComponents[entity].image.drawable = aniCmp.animation.getKeyFrame(aniCmp.stateTime)
 
     }
 
