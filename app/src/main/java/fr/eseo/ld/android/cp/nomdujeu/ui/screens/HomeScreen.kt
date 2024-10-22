@@ -117,20 +117,21 @@ fun HomeScreen (
                     // Play/Cancel button at the bottom right
                     Button(
                         onClick = {
-                            if(currentUser != null) {
-                                coroutineScope.launch {
-                                    HandlePlay().handlePlayButtonClick(
-                                        context = context,
-                                        navController = navController,
-                                        isInWaitingRoom = isInWaitingRoom,
-                                        waitingRoom = waitingRoom,
-                                        gameViewModel = gameViewModel,
-                                        currentPlayer = currentUser!!
-                                    )
-                                }
-                            } else {
-                                Toast.makeText(context, "Error when trying to connect to match making. Try to restart game or relog in", Toast.LENGTH_SHORT).show()
-                            }
+                            gameViewModel.launchGame(context, navController)
+//                            if(currentUser != null) {
+//                                coroutineScope.launch {
+//                                    HandlePlay().handlePlayButtonClick(
+//                                        context = context,
+//                                        navController = navController,
+//                                        isInWaitingRoom = isInWaitingRoom,
+//                                        waitingRoom = waitingRoom,
+//                                        gameViewModel = gameViewModel,
+//                                        currentPlayer = currentUser!!
+//                                    )
+//                                }
+//                            } else {
+//                                Toast.makeText(context, "Error when trying to connect to match making. Try to restart game or relog in", Toast.LENGTH_SHORT).show()
+//                            }
                         },
                         modifier = Modifier
                             .align(Alignment.BottomEnd)
