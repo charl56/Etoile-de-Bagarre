@@ -110,6 +110,11 @@ dependencies {
     implementation(libs.firebase.config)
     implementation(libs.firebase.messaging)
     implementation(libs.androidx.runtime.livedata)
+//    Ktor : don't work when set in libs.version and installed here
+    implementation("io.ktor:ktor-client-core:3.0.0")
+    implementation("io.ktor:ktor-client-cio:3.0.0")
+    implementation("io.ktor:ktor-client-websockets:3.0.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.0")
 
 //    LibGDX
     implementation("com.badlogicgames.gdx:gdx-backend-android:$gdxVersion")

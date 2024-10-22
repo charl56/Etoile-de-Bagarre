@@ -10,6 +10,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -21,9 +22,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.google.firebase.database.FirebaseDatabase
 import fr.eseo.ld.android.cp.nomdujeu.model.Player
-import fr.eseo.ld.android.cp.nomdujeu.service.WaitingRoom
+import fr.eseo.ld.android.cp.nomdujeu.service.WebSocket
 import fr.eseo.ld.android.cp.nomdujeu.ui.navigation.NomDuJeuScreens
 import fr.eseo.ld.android.cp.nomdujeu.viewmodels.AuthenticationViewModel
 import fr.eseo.ld.android.cp.nomdujeu.viewmodels.GameViewModel
@@ -44,12 +44,15 @@ fun HomeScreen (
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val isInWaitingRoom = remember { mutableStateOf(false) }
-    val waitingRoom = remember { WaitingRoom(FirebaseDatabase.getInstance("https://nom-du-jeu-default-rtdb.europe-west1.firebasedatabase.app")) }
-    val players by waitingRoom.players.collectAsState()
-    val currentUser by playerViewModel.player.collectAsState()
+    val webSocket = remember { WebSocket() }
+    val players by webSocket.players.collectAsState()       // List of players in the waiting room
+    val currentUser by playerViewModel.player.collectAsState()  // Current user
+    val isWebSocketAvailable = remember { mutableStateOf(false) }   // Is the websocket available
 
-
-    println("HomeScreen: $currentUser")
+    // Check if websocket is available
+    LaunchedEffect(Unit) {
+        isWebSocketAvailable.value = webSocket.checkAvailability()
+    }
 
     BackHandler {
         // Doing nothing here, so the back button in android is disabled
@@ -123,7 +126,7 @@ fun HomeScreen (
                                         context = context,
                                         navController = navController,
                                         isInWaitingRoom = isInWaitingRoom,
-                                        waitingRoom = waitingRoom,
+                                        webSocket = webSocket,
                                         gameViewModel = gameViewModel,
                                         currentPlayer = currentUser!!
                                     )
@@ -134,9 +137,19 @@ fun HomeScreen (
                         },
                         modifier = Modifier
                             .align(Alignment.BottomEnd)
-                            .padding(16.dp)
+                            .padding(16.dp),
+                        enabled = isWebSocketAvailable.value && !isInWaitingRoom.value
                     ) {
                         Text(text = if (isInWaitingRoom.value) "Annuler" else "Lancer une partie")
+                    }
+                    if (!isWebSocketAvailable.value) {
+                        Text(
+                            text = "Server isn't available now",
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier
+                                .align(Alignment.BottomEnd)
+                                .padding(bottom = 64.dp)
+                        )
                     }
                 }
             }
@@ -153,30 +166,37 @@ class HandlePlay(
         context: Context,
         navController: NavController,
         isInWaitingRoom: MutableState<Boolean>,
-        waitingRoom: WaitingRoom,
+        webSocket: WebSocket,
         gameViewModel: GameViewModel,
         currentPlayer: Player
     ) {
-        if (isInWaitingRoom.value) {
+        if (isInWaitingRoom.value) {        // Stop websocket when leaving the waiting room
             withContext(dispatcherIo) {
-                waitingRoom.leaveRoom()
+                webSocket.leaveRoom()
             }
             isInWaitingRoom.value = false
-        } else {
+        } else {                            // Join the waiting room : start websocket
             isInWaitingRoom.value = true
             withContext(dispatcherIo) {
-                val isReady = waitingRoom.joinAndWait(currentPlayer)  // Passez l'utilisateur actuel
-                withContext(dispatcherMain) {
-                    if (isReady) {
-                        gameViewModel.launchGame(context, navController)
-                    } else {
-                        Toast.makeText(
-                            context,
-                            "Erreur lors de la connexion à la salle d'attente",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        isInWaitingRoom.value = false
+                launch {
+                    webSocket.gameStarted.collect { started ->
+                        if (started) {
+                            withContext(dispatcherMain) {
+                                gameViewModel.launchGame(context, navController)
+                            }
+                        }
                     }
+                }
+                webSocket.joinAndWait(currentPlayer)
+            }
+            withContext(dispatcherMain) {
+                if (!webSocket.gameStarted.value) {
+                    Toast.makeText(
+                        context,
+                        "Erreur lors de la connexion à la salle d'attente",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    isInWaitingRoom.value = false
                 }
             }
         }
