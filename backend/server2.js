@@ -6,12 +6,12 @@ const server = http.createServer();
 const wss = new WebSocket.Server({ server });
 
 const rooms = new Map();
-const MAX_PLAYERS = 5;
+const MAX_PLAYERS = 2;
 
 // Create room when no room available
 function createRoom() {
     const roomId = Date.now().toString();
-    rooms.set(roomId, { players: new Set(), isFull: false });
+    rooms.set(roomId, { players: new Map(), isFull: false });
     return roomId;
 }
 
@@ -29,6 +29,8 @@ function findAvailableRoom() {
 wss.on('connection', (ws, req) => {
     const parameters = url.parse(req.url, true);
     let roomId = parameters.query.roomId;
+    console.log("parameters.query", parameters.query);
+    console.log("Connection to room", roomId);
 
     if (!roomId || !rooms.has(roomId)) {
         roomId = findAvailableRoom();
@@ -45,30 +47,22 @@ wss.on('connection', (ws, req) => {
     room.players.set(ws, null);
     ws.roomId = roomId;
 
-    // Send player count
-    function broadcastPlayerCount() {
-        const message = JSON.stringify({ type: 'playerCount', count: room.players.size });
-        room.players.forEach((_, client) => client.send(message));
-    }
 
-    // Send player list
-    function broadcastPlayers() {
-        const playerList = Array.from(room.players.values()).filter(player => player !== null);
-        const message = JSON.stringify({ type: 'playerList', players: playerList });
-        room.players.forEach((_, client) => client.send(message));
-    }
 
     broadcastPlayerCount();
 
     ws.on('message', (message) => {
         try {
             const data = JSON.parse(message);
+            console.log("on message", data);
             switch (data.type) {
+                case 'playerJoinWaitingRoom':
+                    
                 case 'playerInfo':
                     room.players.set(ws, data.player);
                     broadcastPlayers();
                     break;
-                // Ajoutez d'autres cas si nécessaire
+                // Add other case if needed
             }
         } catch (error) {
             console.error('Error processing message:', error);
@@ -86,6 +80,20 @@ wss.on('connection', (ws, req) => {
         }
     });
 
+    // Send player count
+    function broadcastPlayerCount() {
+        const message = JSON.stringify({ type: 'playerCount', count: room.players.size });
+        console.log("Broadcasting player count", message);
+        room.players.forEach((_, client) => client.send(message));
+    }
+
+    // Send player list
+    function broadcastPlayers() {
+        const playerList = Array.from(room.players.values()).filter(player => player !== null);
+        const message = JSON.stringify({ type: 'playerList', players: playerList });
+        room.players.forEach((_, client) => client.send(message));
+    }
+
 
     if (room.players.size === MAX_PLAYERS) {
         room.isFull = true;
@@ -94,7 +102,8 @@ wss.on('connection', (ws, req) => {
 
 });
 
+
 const PORT = 5025;
-server.listen(PORT, () => {
+server.listen(PORT, '0.0.0.0', () => {
     console.log(`WebSocket server is running on port ${PORT}`);
 });

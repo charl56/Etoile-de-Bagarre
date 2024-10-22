@@ -28,7 +28,9 @@ class PlayerViewModel @Inject constructor(
 
     init {
         // Update value when application is launched (here actual player)
-        getPlayerByEmail(authenticationRepository.getCurrentUser()?.email!!)
+        if(authenticationRepository.getCurrentUser() != null){
+            getPlayerByEmail(authenticationRepository.getCurrentUser()?.email!!)
+        }
     }
 
 

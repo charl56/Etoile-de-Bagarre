@@ -46,6 +46,7 @@ fun HomeScreen (
     val isInWaitingRoom = remember { mutableStateOf(false) }
     val webSocket = remember { WebSocket() }
     val players by webSocket.players.collectAsState()       // List of players in the waiting room
+    val playerCount by webSocket.playerCount.collectAsState()       // List of players in the waiting room
     val currentUser by playerViewModel.player.collectAsState()  // Current user
     val isWebSocketAvailable = remember { mutableStateOf(false) }   // Is the websocket available
 
@@ -110,7 +111,7 @@ fun HomeScreen (
                     // Loader when waiting, centered on the screen
                     if (isInWaitingRoom.value) {
                         Text(
-                            text = "Joueurs en attente : ${players.size} / 5",
+                            text = "Joueurs en attente : $playerCount / 5",
                             modifier = Modifier
                                 .align(Alignment.BottomCenter)
                                 .padding(bottom = 16.dp)
@@ -138,7 +139,7 @@ fun HomeScreen (
                         modifier = Modifier
                             .align(Alignment.BottomEnd)
                             .padding(16.dp),
-                        enabled = isWebSocketAvailable.value && !isInWaitingRoom.value
+                        enabled = isWebSocketAvailable.value
                     ) {
                         Text(text = if (isInWaitingRoom.value) "Annuler" else "Lancer une partie")
                     }
@@ -170,14 +171,15 @@ class HandlePlay(
         gameViewModel: GameViewModel,
         currentPlayer: Player
     ) {
-        if (isInWaitingRoom.value) {        // Stop websocket when leaving the waiting room
+        if (isInWaitingRoom.value) {        // Leave the waiting room, but stay connected to websocket
             withContext(dispatcherIo) {
                 webSocket.leaveRoom()
             }
             isInWaitingRoom.value = false
-        } else {                            // Join the waiting room : start websocket
+        } else {                            // Join the waiting room in websocket
             isInWaitingRoom.value = true
             withContext(dispatcherIo) {
+                // Waiting that websocket say "game started", when the room is full
                 launch {
                     webSocket.gameStarted.collect { started ->
                         if (started) {
@@ -187,17 +189,8 @@ class HandlePlay(
                         }
                     }
                 }
+                // The waiting start with this function
                 webSocket.joinAndWait(currentPlayer)
-            }
-            withContext(dispatcherMain) {
-                if (!webSocket.gameStarted.value) {
-                    Toast.makeText(
-                        context,
-                        "Erreur lors de la connexion à la salle d'attente",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    isInWaitingRoom.value = false
-                }
             }
         }
     }

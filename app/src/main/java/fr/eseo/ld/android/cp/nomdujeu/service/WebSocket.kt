@@ -9,11 +9,15 @@ import io.ktor.client.request.url
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.int
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 
 class WebSocket {
     private val client = HttpClient {
@@ -33,83 +37,104 @@ class WebSocket {
 
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
+    var wsUrl = "10.0.2.2:5025"      // Local emulator android
+//    var wsUrl = "172.23.1.4:5025"     // Local computer
+
     suspend fun checkAvailability(): Boolean {
         return try {
-            withTimeout(5000) { // 5 secondes de timeout
-                client.webSocketSession {
-                    url("ws://localhost:5025/waiting-room")
-                }.close()
+            withTimeout(5000) { // 5s of timeout
+                session = client.webSocketSession {
+                    url("ws://${wsUrl}/waiting-room")
+                }
+
+                // Function who will get messages from server
+                coroutineScope.launch { receiveMessages() }
             }
             true
         } catch (e: Exception) {
-            println("Le serveur WebSocket n'est pas disponible: ${e.message}")
+            println("WEBSOCKET : Websocket server not available: ${e.message}")
             false
         }
     }
 
-    suspend fun joinAndWait(currentPlayer: Player) {
-        try {
-            session = client.webSocketSession {
-                url("ws://localhost:5025/waiting-room")
-            }
 
-            // Envoyer les informations du joueur au serveur
-            sendPlayerData(currentPlayer)
-
-            // Lancer la réception des messages
-            coroutineScope.launch { receiveMessages() }
-
-            // Traiter les messages entrants
-            for (message in incomingMessages) {
-                val data = Json.decodeFromString<Map<String, Any>>(message)
-                println("message: $message")
-                when (data["type"]) {
-                    "playerCount" -> _playerCount.value = (data["count"] as Double).toInt()
-                    "playerList" -> updatePlayerList(data["players"] as List<Map<String, Any>>)
-                    "gameStart" -> _gameStarted.value = true
-                }
-            }
-        } catch (e: Exception) {
-            println("Erreur lors de la connexion à la salle d'attente: ${e.message}")
-        }
-    }
-
+    // Messages from websocket
     private suspend fun receiveMessages() {
         try {
-            for (frame in session.incoming) {
+            session.incoming.consumeEach { frame ->
                 if (frame is Frame.Text) {
-                    incomingMessages.send(frame.readText())
+                    val message = frame.readText()
+                    processMessage(message)
                 }
             }
         } catch (e: Exception) {
-            println("Erreur lors de la réception des messages: ${e.message}")
+            println("WEBSOCKET: Error while receiving messages: ${e.message}")
         }
     }
 
-    suspend fun sendPlayerData(player: Player) {
+    private fun processMessage(message: String) {
+        try {
+            val jsonElement = Json.parseToJsonElement(message)
+            println("WEBSOCKET: Incoming message: $jsonElement")
+            val jsonObject = jsonElement.jsonObject
+            println("WEBSOCKET: Incoming message: $jsonObject")
+            println("WEBSOCKET: Incoming message: ${jsonObject["type"]}")
+            println("WEBSOCKET: Incoming message: ${jsonObject["type"]?.jsonPrimitive?.content}")
+
+            when (jsonObject["type"]?.jsonPrimitive?.content) {
+                "playerCount" -> {
+                    val count = jsonObject["count"]?.jsonPrimitive?.int
+                    if (count != null) {
+                        _playerCount.value = count
+                        println("WEBSOCKET: Player count updated to $count")
+                    }
+                }
+                "gameStart" -> {
+                    _gameStarted.value = true
+                    println("WEBSOCKET: Game started")
+                }
+            }
+
+        } catch (e: Exception) {
+            println("WEBSOCKET: Error processing message: ${e.message}")
+        }
+    }
+
+
+    suspend fun joinAndWait(currentPlayer: Player) {
         val message = Json.encodeToString(mapOf(
-            "type" to "playerInfo",
-            "player" to player
+            "type" to "joinWaitingRoom"
         ))
         session.send(Frame.Text(message))
     }
 
-    suspend fun getPlayersData(): List<Player> {
-        return _players.value
+    suspend fun leaveRoom() {
+        val message = Json.encodeToString(mapOf(
+            "type" to "leaveWaitingRoom"
+        ))
+        session.send(Frame.Text(message))
     }
+
+
+
+    // Send data player during game
+    suspend fun sendPlayerData(player: Player) {
+
+    }
+
+    // Get players data during game
+    suspend fun getPlayersData(): List<Player> {
+        return emptyList()
+    }
+
 
     private fun updatePlayerList(playerData: List<Map<String, Any>>) {
-        _players.value = playerData.mapNotNull { playerMap ->
-            try {
-                Player.fromMap(playerMap)
-            } catch (e: Exception) {
-                println("Erreur lors de la conversion des données du joueur: ${e.message}")
-                null
-            }
-        }
+
     }
 
-    suspend fun leaveRoom() {
+
+
+    suspend fun leaveWebSocket() {
         session.close()
         client.close()
     }

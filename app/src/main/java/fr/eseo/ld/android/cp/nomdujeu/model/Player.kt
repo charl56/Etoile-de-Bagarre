@@ -11,6 +11,7 @@ data class Player(
 ) {
     companion object {  // use to create instance of a class, from a Map
         fun fromMap(map: Map<String, Any>): Player {
+            println("WEBSOCKET : Player.fromMap : $map")
             return Player(
                 id = map["id"] as? String ?: "",
                 pseudo = map["pseudo"] as? String ?: "",

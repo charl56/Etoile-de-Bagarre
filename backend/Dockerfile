@@ -19,4 +19,7 @@ EXPOSE 5025
 # Définir la commande pour exécuter l'application
 CMD [ "node", "server.js" ]
 
-# Create
+
+# Build image : docker build -t websocket-server .
+# Run image on local port 5025 : docker run -p 5025:5025 -d websocket-server
+
