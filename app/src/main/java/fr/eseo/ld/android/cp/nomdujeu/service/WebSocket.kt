@@ -15,6 +15,7 @@ import kotlinx.coroutines.withTimeout
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.int
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -75,11 +76,7 @@ class WebSocket {
     private fun processMessage(message: String) {
         try {
             val jsonElement = Json.parseToJsonElement(message)
-            println("WEBSOCKET: Incoming message: $jsonElement")
             val jsonObject = jsonElement.jsonObject
-            println("WEBSOCKET: Incoming message: $jsonObject")
-            println("WEBSOCKET: Incoming message: ${jsonObject["type"]}")
-            println("WEBSOCKET: Incoming message: ${jsonObject["type"]?.jsonPrimitive?.content}")
 
             when (jsonObject["type"]?.jsonPrimitive?.content) {
                 "playerCount" -> {
@@ -92,6 +89,14 @@ class WebSocket {
                 "gameStart" -> {
                     _gameStarted.value = true
                     println("WEBSOCKET: Game started")
+                }
+                "updatePlayersData" -> {
+                    val players = jsonObject["players"]?.jsonObject
+
+                    // Send data only if game is started, and var isn't empty
+                    if(players != null && _gameStarted.value) {
+                        updatePlayersData(players)
+                    }
                 }
             }
 
@@ -118,18 +123,19 @@ class WebSocket {
 
 
     // Send data player during game
-    suspend fun sendPlayerData(player: Player) {
-
+    suspend fun updatePlayerData(player: Player) {
+        val message = Json.encodeToString(mapOf(
+            "type" to "updatePlayerData",
+            "data" to player
+        ))
+        session.send(Frame.Text(message))
     }
+
 
     // Get players data during game
-    suspend fun getPlayersData(): List<Player> {
-        return emptyList()
-    }
-
-
-    private fun updatePlayerList(playerData: List<Map<String, Any>>) {
-
+    private fun updatePlayersData(players: Map<String, JsonElement>) {
+        // TODO : update player list
+        println("WEBSOCKET: Players list updated to $players")
     }
 
 

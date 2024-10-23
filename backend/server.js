@@ -1,6 +1,7 @@
 const WebSocket = require('ws');
 const http = require('http');
 const url = require('url');
+const { setInterval } = require('timers/promises');
 
 const server = http.createServer();
 const wss = new WebSocket.Server({ server });
@@ -12,17 +13,12 @@ const MAX_PLAYERS = 2;
 function createRoom() {
     const roomId = Date.now().toString();
     rooms.set(roomId, { players: new Map(), isFull: false });
-    console.log("rooms create", rooms);
-
     return roomId;
 }
 
 // Try to find room when connecting
 function findAvailableRoom() {
-    console.log("rooms", rooms);
     for (const [roomId, room] of rooms) {
-        console.log("room", room);
-        console.log("room", room.players.size);
         if (room.players.size < MAX_PLAYERS && !room.isFull) {
             return roomId;
         }
@@ -31,10 +27,31 @@ function findAvailableRoom() {
 }
 
 
+
+const broadcast = (roomId, typeBordcasted) => {
+    const room = rooms.get(roomId);
+    if (!room) return;
+
+    // Convert player data to an array or another suitable format
+    const playersData = Array.from(room.players.values()).map(player => ({
+        id: player.id,
+        position: player.position,
+        life: player.life,
+
+    }));
+
+    // Create a message containing all players' data
+    const message = JSON.stringify({ type: typeBordcasted, players: playersData });
+
+    // Send this message to each player in the room
+    room.players.forEach((_, client) => client.send(message));
+
+};
+
 // Connecting to websocket. With ws war, we can know who is connected
 wss.on('connection', (ws, req) => {
-    
-    if(ws.roomId != undefined) {
+
+    if (ws.roomId != undefined) {
         var room = rooms.get(ws.roomId);
     }
 
@@ -47,13 +64,14 @@ wss.on('connection', (ws, req) => {
                     JoinWaitingRoom()
                     break;
 
-                case 'leavingWaitingRoom':
-                    LeavingWaitingRoom()
+                case 'leaveWaitingRoom':
+                    leaveWaitingRoom()
                     break;
 
-                case 'playerInfo':
-                  
+                case 'updatePlayerData':
+                    UpdatePlayerData(data)
                     break;
+
                 // Add other case if needed
             }
         } catch (error) {
@@ -64,16 +82,14 @@ wss.on('connection', (ws, req) => {
 
     ws.on('close', () => {
 
-        
+
     });
 
 
-    function JoinWaitingRoom(){
-        console.log("JoinWaitingRoom");
+    function JoinWaitingRoom() {
         // Add to a room, if available, else create new room
         const roomId = findAvailableRoom();
         ws.roomId = roomId;
-        console.log("roomId", roomId);
         room = rooms.get(roomId);
         // Add player to room
         room.players.set(ws, ws);
@@ -86,22 +102,45 @@ wss.on('connection', (ws, req) => {
         if (room.players.size === MAX_PLAYERS) {
             room.isFull = true;
             room.players.forEach((_, client) => client.send(JSON.stringify({ type: 'gameStart' })));
+
+            // Each room have their own interval loop
+            if (!room.updateInterval) {
+                room.updatePlayersData = setInterval(() => {
+                    for (const [roomId, room] of rooms) {
+                        if (!room.isFull) continue;
+                        broadcast(roomId, 'updatePlayersData');
+                    }
+                }, 1000 / 60);
+            }
+
         }
     }
 
-    function LeavingWaitingRoom(){
+    function leaveWaitingRoom() {
         if (!room || !room.players.has(ws)) return;
 
         // Remove from room
         room.players.delete(ws);
+
         // Delete room if empty
         if (room.players.size === 0) {
+            // Each room have their own interval loop
+            if (room.updateInterval) {
+                clearInterval(room.updateInterval);
+                delete room.updateInterval;
+            }
             rooms.delete(ws.roomId);
         } else {
             // Notify all players in the room
             const message = JSON.stringify({ type: 'playerCount', count: room.players.size });
             room.players.forEach((_, client) => client.send(message));
         }
+    }
+
+    function UpdatePlayerData(data) {
+        console.log("data player", data.player);
+        room.players.set(ws, data.player);
+        console.log("room.players", room.players);
     }
 
 });

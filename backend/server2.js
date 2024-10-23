@@ -6,7 +6,7 @@ const server = http.createServer();
 const wss = new WebSocket.Server({ server });
 
 const rooms = new Map();
-const MAX_PLAYERS = 2;
+const MAX_PLAYERS = 3;
 
 // Create room when no room available
 function createRoom() {
