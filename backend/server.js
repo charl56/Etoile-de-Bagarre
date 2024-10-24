@@ -1,7 +1,7 @@
 const WebSocket = require('ws');
 const http = require('http');
 const url = require('url');
-const { setInterval } = require('timers/promises');
+// const { setInterval } = require('timers/promises');
 
 const server = http.createServer();
 const wss = new WebSocket.Server({ server });
@@ -42,6 +42,7 @@ const broadcast = (roomId, typeBordcasted) => {
 
     // Create a message containing all players' data
     const message = JSON.stringify({ type: typeBordcasted, players: playersData });
+    console.log("send data of all player to one player ", message)
 
     // Send this message to each player in the room
     room.players.forEach((_, client) => client.send(message));
@@ -81,8 +82,11 @@ wss.on('connection', (ws, req) => {
 
 
     ws.on('close', () => {
-
-
+        try {
+            leaveWaitingRoom()
+        } catch (error) {
+            console.error('Error closing connection:', error);
+        }
     });
 
 
@@ -105,7 +109,7 @@ wss.on('connection', (ws, req) => {
 
             // Each room have their own interval loop
             if (!room.updateInterval) {
-                room.updatePlayersData = setInterval(() => {
+                room.updateInterval = setInterval(() => {
                     for (const [roomId, room] of rooms) {
                         if (!room.isFull) continue;
                         broadcast(roomId, 'updatePlayersData');
@@ -138,9 +142,8 @@ wss.on('connection', (ws, req) => {
     }
 
     function UpdatePlayerData(data) {
-        console.log("data player", data.player);
-        room.players.set(ws, data.player);
-        console.log("room.players", room.players);
+        console.log("data from one player ", data);
+        // room.players.set(ws, data.player);
     }
 
 });

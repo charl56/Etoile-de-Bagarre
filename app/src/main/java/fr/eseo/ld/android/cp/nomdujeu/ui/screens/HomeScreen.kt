@@ -20,8 +20,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import fr.eseo.ld.android.cp.nomdujeu.R
 import fr.eseo.ld.android.cp.nomdujeu.model.Player
 import fr.eseo.ld.android.cp.nomdujeu.service.WebSocket
 import fr.eseo.ld.android.cp.nomdujeu.ui.navigation.NomDuJeuScreens
@@ -44,8 +46,8 @@ fun HomeScreen (
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val isInWaitingRoom = remember { mutableStateOf(false) }
-    val webSocket = remember { WebSocket() }
-    val players by webSocket.players.collectAsState()       // List of players in the waiting room
+    val webSocket = WebSocket.getInstance()
+
     val playerCount by webSocket.playerCount.collectAsState()       // List of players in the waiting room
     val currentUser by playerViewModel.player.collectAsState()  // Current user
     val isWebSocketAvailable = remember { mutableStateOf(false) }   // Is the websocket available
@@ -82,18 +84,18 @@ fun HomeScreen (
                             .align(Alignment.TopStart)
                             .padding(top = 16.dp, end = 16.dp)
                     ) {
-                        Text(text = "Deconnection")
+                        Text(text = stringResource(R.string.homeScreen_logout))
                     }
 
                     Text(
-                        text = currentUser?.pseudo ?: "Pseudo loading...",
+                        text = currentUser?.pseudo ?: stringResource(R.string.homeScreen_pseudoLoading),
                         style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier
                             .align(Alignment.TopCenter)
                             .padding(top = 16.dp)
                     )
                     Text(
-                        text = "${currentUser?.wins ?: 0 } Win(s)",
+                        text = "${currentUser?.wins ?: 0 } ${stringResource(R.string.homeScreen_wins)}",
                         style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier
                             .align(Alignment.TopEnd)
@@ -111,7 +113,7 @@ fun HomeScreen (
                     // Loader when waiting, centered on the screen
                     if (isInWaitingRoom.value) {
                         Text(
-                            text = "Joueurs en attente : $playerCount / 5",
+                            text = "${stringResource(R.string.homeScreen_waitingPlayer)} : $playerCount / 5",
                             modifier = Modifier
                                 .align(Alignment.BottomCenter)
                                 .padding(bottom = 16.dp)
@@ -129,11 +131,12 @@ fun HomeScreen (
                                         isInWaitingRoom = isInWaitingRoom,
                                         webSocket = webSocket,
                                         gameViewModel = gameViewModel,
-                                        currentPlayer = currentUser!!
+                                        currentPlayer = currentUser!!,
+                                        isWebSocketAvailable = isWebSocketAvailable
                                     )
                                 }
                             } else {
-                                Toast.makeText(context, "Error when trying to connect to match making. Try to restart game or relog in", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, "${R.string.homeScreen_error_connectMatchMaking}", Toast.LENGTH_SHORT).show()
                             }
                         },
                         modifier = Modifier
@@ -141,11 +144,11 @@ fun HomeScreen (
                             .padding(16.dp),
                         enabled = isWebSocketAvailable.value
                     ) {
-                        Text(text = if (isInWaitingRoom.value) "Annuler" else "Lancer une partie")
+                        Text(text = if (isInWaitingRoom.value) "${stringResource(R.string.homeScreen_stopMatchMaking)}" else "${stringResource(R.string.homeScreen_startMatchMaking)}")
                     }
                     if (!isWebSocketAvailable.value) {
                         Text(
-                            text = "Server isn't available now",
+                            text = "${stringResource(R.string.homeScreen_error_serverNotAvailable)}",
                             color = MaterialTheme.colorScheme.error,
                             modifier = Modifier
                                 .align(Alignment.BottomEnd)
@@ -169,7 +172,8 @@ class HandlePlay(
         isInWaitingRoom: MutableState<Boolean>,
         webSocket: WebSocket,
         gameViewModel: GameViewModel,
-        currentPlayer: Player
+        currentPlayer: Player,
+        isWebSocketAvailable: MutableState<Boolean>
     ) {
         if (isInWaitingRoom.value) {        // Leave the waiting room, but stay connected to websocket
             withContext(dispatcherIo) {
@@ -190,7 +194,13 @@ class HandlePlay(
                     }
                 }
                 // The waiting start with this function
-                webSocket.joinAndWait(currentPlayer)
+                try {
+                    webSocket.joinAndWait(currentPlayer)
+                } catch (e: Exception) {
+                    println("WEBSOCKET: Error while joining the waiting room: ${e.message}")
+                    isWebSocketAvailable.value = webSocket.checkAvailability()
+
+                }
             }
         }
     }

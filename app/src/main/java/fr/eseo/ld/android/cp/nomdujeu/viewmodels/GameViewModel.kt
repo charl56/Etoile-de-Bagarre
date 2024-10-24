@@ -6,9 +6,12 @@ import android.content.Intent
 import android.os.Handler
 import android.os.Looper
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import fr.eseo.ld.android.cp.nomdujeu.game.AndroidLauncher
+import fr.eseo.ld.android.cp.nomdujeu.service.WebSocket
 import fr.eseo.ld.android.cp.nomdujeu.ui.navigation.NomDuJeuScreens
+import kotlinx.coroutines.launch
 
 @SuppressLint("StaticFieldLeak")
 class GameViewModel : ViewModel() {
@@ -34,8 +37,15 @@ class GameViewModel : ViewModel() {
     fun endGame(navController: NavController) {
         gameLaunched = false
         AndroidLauncher.exitGame()
-        navController.navigate(NomDuJeuScreens.END_GAME_SCREEN.id)
+        // Leave game room, but stay connected to websocket
+        viewModelScope.launch {
+            val webSocket = WebSocket.getInstance()
+            webSocket.leaveRoom()
+            navController.navigate(NomDuJeuScreens.END_GAME_SCREEN.id)
+        }
+
     }
+
 }
 
 

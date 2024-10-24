@@ -8,6 +8,7 @@ data class Player(
     val x : Float = 0f,
     val y : Float = 0f,
     val life : Int = 100,
+    val isAlive : Boolean = true
 ) {
     companion object {  // use to create instance of a class, from a Map
         fun fromMap(map: Map<String, Any>): Player {
