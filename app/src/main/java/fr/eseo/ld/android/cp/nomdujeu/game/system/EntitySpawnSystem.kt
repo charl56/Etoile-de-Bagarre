@@ -16,8 +16,11 @@ import fr.eseo.ld.android.cp.nomdujeu.game.AndroidLauncher.Companion.UNIT_SCALE
 import fr.eseo.ld.android.cp.nomdujeu.game.component.AnimationComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.component.AnimationModel
 import fr.eseo.ld.android.cp.nomdujeu.game.component.AnimationType
+import fr.eseo.ld.android.cp.nomdujeu.game.component.DEFAULT_SPEED
 import fr.eseo.ld.android.cp.nomdujeu.game.component.ImageComponent
+import fr.eseo.ld.android.cp.nomdujeu.game.component.MoveComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.component.PhysicComponent.Companion.physicCmpFromImage
+import fr.eseo.ld.android.cp.nomdujeu.game.component.PlayerComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.component.SpawnCfg
 import fr.eseo.ld.android.cp.nomdujeu.game.component.SpawnComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.event.MapChangeEvent
@@ -49,24 +52,35 @@ class EntitySpawnSystem (
             val relativeSize = size(cfg.model)
 
             world.entity {
-                    val imageCmp = add<ImageComponent>{
-                        image = Image().apply{
-                            setScaling(Scaling.fill)
-                            setSize(relativeSize.x, relativeSize.y )
-                            setPosition(lication.x , lication.y)        // Lication : the name is write like this in the lib
-                        }
+                val imageCmp = add<ImageComponent>{
+                    image = Image().apply{
+                        setScaling(Scaling.fill)
+                        setSize(relativeSize.x, relativeSize.y )
+                        setPosition(lication.x , lication.y)        // Lication : the name is write like this in the lib
                     }
+                }
 
-                    add<AnimationComponent>{
-                        nextAnimation(cfg.model, AnimationType.IDLE)
-                    }
+                add<AnimationComponent>{
+                    nextAnimation(cfg.model, AnimationType.IDLE)
+                }
 
-                    physicCmpFromImage(phWorld, imageCmp.image, BodyDef.BodyType.DynamicBody) {
-                        phCmp, width, height ->
-                        box(width, height) {
-                            isSensor = false
-                        }
+                physicCmpFromImage(phWorld, imageCmp.image, BodyDef.BodyType.DynamicBody) {
+                    phCmp, width, height ->
+                    box(width, height) {
+                        isSensor = false
                     }
+                }
+
+                if (cfg.speedScaling > 0f) {
+                    add<MoveComponent> {
+                        speed = DEFAULT_SPEED * cfg.speedScaling
+                    }
+                }
+
+                if (type == "Player"){
+                    add<PlayerComponent>()
+                }
+
             }
         }
         world.remove(entity)

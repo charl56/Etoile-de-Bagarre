@@ -36,6 +36,11 @@ class PhysicSystem(
         val physicCmp = physicCmps[entity]
         val imageCmp = imageCmps[entity]
 
+        if (!physicCmp.impulse.isZero){
+            physicCmp.body.applyLinearImpulse(physicCmp.impulse, physicCmp.body.worldCenter, true)
+            physicCmp.impulse.setZero()
+        }
+
         val (bodyX, bodyY) = physicCmp.body.position
         imageCmp.image.run{
             setPosition(bodyX-width/2, bodyY-height/2)
