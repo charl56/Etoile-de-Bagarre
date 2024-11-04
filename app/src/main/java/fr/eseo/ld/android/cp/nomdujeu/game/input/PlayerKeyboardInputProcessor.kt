@@ -15,7 +15,7 @@ class PlayerKeyboardInputProcessor(
 
     private var playerSin = 0f
     private var playerCos = 0f
-    private val pleyerEntities = world.family(allOf = arrayOf(PlayerComponent::class))
+    private val playerEntities = world.family(allOf = arrayOf(PlayerComponent::class))
 
     init {
         Gdx.input.inputProcessor = this
@@ -25,31 +25,26 @@ class PlayerKeyboardInputProcessor(
         TODO("Not yet implemented")
     }
 
-    /**
-     * UP -> degree = 90
-     * DOWN -> degree = 270
-     * LEFT -> degree = 180
-     * RIGHT -> degree = 0
-     */
     override fun keyDown(keycode: Int): Boolean {
         if (keycode.isMovementKey()) {
             when (keycode) {
                 Input.Keys.UP -> {
-                    playerSin = 1f
+                    playerSin = if(Gdx.input.isKeyPressed(Input.Keys.DOWN)) 0f else 1f
                 }
 
                 Input.Keys.DOWN -> {
-                    playerSin = -1f
-                }
-
-                Input.Keys.LEFT -> {
-                    playerCos = -1f
+                    playerSin = if(Gdx.input.isKeyPressed(Input.Keys.UP)) 0f else -1f
                 }
 
                 Input.Keys.RIGHT -> {
-                    playerCos = 1f
+                    playerCos = if(Gdx.input.isKeyPressed(Input.Keys.LEFT)) 0f else 1f
+                }
+
+                Input.Keys.LEFT -> {
+                    playerCos = if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)) 0f else -1f
                 }
             }
+            updatePlayerMovement()
             return true
         }
         return false
@@ -66,22 +61,22 @@ class PlayerKeyboardInputProcessor(
                     playerSin = if(Gdx.input.isKeyPressed(Input.Keys.UP)) 1f else 0f
                 }
 
-                Input.Keys.LEFT -> {
-                    playerCos = if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)) 1f else 0f
-                }
-
                 Input.Keys.RIGHT -> {
                     playerCos = if(Gdx.input.isKeyPressed(Input.Keys.LEFT)) -1f else 0f
                 }
+
+                Input.Keys.LEFT -> {
+                    playerCos = if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)) 1f else 0f
+                }
             }
+            updatePlayerMovement()
             return true
         }
-        updatePlayerMovement()
         return false
     }
 
     private fun updatePlayerMovement() {
-        pleyerEntities.forEach { player ->
+        playerEntities.forEach { player ->
             with(moveCmps[player]) {
                 cos = playerCos
                 sin = playerSin
