@@ -72,7 +72,11 @@ class EntitySpawnSystem (
 
                 physicCmpFromImage(phWorld, imageCmp.image, BodyDef.BodyType.DynamicBody) {
                     phCmp, width, height ->
-                    box(width, height) {
+
+                    val w = width * cfg.physicScaling.x
+                    val h = height * cfg.physicScaling.y
+
+                    box(w, h, cfg.physicOffset) {
                         isSensor = false
                     }
                 }
@@ -101,7 +105,11 @@ class EntitySpawnSystem (
         println("spawnCfg Type : $type")
 
         when (type) {
-            "Player" -> SpawnCfg(AnimationModel.PLAYER)
+            "Player" -> SpawnCfg(
+                AnimationModel.PLAYER,
+                physicScaling = vec2(0.3f,0.3f),
+                physicOffset = vec2(0f, -10f * UNIT_SCALE)
+            )
             else -> gdxError("Unknown entity type $type")
         }
     }
