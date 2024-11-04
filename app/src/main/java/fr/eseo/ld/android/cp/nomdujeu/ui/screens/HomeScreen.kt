@@ -54,6 +54,7 @@ fun HomeScreen (
 
     // Check if websocket is available
     LaunchedEffect(Unit) {
+        println("WEBSOCKET: Check availability")
         isWebSocketAvailable.value = webSocket.checkAvailability()
     }
 

@@ -24,6 +24,7 @@ class GameViewModel : ViewModel() {
             val intent = Intent(context, AndroidLauncher::class.java)
             context.startActivity(intent)
             gameLaunched = true
+
             // TODO : mettre en palce un singleton qui se connecte à la BDD, pouir envoyer et recupérer les données (position, vie...)
 
             // TODO : à supprimer, permet de lancer endGame après 5 sec

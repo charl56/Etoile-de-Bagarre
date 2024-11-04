@@ -58,9 +58,9 @@ wss.on('connection', (ws, req) => {
 
     ws.on('message', (message) => {
         try {
-            const data = JSON.parse(message);
-            console.log("on message", data);
-            switch (data.type) {
+            const msg = JSON.parse(message);
+            console.log("on message", msg);
+            switch (msg.type) {
                 case 'joinWaitingRoom':
                     JoinWaitingRoom()
                     break;
@@ -70,7 +70,14 @@ wss.on('connection', (ws, req) => {
                     break;
 
                 case 'updatePlayerData':
-                    UpdatePlayerData(data)
+                    UpdatePlayerData(msg.data)
+                    break;
+
+                // TODO
+                case 'onHit':
+                    break;
+                // TODO
+                case 'onReceiveHot':
                     break;
 
                 // Add other case if needed
@@ -143,6 +150,11 @@ wss.on('connection', (ws, req) => {
 
     function UpdatePlayerData(data) {
         console.log("data from one player ", data);
+        try {
+            console.log("Parse data : ", JSON.parse(data));
+        } catch (error) {
+            console.log("error parsing data player")
+        }
         // room.players.set(ws, data.player);
     }
 

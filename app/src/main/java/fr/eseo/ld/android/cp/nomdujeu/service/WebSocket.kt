@@ -13,12 +13,7 @@ import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.int
-import kotlinx.serialization.json.jsonArray
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.*
 
 class WebSocket private constructor() {
 
@@ -107,6 +102,9 @@ class WebSocket private constructor() {
                         updatePlayerData(null)
                     }
                 }
+
+                // Cette fonction met a jour la liste des players, qui est appelé par le jeu ensuite
+                // Pour mettre à jour l'affichage, on appelle le singleton WebSocket.getInstance().players
                 "updatePlayersData" -> {
                     if(!_gameStarted.value) return
                     println("WEBSOCKET: Players data received : " + jsonObject["players"]?.jsonArray?.toString())
@@ -115,10 +113,11 @@ class WebSocket private constructor() {
                     if(players != null) {
                         players.forEach { player ->
                             println("Player data: $player")
-                            // Ici, tu peux convertir chaque élément JSON en objet Kotlin:
+                            // Convert JSON en objet Kotlin, the execute updateOrAddPlayer,
+                            // Don't update player if it's the current player
+//                            updateOrAddPlayer(Player.fromMap(player))
                         }
                     }
-//                    updatePlayersData(players)
                 }
             }
 
@@ -127,7 +126,7 @@ class WebSocket private constructor() {
         }
     }
 
-
+    // Function to send message to server, when player is in waiting room
     suspend fun joinAndWait(currentPlayer: Player) {
         val message = Json.encodeToString(mapOf(
             "type" to "joinWaitingRoom"
@@ -135,6 +134,7 @@ class WebSocket private constructor() {
         session.send(Frame.Text(message))
     }
 
+    // Function to send message to server, when player leave the waiting room
     suspend fun leaveRoom() {
         _gameStarted.value = false
         val message = Json.encodeToString(mapOf(
@@ -146,41 +146,51 @@ class WebSocket private constructor() {
 
     /* ===================================================================================================
        Cette fonction doit être appelée à l'endroit où grâce au joystick, la position du joueur se déplace
-       pour envoyer la position du joueur au serveur
+       pour envoyer la position du joueur au serveur, a chaque fois tick/frame
        RESTE : envoyer le bon format de donnée dans "data"
+       Enlever le sleep
        TODO : enlever ce commentaire une fois la fonction implémentée
        ================================================================================================== */
     // Send data player during game
     suspend fun updatePlayerData(player: Player?) {
 
         val player2 = Player("1", "ouai@mai.com", "pseudp", 3, 34f, 421f, 90, true);
+        println("json encodeToString " + Json.encodeToString(player2));
+        println("json encodeToString " + Json.encodeToString(Player.serializer(), player2))
 
+
+
+        // Remove while, set up for tests
         while (System.currentTimeMillis() - System.currentTimeMillis() < 10_000 && _gameStarted.value) {
             println("send data")
             val message = Json.encodeToString(mapOf(
                 "type" to "updatePlayerData",
-                "data" to "player2"
+                "data" to player2
             ))
             session.send(Frame.Text(message))
 
+            // Remove thread sleep, set up for tests
             Thread.sleep(100)
 
         }
 
     }
 
-    /* ==========================================================================================
-       Cette fonction doit être appelée à l'endroit où sont stockées les entités des enemies.
-       On récupère leurs positions sur le serveur, et on les assignes aux entités correspondantes
-       TODO : enlever ce commentaire une fois la fonction implémentée
-       RESTE : récupérer une liste de données, sous le bon format pour assigner direct dans le jeu
-       ========================================================================================= */
-    // Get players data during game
-    private fun updatePlayersData(players: Map<String, JsonElement>) {
-        // TODO : update player list
-        println("WEBSOCKET: Players list updated to $players")
+    // Function to update a player in the list, when we get data of alll players from server
+    fun updateOrAddPlayer(newPlayer: Player) {
+        _players.update { currentList ->
+            val existingIndex = currentList.indexOfFirst { it.id == newPlayer.id }
+            if (existingIndex != -1) {
+                // Update existing object
+                currentList.toMutableList().apply {
+                    this[existingIndex] = newPlayer
+                }
+            } else {
+                // Add new object
+                currentList + newPlayer
+            }
+        }
     }
-
 
 
     suspend fun leaveWebSocket() {

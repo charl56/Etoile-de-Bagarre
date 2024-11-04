@@ -7,4 +7,5 @@ plugins {
     alias(libs.plugins.firebase.crashlytics) apply false
     alias(libs.plugins.firebase.perf) apply false
     alias(libs.plugins.dagger.hilt.android) apply false
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.10" apply false
 }
