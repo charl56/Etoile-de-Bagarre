@@ -6,47 +6,54 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader
 import com.badlogic.gdx.scenes.scene2d.EventListener
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.viewport.ExtendViewport
-import com.github.quillraven.fleks.World
-import com.github.quillraven.fleks.configureWorld
+import com.github.quillraven.fleks.world
+import fr.eseo.ld.android.cp.nomdujeu.game.component.ImageComponent.Companion.ImageComponentListener
+import fr.eseo.ld.android.cp.nomdujeu.game.component.PhysicComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.event.MapChangeEvent
 import fr.eseo.ld.android.cp.nomdujeu.game.event.fire
 import fr.eseo.ld.android.cp.nomdujeu.game.system.AnimationSystem
+import fr.eseo.ld.android.cp.nomdujeu.game.system.DebugSystem
 import fr.eseo.ld.android.cp.nomdujeu.game.system.EntitySpawnSystem
+import fr.eseo.ld.android.cp.nomdujeu.game.system.PhysicSystem
 import fr.eseo.ld.android.cp.nomdujeu.game.system.RenderSystem
 import ktx.app.KtxScreen
 import ktx.assets.disposeSafely
+import ktx.box2d.createWorld
 import ktx.log.logger
+import ktx.math.vec2
 
-/**
- * \file AnimationComponent.kt
- * \brief Composant pour gérer les animations des entités dans une scène de jeu libGDX.
- *
- * Ce fichier définit un composant `AnimationComponent` pour une entité dans le cadre de l'utilisation de la bibliothèque `fleks` avec `libGDX`.
- * Le composant gère les animations (`Animation`) associées aux entités (personnages par exemple).
- *
- * \details
- * - La classe `AnimationComponent` implémente l'interface `Component` de `fleks`.
- * - La propriété `animation` est une instance de `Animation` de `libGDX` qui sera utilisée pour animer l'entité.
- * - La méthode `nextAnimation` permet de définir la prochaine animation à jouer.
- * - Les propriétés `stateTime` et `playMode` gèrent le temps d'état et le mode de lecture de l'animation.
- */
+
+// Principal component to see the game
 class GameScreen : KtxScreen {
 
     private val stage: Stage = Stage(ExtendViewport(16f, 9f))
     private val textureAtlas = TextureAtlas("graphics/gameTextures.atlas")
     private var currentMap : TiledMap? = null
 
-    // Create game world with configutation
-    private val world:World = configureWorld {
-        // Je crois : var qu'on peut récup de n'importe où
+    // Create physic world with no gravity
+    private val phWorld = createWorld(gravity = vec2()).apply {
+        autoClearForces = false
+    }
+
+    // Init game world with configutation
+    private val eWorld = world {
         injectables {
             add(stage)
             add(textureAtlas)
+            add(phWorld)
         }
+
+        components{
+            add<ImageComponentListener>()
+            add<PhysicComponent.PhysicComponentListener>()
+        }
+
         systems {
-            add(RenderSystem(stage))
-            add(AnimationSystem(textureAtlas))
-            add(EntitySpawnSystem(textureAtlas, stage))
+            add<EntitySpawnSystem>()
+            add<PhysicSystem>()
+            add<AnimationSystem>()
+            add<RenderSystem>()
+            add<DebugSystem>()
         }
     }
 
@@ -54,7 +61,7 @@ class GameScreen : KtxScreen {
         log.debug { "Game screen is shown" }
 
         // Add event listeners to the stage, if any system is an EventListener
-        world.systems.forEach{ system ->
+        eWorld.systems.forEach{ system ->
             if(system is EventListener){
                 stage.addListener(system)
             }
@@ -70,7 +77,7 @@ class GameScreen : KtxScreen {
 
     // Rendu du jeu
     override fun render(delta: Float) {
-        world.update(delta)
+        eWorld.update(delta.coerceAtMost(0.25f))
     }
 
     // Stop tous les "services" du jeu
@@ -79,7 +86,7 @@ class GameScreen : KtxScreen {
         textureAtlas.disposeSafely()
         currentMap?.disposeSafely()
         try {
-            world.dispose()
+            eWorld.dispose()
         } catch (e: Exception) {
             log.error(e) { "Error while disposing game world" }
         }

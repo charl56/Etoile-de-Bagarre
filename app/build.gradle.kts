@@ -15,7 +15,7 @@ val box2DLightsVersion = "1.5"
 val ashleyVersion = "1.7.3"
 val aiVersion = "1.8.2"
 val ktxVersion = "1.11.0-rc2"
-val fleksVersion = "2.9"
+val fleksVersion = "1.6-JVM"
 
 android {
     namespace = "fr.eseo.ld.android.cp.nomdujeu"
@@ -86,6 +86,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.firebase.database.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

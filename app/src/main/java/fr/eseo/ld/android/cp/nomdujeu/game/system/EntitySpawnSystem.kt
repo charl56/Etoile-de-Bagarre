@@ -2,70 +2,81 @@ package fr.eseo.ld.android.cp.nomdujeu.game.system
 
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.physics.box2d.BodyDef
+import com.badlogic.gdx.physics.box2d.World
 import com.badlogic.gdx.scenes.scene2d.Event
 import com.badlogic.gdx.scenes.scene2d.EventListener
-import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Image
 import com.badlogic.gdx.utils.Scaling
+import com.github.quillraven.fleks.AllOf
+import com.github.quillraven.fleks.ComponentMapper
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
-import com.github.quillraven.fleks.World.Companion.family
 import fr.eseo.ld.android.cp.nomdujeu.game.AndroidLauncher.Companion.UNIT_SCALE
 import fr.eseo.ld.android.cp.nomdujeu.game.component.AnimationComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.component.AnimationModel
 import fr.eseo.ld.android.cp.nomdujeu.game.component.AnimationType
 import fr.eseo.ld.android.cp.nomdujeu.game.component.ImageComponent
+import fr.eseo.ld.android.cp.nomdujeu.game.component.PhysicComponent.Companion.physicCmpFromImage
 import fr.eseo.ld.android.cp.nomdujeu.game.component.SpawnCfg
 import fr.eseo.ld.android.cp.nomdujeu.game.component.SpawnComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.event.MapChangeEvent
 import ktx.app.gdxError
+import ktx.box2d.box
 import ktx.math.vec2
 import ktx.tiled.layer
 import ktx.tiled.type
 import ktx.tiled.x
 import ktx.tiled.y
 
+@AllOf([SpawnComponent::class])
 class EntitySpawnSystem (
+    private val phWorld: World,
+    private val spawnCmps: ComponentMapper<SpawnComponent>,
     private val atlas: TextureAtlas,
-    private val stage: Stage
 
-) : EventListener, IteratingSystem(         // EventListener : réagit aux changement de la map
-    family = family { all(SpawnComponent) },
-//    comparator = compareEntityBy(SpawnComponent)
-    ) {
+    // EventListener : react when map is changing
+) : EventListener, IteratingSystem( ) {
 
     private val cacheCfgs = mutableMapOf<String, SpawnCfg>()
     private val cacheSizes = mutableMapOf<AnimationModel, Vector2>()
 
 
     override fun onTickEntity(entity: Entity) {
-        val spawnCmps = entity[SpawnComponent]
 
-        with(spawnCmps) {
+        with(spawnCmps[entity]) {
             val cfg = spawnCfg(type)        // Configuration
             val relativeSize = size(cfg.model)
 
             world.entity {
-                    it += ImageComponent(stage).apply{
+                    val imageCmp = add<ImageComponent>{
                         image = Image().apply{
                             setScaling(Scaling.fill)
                             setSize(relativeSize.x, relativeSize.y )
-                            setPosition(lication.x , lication.y)        // Lication car le pb vient du nom de variable dans la lib
+                            setPosition(lication.x , lication.y)        // Lication : the name is write like this in the lib
                         }
                     }
-                    it += AnimationComponent().apply{
+
+                    add<AnimationComponent>{
                         nextAnimation(cfg.model, AnimationType.IDLE)
+                    }
+
+                    physicCmpFromImage(phWorld, imageCmp.image, BodyDef.BodyType.DynamicBody) {
+                        phCmp, width, height ->
+                        box(width, height) {
+                            isSensor = false
+                        }
                     }
             }
         }
-        entity.remove()
+        world.remove(entity)
     }
 
-    private fun spawnCfg(type: String): SpawnCfg = cacheCfgs.getOrPut(type) {       // Cache = on ne le créer pas à chaque fois
+    private fun spawnCfg(type: String): SpawnCfg = cacheCfgs.getOrPut(type) {       // Cache = don't relaod this every time
         println("spawnCfg Type : $type")
 
         when (type) {
-            "Player" -> SpawnCfg(AnimationModel.player)
+            "Player" -> SpawnCfg(AnimationModel.PLAYER)
             else -> gdxError("Unknown entity type $type")
         }
     }
@@ -82,19 +93,16 @@ class EntitySpawnSystem (
     override fun handle(event: Event?): Boolean {
         when(event){
             is MapChangeEvent -> {
-                val entityLayer = event.map.layer("entities")        // Nom utilisé pour le calque dans Tiled
+                val entityLayer = event.map.layer("entities")        // Name of a layer in Tiled application
                 entityLayer.objects.forEach { mapObj ->
                     val type = mapObj.type ?: gdxError("MapObject $mapObj has no type")
 
                     world.entity {
-                        it += SpawnComponent(
-                            type = type,
-                            lication = vec2(mapObj.x * UNIT_SCALE, mapObj.y * UNIT_SCALE)
-                        )
-
+                        add<SpawnComponent>{
+                            this.type = type
+                            this.lication.set(mapObj.x * UNIT_SCALE, mapObj.y * UNIT_SCALE)
+                        }
                     }
-
-
                 }
                 return true
             }
