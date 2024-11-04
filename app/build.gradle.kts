@@ -1,7 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    id("kotlinx-serialization")
     alias(libs.plugins.ksp)
     alias(libs.plugins.gms)
     alias(libs.plugins.firebase.perf)
@@ -115,6 +114,7 @@ dependencies {
     implementation("io.ktor:ktor-client-core:3.0.0")
     implementation("io.ktor:ktor-client-cio:3.0.0")
     implementation("io.ktor:ktor-client-websockets:3.0.0")
+    // JSON serialization
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
 
 //    LibGDX

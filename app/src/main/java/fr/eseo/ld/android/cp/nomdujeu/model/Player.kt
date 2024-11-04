@@ -1,8 +1,5 @@
 package fr.eseo.ld.android.cp.nomdujeu.model
 
-import kotlinx.serialization.Serializable
-
-@Serializable
 data class Player(
     var id: String = "",
     val email: String = "",

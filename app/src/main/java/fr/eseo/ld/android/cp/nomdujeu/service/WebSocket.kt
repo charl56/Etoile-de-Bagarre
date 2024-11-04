@@ -155,19 +155,19 @@ class WebSocket private constructor() {
     suspend fun updatePlayerData(player: Player?) {
 
         val player2 = Player("1", "ouai@mai.com", "pseudp", 3, 34f, 421f, 90, true);
-        println("json encodeToString " + Json.encodeToString(player2));
-        println("json encodeToString " + Json.encodeToString(Player.serializer(), player2))
+//        println("json encodeToString " + Json.encodeToString(player2));
+//        println("json encodeToString " + Json.encodeToString(Player.serializer(), player2))
 
 
 
         // Remove while, set up for tests
         while (System.currentTimeMillis() - System.currentTimeMillis() < 10_000 && _gameStarted.value) {
-            println("send data")
-            val message = Json.encodeToString(mapOf(
-                "type" to "updatePlayerData",
-                "data" to player2
-            ))
-            session.send(Frame.Text(message))
+//            println("send data")
+//            val message = Json.encodeToString(mapOf(
+//                "type" to "updatePlayerData",
+//                "data" to player2
+//            ))
+//            session.send(Frame.Text(message))
 
             // Remove thread sleep, set up for tests
             Thread.sleep(100)
