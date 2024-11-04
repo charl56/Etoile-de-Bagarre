@@ -23,10 +23,10 @@ class GameViewModel : ViewModel() {
             gameLaunched = true
             // TODO : mettre en palce un singleton qui se connecte à la BDD, pouir envoyer et recupérer les données (position, vie...)
 
-            // TODO : à supprimer, permet de lancer endGame après 5 sec
+            // TODO : à supprimer, permet de lancer endGame après 60 sec
             handler.postDelayed({
                 endGame(navController)
-            }, 5000)
+            }, 60000)
         }
     }
 

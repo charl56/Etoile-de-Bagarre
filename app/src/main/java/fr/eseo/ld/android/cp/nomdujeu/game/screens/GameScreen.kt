@@ -11,9 +11,11 @@ import fr.eseo.ld.android.cp.nomdujeu.game.component.ImageComponent.Companion.Im
 import fr.eseo.ld.android.cp.nomdujeu.game.component.PhysicComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.event.MapChangeEvent
 import fr.eseo.ld.android.cp.nomdujeu.game.event.fire
+import fr.eseo.ld.android.cp.nomdujeu.game.input.PlayerKeyboardInputProcessor
 import fr.eseo.ld.android.cp.nomdujeu.game.system.AnimationSystem
 import fr.eseo.ld.android.cp.nomdujeu.game.system.DebugSystem
 import fr.eseo.ld.android.cp.nomdujeu.game.system.EntitySpawnSystem
+import fr.eseo.ld.android.cp.nomdujeu.game.system.MoveSystem
 import fr.eseo.ld.android.cp.nomdujeu.game.system.PhysicSystem
 import fr.eseo.ld.android.cp.nomdujeu.game.system.RenderSystem
 import ktx.app.KtxScreen
@@ -50,6 +52,7 @@ class GameScreen : KtxScreen {
 
         systems {
             add<EntitySpawnSystem>()
+            add<MoveSystem>()
             add<PhysicSystem>()
             add<AnimationSystem>()
             add<RenderSystem>()
@@ -69,6 +72,9 @@ class GameScreen : KtxScreen {
 
         currentMap = TmxMapLoader().load("map/map.tmx")
         stage.fire(MapChangeEvent(currentMap!!))
+
+        // Add input processor to the stage
+        PlayerKeyboardInputProcessor(eWorld, eWorld.mapper())
     }
 
     override fun resize(width: Int, height: Int) {
