@@ -19,12 +19,12 @@ val fleksVersion = "1.6-JVM"
 
 android {
     namespace = "fr.eseo.ld.android.cp.nomdujeu"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "fr.eseo.ld.android.cp.nomdujeu"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -64,7 +64,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.3"
+        kotlinCompilerExtensionVersion = "1.5.9"
     }
     packaging {
         resources {
@@ -110,6 +110,10 @@ dependencies {
     implementation(libs.firebase.config)
     implementation(libs.firebase.messaging)
     implementation(libs.androidx.runtime.livedata)
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services.auth)
+    implementation(libs.googleid)
+    implementation(libs.firebase.auth.ktx)
 
 //    LibGDX
     implementation("com.badlogicgames.gdx:gdx-backend-android:$gdxVersion")

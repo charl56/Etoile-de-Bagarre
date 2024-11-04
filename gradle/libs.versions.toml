@@ -1,6 +1,6 @@
 [versions]
 agp = "8.6.1"
-kotlin = "1.9.10"
+kotlin = "1.9.22"
 coreKtx = "1.13.1"
 junit = "4.13.2"
 junitVersion = "1.2.1"
@@ -20,6 +20,8 @@ kotlinx-coroutines-play-services = "1.7.3"
 firebaseBom = "33.4.0"
 runtimeLivedata = "1.7.3"
 firebaseDatabaseKtx = "21.0.0"
+credentialsPlayServicesAuth = "1.5.0-alpha05"
+googleid = "1.1.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -43,6 +45,11 @@ androidx-preference = {group = "androidx.preference", name = "preference-ktx", v
 kotlinx-coroutines-play-services = {group = "org.jetbrains.kotlinx", name="kotlinx-coroutines-play-services", version.ref="kotlinx-coroutines-play-services"}
 hilt-android = {group = "com.google.dagger", name = "hilt-android", version.ref="hilt"}
 hilt-ksp = {group = "com.google.dagger", name = "hilt-compiler", version.ref="hilt"}
+
+# Google
+androidx-credentials = { module = "androidx.credentials:credentials", version.ref = "credentialsPlayServicesAuth" }
+androidx-credentials-play-services-auth = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "credentialsPlayServicesAuth" }
+googleid = { module = "com.google.android.libraries.identity.googleid:googleid", version.ref = "googleid" }
 # Firebase
 firebase-bom = {group="com.google.firebase", name="firebase-bom", version.ref="firebaseBom"}
 firebase-analytics = {group="com.google.firebase", name="firebase-analytics"}
@@ -54,6 +61,7 @@ firebase-config = {group="com.google.firebase", name="firebase-config"}
 firebase-messaging = {group="com.google.firebase", name="firebase-messaging"}
 androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "runtimeLivedata" }
 firebase-database-ktx = { group = "com.google.firebase", name = "firebase-database-ktx", version.ref = "firebaseDatabaseKtx" }
+firebase-auth-ktx = { module = "com.google.firebase:firebase-auth-ktx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

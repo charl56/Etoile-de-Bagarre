@@ -10,8 +10,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -22,27 +26,41 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import fr.eseo.ld.android.cp.nomdujeu.GoogleAuthClient
 import fr.eseo.ld.android.cp.nomdujeu.R
 import fr.eseo.ld.android.cp.nomdujeu.ui.navigation.NomDuJeuScreens
 import fr.eseo.ld.android.cp.nomdujeu.viewmodels.AuthenticationViewModel
+import kotlinx.coroutines.launch
+
 
 @Composable
 fun ConnectionScreen(
     navController: NavController,
     authenticationViewModel: AuthenticationViewModel
 ) {
+    val context = LocalContext.current
+    val googleAuthClient = GoogleAuthClient(context)
+
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var username by remember { mutableStateOf("") }
+    var isSignIn by remember { mutableStateOf(googleAuthClient.isSignedIn()) }
+    var lifecycleScope = rememberCoroutineScope()
+
 
     ConnectionScreenContent(
         email = email,
@@ -58,6 +76,16 @@ fun ConnectionScreen(
         onSignupClick = {
             authenticationViewModel.signupWithEmail(email, password, username)
             navController.navigate(NomDuJeuScreens.HOME_SCREEN.id)
+        },
+        onGoogleSignIn = {
+            if(!isSignIn){
+                lifecycleScope.launch {
+                    val success = googleAuthClient.signIn()
+                    if (success){
+                        navController.navigate(NomDuJeuScreens.HOME_SCREEN.id)
+                    }
+                }
+            }
         }
     )
 }
@@ -71,7 +99,8 @@ fun ConnectionScreenContent(
     onLoginClick: () -> Unit,
     onSignupClick: () -> Unit,
     username: String,
-    onUsernameChange: (String) -> Unit
+    onUsernameChange: (String) -> Unit,
+    onGoogleSignIn: () -> Unit
 ) {
     var isLoginScreen by remember { mutableStateOf(true) }
 
@@ -99,7 +128,8 @@ fun ConnectionScreenContent(
                                 password = password,
                                 onPasswordChange = onPasswordChange,
                                 onLoginClick = onLoginClick,
-                                onNavigateToSignUp = { isLoginScreen = false }
+                                onNavigateToSignUp = { isLoginScreen = false },
+                                onGoogleSignIn = onGoogleSignIn
                             )
                         } else {
                             SignUpContent(
@@ -127,15 +157,23 @@ fun LoginContent(
     password: String,
     onPasswordChange: (String) -> Unit,
     onLoginClick: () -> Unit,
-    onNavigateToSignUp: () -> Unit
+    onNavigateToSignUp: () -> Unit,
+    onGoogleSignIn: () -> Unit
 ) {
     Box(
         modifier = Modifier
-            .background(brush = Brush.linearGradient(colors = listOf(MaterialTheme.colorScheme.secondary, MaterialTheme.colorScheme.primary)))
+            .background(
+                brush = Brush.linearGradient(
+                    colors = listOf(
+                        MaterialTheme.colorScheme.secondary,
+                        MaterialTheme.colorScheme.primary
+                    )
+                )
+            )
             .fillMaxHeight()
             .fillMaxWidth(0.3f),
         contentAlignment = Alignment.Center
-    ){
+    ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = stringResource(id = R.string.loginTitle),
@@ -151,7 +189,10 @@ fun LoginContent(
                 modifier = Modifier.padding(16.dp)
             )
             Button(onClick = onNavigateToSignUp) {
-                Text(text = stringResource(id = R.string.signup), style=MaterialTheme.typography.bodyMedium)
+                Text(
+                    text = stringResource(id = R.string.signup),
+                    style = MaterialTheme.typography.bodyMedium
+                )
             }
         }
     }
@@ -197,8 +238,22 @@ fun LoginContent(
                 )
             )
             Spacer(modifier = Modifier.padding(8.dp))
+            IconButton(onClick = onGoogleSignIn) {
+                Icon(
+                    painter = painterResource(id = R.drawable.icon_google),
+                    contentDescription = stringResource(id = R.string.signinGoogle),
+                    tint = Color.Unspecified,
+                    modifier = Modifier
+                        .size(24.dp)
+                        .clip(CircleShape)
+                )
+            }
+            Spacer(modifier = Modifier.padding(8.dp))
             Button(onClick = onLoginClick) {
-                Text(text = stringResource(id = R.string.login), style=MaterialTheme.typography.bodyMedium)
+                Text(
+                    text = stringResource(id = R.string.login),
+                    style = MaterialTheme.typography.bodyMedium
+                )
             }
         }
     }
@@ -217,11 +272,18 @@ fun SignUpContent(
 ) {
     Box(
         modifier = Modifier
-            .background(brush = Brush.linearGradient(colors = listOf(MaterialTheme.colorScheme.secondary, MaterialTheme.colorScheme.primary)))
+            .background(
+                brush = Brush.linearGradient(
+                    colors = listOf(
+                        MaterialTheme.colorScheme.secondary,
+                        MaterialTheme.colorScheme.primary
+                    )
+                )
+            )
             .fillMaxHeight()
             .fillMaxWidth(0.3f),
         contentAlignment = Alignment.Center
-    ){
+    ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = stringResource(id = R.string.signUpTitle),
@@ -238,7 +300,10 @@ fun SignUpContent(
                 modifier = Modifier.padding(16.dp)
             )
             Button(onClick = onNavigateToLogin) {
-                Text(text = stringResource(id = R.string.login), style=MaterialTheme.typography.bodyLarge)
+                Text(
+                    text = stringResource(id = R.string.login),
+                    style = MaterialTheme.typography.bodyLarge
+                )
             }
         }
     }
@@ -299,12 +364,13 @@ fun SignUpContent(
             )
             Spacer(modifier = Modifier.padding(8.dp))
             Button(onClick = onSignupClick) {
-                Text(text = stringResource(id = R.string.signup), style=MaterialTheme.typography.bodyMedium)
+                Text(
+                    text = stringResource(id = R.string.signup),
+                    style = MaterialTheme.typography.bodyMedium
+                )
             }
         }
     }
 }
-
-
 
 
