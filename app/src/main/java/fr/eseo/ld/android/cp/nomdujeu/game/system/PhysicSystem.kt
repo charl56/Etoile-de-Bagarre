@@ -1,5 +1,7 @@
 package fr.eseo.ld.android.cp.nomdujeu.game.system
 
+import android.annotation.SuppressLint
+import androidx.compose.ui.unit.fontscaling.MathUtils
 import com.badlogic.gdx.physics.box2d.World
 import com.github.quillraven.fleks.AllOf
 import com.github.quillraven.fleks.ComponentMapper
@@ -34,16 +36,27 @@ class PhysicSystem(
 
     override fun onTickEntity(entity: Entity) {
         val physicCmp = physicCmps[entity]
-        val imageCmp = imageCmps[entity]
+
+        physicCmp.prevPos.set(physicCmp.body.position)
 
         if (!physicCmp.impulse.isZero){
             physicCmp.body.applyLinearImpulse(physicCmp.impulse, physicCmp.body.worldCenter, true)
             physicCmp.impulse.setZero()
         }
+    }
 
+    @SuppressLint("RestrictedApi")
+    override fun onAlphaEntity(entity: Entity, alpha: Float) {
+        val physicCmp = physicCmps[entity]
+        val imageCmp = imageCmps[entity]
+
+        val (prevX, prevY) = physicCmp.prevPos
         val (bodyX, bodyY) = physicCmp.body.position
         imageCmp.image.run{
-            setPosition(bodyX-width/2, bodyY-height/2)
+            setPosition(
+                MathUtils.lerp(prevX, bodyX, alpha) - width/2,
+                MathUtils.lerp(prevY, bodyY, alpha) - height/2
+            )
         }
     }
 
