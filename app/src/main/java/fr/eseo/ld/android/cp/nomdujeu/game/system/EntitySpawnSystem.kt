@@ -1,6 +1,7 @@
 package fr.eseo.ld.android.cp.nomdujeu.game.system
 
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
+import com.badlogic.gdx.math.MathUtils.random
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.BodyDef
 import com.badlogic.gdx.physics.box2d.World
@@ -17,6 +18,7 @@ import fr.eseo.ld.android.cp.nomdujeu.game.component.AnimationComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.component.AnimationModel
 import fr.eseo.ld.android.cp.nomdujeu.game.component.AnimationType
 import fr.eseo.ld.android.cp.nomdujeu.game.component.DEFAULT_SPEED
+import fr.eseo.ld.android.cp.nomdujeu.game.component.EnemyPlayerComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.component.ImageComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.component.MoveComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.component.PhysicComponent.Companion.physicCmpFromImage
@@ -44,6 +46,10 @@ class EntitySpawnSystem (
     private val cacheCfgs = mutableMapOf<String, SpawnCfg>()
     private val cacheSizes = mutableMapOf<AnimationModel, Vector2>()
 
+
+    // Set the actual player to the a random player entity
+    // TODO : Change this to really assign the player to the player entity
+    private var actualPlayerIndex = random.nextInt(4)
 
     override fun onTickEntity(entity: Entity) {
 
@@ -78,7 +84,12 @@ class EntitySpawnSystem (
                 }
 
                 if (type == "Player"){
-                    add<PlayerComponent>()
+                    if (entity.id == actualPlayerIndex){
+                        add<PlayerComponent>()
+                    } else {
+                        add<EnemyPlayerComponent>()
+                    }
+
                 }
 
             }
