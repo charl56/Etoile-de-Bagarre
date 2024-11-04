@@ -32,6 +32,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import fr.eseo.ld.android.cp.nomdujeu.R
+import fr.eseo.ld.android.cp.nomdujeu.ui.navigation.NomDuJeuScreens
 import fr.eseo.ld.android.cp.nomdujeu.viewmodels.AuthenticationViewModel
 
 @Composable
@@ -56,7 +57,7 @@ fun ConnectionScreen(
         },
         onSignupClick = {
             authenticationViewModel.signupWithEmail(email, password, username)
-            navController.popBackStack()
+            navController.navigate(NomDuJeuScreens.HOME_SCREEN.id)
         }
     )
 }
