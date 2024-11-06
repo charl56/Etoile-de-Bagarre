@@ -32,7 +32,6 @@ class RenderSystem (
 
     override fun onTick() {
         super.onTick()
-
         with(stage){
             viewport.apply()
 

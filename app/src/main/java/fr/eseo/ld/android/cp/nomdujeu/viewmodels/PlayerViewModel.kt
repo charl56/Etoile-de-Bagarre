@@ -7,6 +7,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import fr.eseo.ld.android.cp.nomdujeu.model.Player
 import fr.eseo.ld.android.cp.nomdujeu.repository.AuthenticationRepository
 import fr.eseo.ld.android.cp.nomdujeu.repository.FirestoreRepository
+import fr.eseo.ld.android.cp.nomdujeu.service.WebSocket
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -45,6 +46,8 @@ class PlayerViewModel @Inject constructor(
     fun getPlayerByEmail(email: String) {
         repository.getPlayerByEmail(email) { user ->
             _player.value = user
+            // Update player in WebSocket
+            WebSocket.getInstance().setPlayer(user!!)
         }
     }
 

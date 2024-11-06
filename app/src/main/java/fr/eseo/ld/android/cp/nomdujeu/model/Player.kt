@@ -1,5 +1,6 @@
 package fr.eseo.ld.android.cp.nomdujeu.model
 
+
 data class Player(
     var id: String = "",
     val email: String = "",
@@ -8,8 +9,10 @@ data class Player(
     val x : Float = 0f,
     val y : Float = 0f,
     val life : Int = 100,
-    val isAlive : Boolean = true
+    val isAlive : Boolean = true,
+    val listPosition: Int = 0
 )
+// TODO : supprimer si pas utilisé
 {
     companion object {  // use to create instance of a class, from a Map. Data that we need during a game
         fun fromMap(map: Map<String, Any>): Player {

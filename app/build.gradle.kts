@@ -1,4 +1,5 @@
 plugins {
+    kotlin("plugin.serialization") version "1.9.22"
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
@@ -64,7 +65,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.3"
+        kotlinCompilerExtensionVersion = "1.5.8"
     }
     packaging {
         resources {
@@ -115,7 +116,7 @@ dependencies {
     implementation("io.ktor:ktor-client-cio:3.0.0")
     implementation("io.ktor:ktor-client-websockets:3.0.0")
     // JSON serialization
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
 
 //    LibGDX
     implementation("com.badlogicgames.gdx:gdx-backend-android:$gdxVersion")

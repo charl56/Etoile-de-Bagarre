@@ -29,6 +29,7 @@ import fr.eseo.ld.android.cp.nomdujeu.service.WebSocket
 import fr.eseo.ld.android.cp.nomdujeu.ui.navigation.NomDuJeuScreens
 import fr.eseo.ld.android.cp.nomdujeu.viewmodels.AuthenticationViewModel
 import fr.eseo.ld.android.cp.nomdujeu.viewmodels.GameViewModel
+import fr.eseo.ld.android.cp.nomdujeu.viewmodels.HandlePlay
 import fr.eseo.ld.android.cp.nomdujeu.viewmodels.PlayerViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -54,7 +55,6 @@ fun HomeScreen (
 
     // Check if websocket is available
     LaunchedEffect(Unit) {
-        println("WEBSOCKET: Check availability")
         isWebSocketAvailable.value = webSocket.checkAvailability()
     }
 
@@ -163,46 +163,3 @@ fun HomeScreen (
 }
 
 
-class HandlePlay(
-    private val dispatcherIo: CoroutineDispatcher = Dispatchers.IO,
-    private val dispatcherMain: CoroutineDispatcher = Dispatchers.Main
-) {
-    suspend fun handlePlayButtonClick(
-        context: Context,
-        navController: NavController,
-        isInWaitingRoom: MutableState<Boolean>,
-        webSocket: WebSocket,
-        gameViewModel: GameViewModel,
-        currentPlayer: Player,
-        isWebSocketAvailable: MutableState<Boolean>
-    ) {
-        if (isInWaitingRoom.value) {        // Leave the waiting room, but stay connected to websocket
-            withContext(dispatcherIo) {
-                webSocket.leaveRoom()
-            }
-            isInWaitingRoom.value = false
-        } else {                            // Join the waiting room in websocket
-            isInWaitingRoom.value = true
-            withContext(dispatcherIo) {
-                // Waiting that websocket say "game started", when the room is full
-                launch {
-                    webSocket.gameStarted.collect { started ->
-                        if (started) {
-                            withContext(dispatcherMain) {
-                                gameViewModel.launchGame(context, navController)
-                            }
-                        }
-                    }
-                }
-                // The waiting start with this function
-                try {
-                    webSocket.joinAndWait(currentPlayer)
-                } catch (e: Exception) {
-                    println("WEBSOCKET: Error while joining the waiting room: ${e.message}")
-                    isWebSocketAvailable.value = webSocket.checkAvailability()
-
-                }
-            }
-        }
-    }
-}
