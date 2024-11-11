@@ -1,6 +1,7 @@
 package fr.eseo.ld.android.cp.nomdujeu.game.system
 
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer
+import com.badlogic.gdx.physics.box2d.BodyDef
 import com.badlogic.gdx.physics.box2d.World
 import com.badlogic.gdx.scenes.scene2d.Event
 import com.badlogic.gdx.scenes.scene2d.EventListener
@@ -10,6 +11,9 @@ import com.github.quillraven.fleks.IteratingSystem
 import fr.eseo.ld.android.cp.nomdujeu.game.component.PhysicComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.component.PhysicComponent.Companion.physicCmpFromShape2D
 import fr.eseo.ld.android.cp.nomdujeu.game.event.MapChangeEvent
+import ktx.box2d.body
+import ktx.box2d.loop
+import ktx.math.vec2
 import ktx.tiled.forEachLayer
 import ktx.tiled.height
 import ktx.tiled.isEmpty
@@ -56,6 +60,27 @@ class CollisionSpawnSystem(
                         }
                     }
                 }
+
+                // Create a physic component for the map border
+                world.entity {
+                    val width = event.map.width.toFloat()
+                    val height = event.map.height.toFloat()
+
+                    add<PhysicComponent> {
+                        body = phWorld.body(BodyDef.BodyType.StaticBody) {
+                            position.set(0f, 0f)
+                            fixedRotation = true
+                            allowSleep = false
+                            loop(
+                                vec2(0f, 0f),
+                                vec2(width, 0f),
+                                vec2(width, height),
+                                vec2(0f, height)
+                            )
+                        }
+                    }
+                }
+
                 return true
             }
             else -> return false
