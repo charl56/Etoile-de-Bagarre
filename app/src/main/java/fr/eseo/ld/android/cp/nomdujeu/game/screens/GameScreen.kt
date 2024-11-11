@@ -14,6 +14,7 @@ import fr.eseo.ld.android.cp.nomdujeu.game.event.fire
 import fr.eseo.ld.android.cp.nomdujeu.game.input.PlayerKeyboardInputProcessor
 import fr.eseo.ld.android.cp.nomdujeu.game.system.AnimationSystem
 import fr.eseo.ld.android.cp.nomdujeu.game.system.CameraSystem
+import fr.eseo.ld.android.cp.nomdujeu.game.system.CollisionSpawnSystem
 import fr.eseo.ld.android.cp.nomdujeu.game.system.DebugSystem
 import fr.eseo.ld.android.cp.nomdujeu.game.system.EntitySpawnSystem
 import fr.eseo.ld.android.cp.nomdujeu.game.system.MoveSystem
@@ -53,12 +54,13 @@ class GameScreen : KtxScreen {
 
         systems {
             add<EntitySpawnSystem>()
+            add<CollisionSpawnSystem>()
             add<MoveSystem>()
             add<PhysicSystem>()
             add<AnimationSystem>()
             add<CameraSystem>()
             add<RenderSystem>()
-            add<DebugSystem>()
+           // add<DebugSystem>()
         }
     }
 
