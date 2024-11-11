@@ -60,7 +60,7 @@ class GameScreen : KtxScreen {
             add<AnimationSystem>()
             add<CameraSystem>()
             add<RenderSystem>()
-           // add<DebugSystem>()
+            add<DebugSystem>()
         }
     }
 

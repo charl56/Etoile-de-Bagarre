@@ -76,8 +76,17 @@ class EntitySpawnSystem (
                     val w = width * cfg.physicScaling.x
                     val h = height * cfg.physicScaling.y
 
+                    // hit box
                     box(w, h, cfg.physicOffset) {
-                        isSensor = false
+                        isSensor = cfg.bodyType != BodyDef.BodyType.StaticBody
+                    }
+
+                    // collision box
+                    if (cfg.bodyType != BodyDef.BodyType.StaticBody){
+                        val collHeight = h * 0.4f
+                        val collOffset = vec2().apply { set(cfg.physicOffset) }
+                        collOffset.y -= h * 0.5f - collHeight * 0.5f
+                        box(w, h * 0.4f, collOffset)
                     }
                 }
 
