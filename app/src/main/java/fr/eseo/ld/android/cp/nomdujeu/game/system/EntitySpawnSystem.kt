@@ -70,7 +70,7 @@ class EntitySpawnSystem (
                     nextAnimation(cfg.model, AnimationType.IDLE)
                 }
 
-                physicCmpFromImage(phWorld, imageCmp.image, BodyDef.BodyType.DynamicBody) {
+                physicCmpFromImage(phWorld, imageCmp.image, cfg.bodyType) {
                     phCmp, width, height ->
 
                     val w = width * cfg.physicScaling.x

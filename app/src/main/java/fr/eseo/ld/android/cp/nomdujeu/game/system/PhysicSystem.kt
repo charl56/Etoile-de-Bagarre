@@ -2,6 +2,12 @@ package fr.eseo.ld.android.cp.nomdujeu.game.system
 
 import android.annotation.SuppressLint
 import androidx.compose.ui.unit.fontscaling.MathUtils
+import com.badlogic.gdx.physics.box2d.BodyDef
+import com.badlogic.gdx.physics.box2d.Contact
+import com.badlogic.gdx.physics.box2d.ContactImpulse
+import com.badlogic.gdx.physics.box2d.ContactListener
+import com.badlogic.gdx.physics.box2d.Fixture
+import com.badlogic.gdx.physics.box2d.Manifold
 import com.badlogic.gdx.physics.box2d.World
 import com.github.quillraven.fleks.AllOf
 import com.github.quillraven.fleks.ComponentMapper
@@ -19,7 +25,11 @@ class PhysicSystem(
     private val phWorld : World,
     private val imageCmps: ComponentMapper<ImageComponent>,
     private val physicCmps: ComponentMapper<PhysicComponent>
-) : IteratingSystem(interval = Fixed(1/60f)) {
+) : ContactListener, IteratingSystem(interval = Fixed(1/60f)) {
+
+    init {
+        phWorld.setContactListener(this)
+    }
 
     override fun onUpdate() {
         if (phWorld.autoClearForces){
@@ -59,6 +69,20 @@ class PhysicSystem(
             )
         }
     }
+
+    override fun beginContact(contact: Contact?) { }
+
+    override fun endContact(contact: Contact?) { }
+
+    override fun preSolve(contact: Contact, oldManifold: Manifold?) {
+        // Enable collisions between entities
+        contact.isEnabled = ( contact.fixtureA.isDynamicBody() || contact.fixtureB.isDynamicBody() )
+    }
+
+    // Not used
+    override fun postSolve(contact: Contact?, impulse: ContactImpulse?) = Unit
+
+    private fun Fixture.isDynamicBody() = this.body.type == BodyDef.BodyType.DynamicBody
 
     companion object {
         private val log = logger<PhysicSystem>()
