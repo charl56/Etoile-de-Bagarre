@@ -1,6 +1,7 @@
 package fr.eseo.ld.android.cp.nomdujeu.game.event
 
 import com.badlogic.gdx.maps.tiled.TiledMap
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer
 import com.badlogic.gdx.scenes.scene2d.Event
 import com.badlogic.gdx.scenes.scene2d.Stage
 
@@ -20,3 +21,5 @@ fun Stage.fire(event: Event) {
 }
 
 data class MapChangeEvent(val map: TiledMap) : Event()
+
+class CollisionDespawnEvent(val cell: TiledMapTileLayer.Cell) : Event()
