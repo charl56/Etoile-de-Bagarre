@@ -10,9 +10,11 @@ import com.github.quillraven.fleks.ComponentListener
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.EntityCreateCfg
 import fr.eseo.ld.android.cp.nomdujeu.game.AndroidLauncher.Companion.UNIT_SCALE
+import fr.eseo.ld.android.cp.nomdujeu.game.system.CollisionSpawnSystem.Companion.SPAWN_AREA_SIZE
 import ktx.app.gdxError
 import ktx.box2d.BodyDefinition
 import ktx.box2d.body
+import ktx.box2d.circle
 import ktx.box2d.loop
 import ktx.math.vec2
 
@@ -46,6 +48,9 @@ class PhysicComponent {
                                 vec2(bodyWidth, bodyHeight),
                                 vec2(0f, bodyHeight)
                             )
+                            circle(SPAWN_AREA_SIZE + 2f){
+                                isSensor = true
+                            }
                         }
                     }
                 }

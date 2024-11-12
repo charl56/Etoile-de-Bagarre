@@ -13,6 +13,7 @@ import fr.eseo.ld.android.cp.nomdujeu.game.component.CollisionComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.component.PhysicComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.component.PhysicComponent.Companion.physicCmpFromShape2D
 import fr.eseo.ld.android.cp.nomdujeu.game.component.TiledComponent
+import fr.eseo.ld.android.cp.nomdujeu.game.event.CollisionDespawnEvent
 import fr.eseo.ld.android.cp.nomdujeu.game.event.MapChangeEvent
 import ktx.box2d.body
 import ktx.box2d.loop
@@ -54,8 +55,9 @@ class CollisionSpawnSystem(
 
         tiledLayers.forEach { layer ->
             layer.forEachCell(entityX.toInt(), entityY.toInt(), SPAWN_AREA_SIZE) { cell, x, y ->
+
+                // cell is not linked to a collision object => do nothing
                 if (cell.tile.objects.isEmpty()) {
-                    // cell is not linked to a collision object = do nothing
                     return@forEachCell
                 }
 
@@ -101,14 +103,19 @@ class CollisionSpawnSystem(
                         }
                     }
                 }
-
                 return true
             }
+
+            is CollisionDespawnEvent -> {
+                processedCells.remove(event.cell)
+                return true
+            }
+
             else -> return false
         }
     }
 
     companion object {
-        private const val SPAWN_AREA_SIZE = 3
+        const val SPAWN_AREA_SIZE = 3
     }
 }
