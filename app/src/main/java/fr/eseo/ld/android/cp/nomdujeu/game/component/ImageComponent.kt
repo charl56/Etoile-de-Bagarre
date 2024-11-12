@@ -1,13 +1,13 @@
 package fr.eseo.ld.android.cp.nomdujeu.game.component
 
 import com.badlogic.gdx.scenes.scene2d.Stage
-import com.badlogic.gdx.scenes.scene2d.ui.Image
 import com.github.quillraven.fleks.ComponentListener
 import com.github.quillraven.fleks.Entity
+import fr.eseo.ld.android.cp.nomdujeu.game.actor.FlipImage
 
 
 class ImageComponent : Comparable<ImageComponent> {
-    lateinit var image: Image
+    lateinit var image: FlipImage
 
     // Compare the y position of the image first and then the x position
     override fun compareTo(other: ImageComponent): Int {
