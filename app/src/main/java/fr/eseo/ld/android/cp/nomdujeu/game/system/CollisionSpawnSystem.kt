@@ -6,25 +6,33 @@ import com.badlogic.gdx.physics.box2d.World
 import com.badlogic.gdx.scenes.scene2d.Event
 import com.badlogic.gdx.scenes.scene2d.EventListener
 import com.github.quillraven.fleks.AllOf
+import com.github.quillraven.fleks.ComponentMapper
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
+import fr.eseo.ld.android.cp.nomdujeu.game.component.CollisionComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.component.PhysicComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.component.PhysicComponent.Companion.physicCmpFromShape2D
+import fr.eseo.ld.android.cp.nomdujeu.game.component.TiledComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.event.MapChangeEvent
 import ktx.box2d.body
 import ktx.box2d.loop
+import ktx.collections.GdxArray
+import ktx.math.component1
+import ktx.math.component2
 import ktx.math.vec2
-import ktx.tiled.forEachLayer
 import ktx.tiled.height
 import ktx.tiled.isEmpty
 import ktx.tiled.shape
 import ktx.tiled.width
-import kotlin.math.max
 
-@AllOf([PhysicComponent::class])
+@AllOf([PhysicComponent::class, CollisionComponent::class])
 class CollisionSpawnSystem(
-    private val phWorld: World
+    private val phWorld: World,
+    private val physicCmps: ComponentMapper<PhysicComponent>,
 ) : EventListener, IteratingSystem() {
+
+    private val tiledLayers = GdxArray<TiledMapTileLayer>()
+    private val processedCells = mutableSetOf<TiledMapTileLayer.Cell>()
 
     private fun TiledMapTileLayer.forEachCell(
         startX: Int,
@@ -41,25 +49,38 @@ class CollisionSpawnSystem(
         }
     }
 
-    override fun onTickEntity(entity: Entity) {}
+    override fun onTickEntity(entity: Entity) {
+        val (entityX, entityY) = physicCmps[entity].body.position
 
-    override fun handle(event: Event): Boolean {
-        when(event){
-            is MapChangeEvent -> {
-                event.map.forEachLayer<TiledMapTileLayer> { layer ->
-                    layer.forEachCell(0,0, max(event.map.width, event.map.height)) { cell, x, y ->
-                        if (cell.tile.objects.isEmpty()) {
-                            // cell is not linked to a collision object = do nothing
-                            return@forEachCell
-                        }
+        tiledLayers.forEach { layer ->
+            layer.forEachCell(entityX.toInt(), entityY.toInt(), SPAWN_AREA_SIZE) { cell, x, y ->
+                if (cell.tile.objects.isEmpty()) {
+                    // cell is not linked to a collision object = do nothing
+                    return@forEachCell
+                }
 
-                        cell.tile.objects.forEach { mapObject ->
-                            world.entity {
-                                physicCmpFromShape2D(phWorld, x, y, mapObject.shape)
+                if (!processedCells.contains(cell)) {
+                    processedCells.add(cell)
+                    cell.tile.objects.forEach { mapObject ->
+                        world.entity {
+                            physicCmpFromShape2D(phWorld, x, y, mapObject.shape)
+
+                            add<TiledComponent> {
+                                this.cell = cell
+                                nearbyEntities.add(entity)
                             }
                         }
                     }
                 }
+
+            }
+        }
+    }
+
+    override fun handle(event: Event): Boolean {
+        when(event){
+            is MapChangeEvent -> {
+                event.map.layers.getByType(TiledMapTileLayer::class.java, tiledLayers)
 
                 // Create a physic component for the map border
                 world.entity {
@@ -85,5 +106,9 @@ class CollisionSpawnSystem(
             }
             else -> return false
         }
+    }
+
+    companion object {
+        private const val SPAWN_AREA_SIZE = 3
     }
 }

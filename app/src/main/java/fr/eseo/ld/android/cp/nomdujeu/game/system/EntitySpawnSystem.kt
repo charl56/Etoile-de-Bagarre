@@ -17,6 +17,7 @@ import fr.eseo.ld.android.cp.nomdujeu.game.AndroidLauncher.Companion.UNIT_SCALE
 import fr.eseo.ld.android.cp.nomdujeu.game.component.AnimationComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.component.AnimationModel
 import fr.eseo.ld.android.cp.nomdujeu.game.component.AnimationType
+import fr.eseo.ld.android.cp.nomdujeu.game.component.CollisionComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.component.DEFAULT_SPEED
 import fr.eseo.ld.android.cp.nomdujeu.game.component.EnemyPlayerComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.component.ImageComponent
@@ -102,7 +103,10 @@ class EntitySpawnSystem (
                     } else {
                         add<EnemyPlayerComponent>()
                     }
+                }
 
+                if(cfg.bodyType != BodyDef.BodyType.StaticBody){
+                    add<CollisionComponent>()
                 }
 
             }

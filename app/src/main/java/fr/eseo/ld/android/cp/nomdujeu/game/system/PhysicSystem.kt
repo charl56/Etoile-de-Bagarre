@@ -75,7 +75,7 @@ class PhysicSystem(
     override fun endContact(contact: Contact?) { }
 
     override fun preSolve(contact: Contact, oldManifold: Manifold?) {
-        // Enable collisions between entities
+        // Enable collisions between entities with dynamic bodies only (player and enemies)
         contact.isEnabled = ( contact.fixtureA.isDynamicBody() || contact.fixtureB.isDynamicBody() )
     }
 
