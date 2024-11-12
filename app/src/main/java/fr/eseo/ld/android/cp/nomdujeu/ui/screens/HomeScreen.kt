@@ -48,6 +48,7 @@ fun HomeScreen (
     val coroutineScope = rememberCoroutineScope()
     val isInWaitingRoom = remember { mutableStateOf(false) }
     val webSocket = WebSocket.getInstance()
+    webSocket.InitViewModels(playerViewModel, gameViewModel);
 
     val playerCount by webSocket.playerCount.collectAsState()       // List of players in the waiting room
     val currentUser by playerViewModel.player.collectAsState()  // Current user

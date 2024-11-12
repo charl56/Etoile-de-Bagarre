@@ -51,8 +51,7 @@ class PlayerViewModel @Inject constructor(
         }
     }
 
-    // TODO : call when a player win a game
-    fun addWinToUserWithId(userId : String) {
+    fun addWinToPlayerWithId(userId : String) {
         repository.addWinToPlayerWithId(userId)
     }
 

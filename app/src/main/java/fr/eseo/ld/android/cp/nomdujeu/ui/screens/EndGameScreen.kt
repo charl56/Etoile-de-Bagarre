@@ -16,6 +16,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import fr.eseo.ld.android.cp.nomdujeu.R
+import fr.eseo.ld.android.cp.nomdujeu.service.WebSocket
 import fr.eseo.ld.android.cp.nomdujeu.ui.navigation.NomDuJeuScreens
 
 @Composable
@@ -23,7 +24,11 @@ fun EndGameScreen(
     navController: NavController,
 ) {
 
-
+    // Need to be refactor ?
+    var webSocket = WebSocket.getInstance()
+    var winner = webSocket.winner;
+    var kills = webSocket.kills;
+    var endString = "$winner à gagné avec $kills kills"
 
     Surface(
         modifier = Modifier
@@ -37,7 +42,7 @@ fun EndGameScreen(
                     modifier = Modifier.padding(innerPadding).fillMaxSize(),
                 ) {
                     Text(
-                        text = "${stringResource(R.string.endGameScreen_endGame)}",
+                        text = endString,
                         modifier = Modifier.align(Alignment.TopCenter)
                     )
                     Button(

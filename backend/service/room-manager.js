@@ -6,11 +6,10 @@ function createRoom() {
     const roomId = Date.now().toString();
     rooms.set(roomId, {
         players: new Map(),
-        isFull: false
+        isFull: false,
     });
     return roomId;
 }
-
 
 // Try to find room when connecting
 function findAvailableRoom() {
@@ -21,8 +20,6 @@ function findAvailableRoom() {
     }
     return createRoom();
 }
-
-
 
 // Get index of player in a room
 function getPlayerIndex(roomId, playerId) {
@@ -41,11 +38,27 @@ function getPlayerIndex(roomId, playerId) {
     return -1; // If player not found
 }
 
-
 // Send message to all players in the room
 const broadcast = (roomId) => {
     const room = rooms.get(roomId);
     if (!room) return;
+
+    // detect when to end the game : 1 player alive
+    var alivePlayers;
+    room.players.forEach((player) => {
+        if(player.isAlive){
+            alivePlayers++
+        }
+    })
+
+
+    if(alivePlayers === 1){
+        room.players.forEach((player) => {
+            player.send(JSON.stringify({ type: 'endGame', winner: player.pseudo, kills: player.kills, id: player.id }));
+        });
+        return;
+    }
+
 
     // Convert player data to an array or another suitable format
     const playersData = Array.from(room.players.values()).map(player => (
@@ -54,6 +67,7 @@ const broadcast = (roomId) => {
             pseudo: player.pseudo,
             x: player.x,
             y: player.y,
+            kills: player.kills,
             life: player.life,
             isAlive: player.isAlive,
             listPosition: player.listPosition

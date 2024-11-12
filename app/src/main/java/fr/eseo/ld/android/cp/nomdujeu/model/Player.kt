@@ -8,6 +8,7 @@ data class Player(
     val wins: Int = 0,
     val x : Float = 0f,
     val y : Float = 0f,
+    val kills : Int = 0,
     val life : Int = 100,
     val isAlive : Boolean = true,
     val listPosition: Int = 0
@@ -24,6 +25,7 @@ data class Player(
                 wins = map["wins"] as? Int ?: 0,
                 x = map["x"] as? Float ?: 0f,
                 y = map["y"] as? Float ?: 0f,
+                kills = map["kills"] as? Int ?: 0,
                 life = map["life"] as? Int ?: 100,
                 isAlive = map["isAlive"] as? Boolean ?: true
             )
