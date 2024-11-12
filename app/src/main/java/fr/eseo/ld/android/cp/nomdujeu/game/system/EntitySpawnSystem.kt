@@ -14,6 +14,7 @@ import com.github.quillraven.fleks.ComponentMapper
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
 import fr.eseo.ld.android.cp.nomdujeu.game.AndroidLauncher.Companion.UNIT_SCALE
+import fr.eseo.ld.android.cp.nomdujeu.game.actor.FlipImage
 import fr.eseo.ld.android.cp.nomdujeu.game.component.AnimationComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.component.AnimationModel
 import fr.eseo.ld.android.cp.nomdujeu.game.component.AnimationType
@@ -60,7 +61,7 @@ class EntitySpawnSystem (
 
             world.entity {
                 val imageCmp = add<ImageComponent>{
-                    image = Image().apply{
+                    image = FlipImage().apply{
                         setScaling(Scaling.fill)
                         setSize(relativeSize.x, relativeSize.y )
                         setPosition(lication.x , lication.y)        // Lication : the name is write like this in the lib

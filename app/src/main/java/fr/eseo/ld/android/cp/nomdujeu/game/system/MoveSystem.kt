@@ -4,6 +4,7 @@ import com.github.quillraven.fleks.AllOf
 import com.github.quillraven.fleks.ComponentMapper
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
+import fr.eseo.ld.android.cp.nomdujeu.game.component.ImageComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.component.MoveComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.component.PhysicComponent
 import ktx.math.component1
@@ -13,6 +14,7 @@ import ktx.math.component2
 class MoveSystem (
     private val moveCmps : ComponentMapper<MoveComponent>,
     private val physicCmps : ComponentMapper<PhysicComponent>,
+    private val imageCmps : ComponentMapper<ImageComponent>
 ) : IteratingSystem() {
 
     override fun onTickEntity(entity: Entity) {
@@ -36,5 +38,10 @@ class MoveSystem (
             mass * (moveCmp.speed * moveCmp.sin - velY)
         )
 
+        imageCmps.getOrNull(entity)?.let { imageCmp ->
+            if(moveCmp.cos != 0f) {
+                imageCmp.image.flipX = moveCmp.cos < 0f
+            }
+        }
     }
 }
