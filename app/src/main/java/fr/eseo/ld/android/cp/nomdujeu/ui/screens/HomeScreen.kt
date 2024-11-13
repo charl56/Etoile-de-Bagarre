@@ -24,17 +24,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import fr.eseo.ld.android.cp.nomdujeu.R
-import fr.eseo.ld.android.cp.nomdujeu.model.Player
 import fr.eseo.ld.android.cp.nomdujeu.service.WebSocket
 import fr.eseo.ld.android.cp.nomdujeu.ui.navigation.NomDuJeuScreens
 import fr.eseo.ld.android.cp.nomdujeu.viewmodels.AuthenticationViewModel
 import fr.eseo.ld.android.cp.nomdujeu.viewmodels.GameViewModel
-import fr.eseo.ld.android.cp.nomdujeu.viewmodels.HandlePlay
 import fr.eseo.ld.android.cp.nomdujeu.viewmodels.PlayerViewModel
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+
 
 
 @Composable
@@ -126,17 +121,18 @@ fun HomeScreen (
                     Button(
                         onClick = {
                             if(currentUser != null) {
-                                coroutineScope.launch {
-                                    HandlePlay().handlePlayButtonClick(
-                                        context = context,
-                                        navController = navController,
-                                        isInWaitingRoom = isInWaitingRoom,
-                                        webSocket = webSocket,
-                                        gameViewModel = gameViewModel,
-                                        currentPlayer = currentUser!!,
-                                        isWebSocketAvailable = isWebSocketAvailable
-                                    )
-                                }
+                                gameViewModel.launchGame(context, navController)
+//                                coroutineScope.launch {
+//                                    HandlePlay().handlePlayButtonClick(
+//                                        context = context,
+//                                        navController = navController,
+//                                        isInWaitingRoom = isInWaitingRoom,
+//                                        webSocket = webSocket,
+//                                        gameViewModel = gameViewModel,
+//                                        currentPlayer = currentUser!!,
+//                                        isWebSocketAvailable = isWebSocketAvailable
+//                                    )
+//                                }
                             } else {
                                 Toast.makeText(context, "${R.string.homeScreen_error_connectMatchMaking}", Toast.LENGTH_SHORT).show()
                             }
@@ -144,7 +140,7 @@ fun HomeScreen (
                         modifier = Modifier
                             .align(Alignment.BottomEnd)
                             .padding(16.dp),
-                        enabled = isWebSocketAvailable.value
+//                        enabled = isWebSocketAvailable.value
                     ) {
                         Text(text = if (isInWaitingRoom.value) "${stringResource(R.string.homeScreen_stopMatchMaking)}" else "${stringResource(R.string.homeScreen_startMatchMaking)}")
                     }
