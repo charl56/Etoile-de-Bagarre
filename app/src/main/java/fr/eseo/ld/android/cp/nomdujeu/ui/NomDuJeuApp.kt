@@ -59,7 +59,7 @@ fun NomDuJeuApp() {
         }
 
         composable(NomDuJeuScreens.END_GAME_SCREEN.id) {
-            EndGameScreen(navController, authenticationViewModel, gameViewModel)
+            EndGameScreen(navController)
         }
     }
 }

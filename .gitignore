@@ -14,3 +14,6 @@
 .cxx
 local.properties
 /org.*
+
+nodes_modules/
+package-lock.json
