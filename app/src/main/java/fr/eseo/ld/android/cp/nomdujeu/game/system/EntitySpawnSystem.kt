@@ -69,7 +69,7 @@ class EntitySpawnSystem (
                 }
 
                 add<AnimationComponent>{
-                    nextAnimation(cfg.model, AnimationType.IDLE)
+                    nextAnimation(cfg.model, AnimationType.WALK)
                 }
 
                 physicCmpFromImage(phWorld, imageCmp.image, cfg.bodyType) {
