@@ -10,4 +10,20 @@
     <string name="signUpTitle">Hello Friend !</string>
     <string name="signUpMessage">Enter your personal details and dive into the world with us!</string>
     <string name="username">Username</string>
+
+    <!-- HOME SCREEN -->
+    <string name="homeScreen_logout">Log out</string>
+    <string name="homeScreen_pseudoLoading">Pseudo loading...</string>
+    <string name="homeScreen_wins">Win(s)</string>
+    <string name="homeScreen_waitingPlayer">Player waiting</string>
+    <string name="homeScreen_error_connectMatchMaking">Error when trying to connect to match making. Try to restart game or relog in</string>
+    <string name="homeScreen_error_serverNotAvailable">Server isn\'t available now</string>
+    <string name="homeScreen_startMatchMaking">Play</string>
+    <string name="homeScreen_stopMatchMaking">Cancel</string>
+
+    <!-- END GAME SCREEN -->
+    <string name="endGameScreen_endGame">End of the game</string>
+    <string name="endGameScreen_replay">Replay</string>
+    <string name="endGameScreen_exit">Exit</string>
+
 </resources>

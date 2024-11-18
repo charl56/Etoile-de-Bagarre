@@ -1,5 +1,6 @@
 package fr.eseo.ld.android.cp.nomdujeu.game.screens
 
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.maps.tiled.TmxMapLoader
@@ -11,7 +12,7 @@ import fr.eseo.ld.android.cp.nomdujeu.game.component.ImageComponent.Companion.Im
 import fr.eseo.ld.android.cp.nomdujeu.game.component.PhysicComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.event.MapChangeEvent
 import fr.eseo.ld.android.cp.nomdujeu.game.event.fire
-import fr.eseo.ld.android.cp.nomdujeu.game.input.PlayerKeyboardInputProcessor
+import fr.eseo.ld.android.cp.nomdujeu.game.input.PlayerJoystickInputProcessor
 import fr.eseo.ld.android.cp.nomdujeu.game.system.AnimationSystem
 import fr.eseo.ld.android.cp.nomdujeu.game.system.CameraSystem
 import fr.eseo.ld.android.cp.nomdujeu.game.system.CollisionDespawnSystem
@@ -34,6 +35,7 @@ class GameScreen : KtxScreen {
     private val stage: Stage = Stage(ExtendViewport(16f, 9f))
     private val textureAtlas = TextureAtlas("graphics/gameTextures.atlas")
     private var currentMap : TiledMap? = null
+    private lateinit var joystickInputProcessor: PlayerJoystickInputProcessor
 
     // Create physic world with no gravity
     private val phWorld = createWorld(gravity = vec2()).apply {
@@ -80,8 +82,12 @@ class GameScreen : KtxScreen {
         stage.fire(MapChangeEvent(currentMap!!))
 
         // Add input processor to the stage
-        PlayerKeyboardInputProcessor(eWorld, eWorld.mapper())
+//        PlayerKeyboardInputProcessor(eWorld, eWorld.mapper())
+        joystickInputProcessor = PlayerJoystickInputProcessor(eWorld, eWorld.mapper(), stage.camera as OrthographicCamera)
     }
+
+
+
 
     override fun resize(width: Int, height: Int) {
         stage.viewport.update(width, height, true)
@@ -90,6 +96,7 @@ class GameScreen : KtxScreen {
     // Rendu du jeu
     override fun render(delta: Float) {
         eWorld.update(delta.coerceAtMost(0.25f))
+        joystickInputProcessor.render()
     }
 
     // Stop tous les "services" du jeu
@@ -101,6 +108,11 @@ class GameScreen : KtxScreen {
             eWorld.dispose()
         } catch (e: Exception) {
             log.error(e) { "Error while disposing game world" }
+        }
+        try {
+            joystickInputProcessor.dispose()
+        } catch (e: Exception) {
+            log.error(e) { "Error while disposing joystick input processor" }
         }
     }
 

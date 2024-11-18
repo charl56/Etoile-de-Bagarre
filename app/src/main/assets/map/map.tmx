@@ -9,15 +9,15 @@
  </tileset>
  <layer id="2" name="water" width="35" height="35" locked="1">
   <data encoding="base64" compression="zlib">
-   eJztwwENAAAMw6D6dzoXF3JIWDVVVVVVffwAkU9bLg==
+   eJzt0rEJADAIBVH3H9Ad3CK9hNiI38AVr7AJhybMLAAAQDtf0ABkfqFsec2T3fnNqmVyN+qW6g4b/lJuU3YAAP51AGp1WOE=
   </data>
  </layer>
- <layer id="1" name="island" width="35" height="35">
+ <layer id="1" name="island" width="35" height="35" locked="1">
   <data encoding="base64" compression="zlib">
-   eJztl8EJhDAQRWewHhvZEhY8bWc2YheyLXiwBxMwCMFkJ/GPiWzAdxGDzz9jwixEtDyYFxOZi9bEdR/Ge8x0wCTzsutGcBZzhJhXv39DapapDjEvh7ufk02ugwRpNpoOUp+7HH75+P9GSZ++oIvfy82luTSXNL6GN9fhcnY2/bvLWX0sk2GoIJOS2YTO6hIuoWxqd7H91fEBuqdCLpP3Xovf5+4ZpFPObKPphJhVUHsBam662vOhPe/ueiE9ruSj5ZHjguqRWK2kaGXS0GUDxh3pkA==
+   eJztl8ENgzAMRR11Ho6doVJHQOLUcbpF1SV6YgvEChzoDE2kRrRWY+LEJkWKxLsQAo9vE5QJAKYdczYA9oCZOe9i5D0GWDAQ5+Xm3YSzGAgor+b9DtwsuQ6Ul8efT8km1SGG2Gw0HWJ9tnJY88HfRkmfpqAL7uXqUl2qC4/R0pr/cPn1b9qTy9GOdx9clerj6C0d4z53YuwE394PRiYpdaJcqDFM6F9dwiWUDccF988T1muS6+L662AWOD2V49Kj5zpwn/trJJ1S9jaaThJ7Fe5aoOkisWaH1ryt6yXpkZOPlkeKi1SPULWKRSuTii4v4vfhMg==
   </data>
  </layer>
- <objectgroup id="5" name="entities">
+ <objectgroup id="5" name="entities" locked="1">
   <object id="6" name="Player" gid="530" x="93" y="332" width="48" height="48">
    <properties>
     <property name="type" value="Player"/>
@@ -41,7 +41,7 @@
  </objectgroup>
  <layer id="3" name="bgd_1" width="35" height="35" locked="1">
   <data encoding="base64" compression="zlib">
-   eJzt0rsJACAMAFFdwq2cxzndyD6k0OIQ5R4ErPK1FEmSGBPMPULs6pXpJXtH5D6y+id7EasB/+6GX+Z4nXeQJImxAI2GBe4=
+   eJzt0TEKACAIhWFbOkJX9ZzdqMFNsCmL5P9AcJKnigAAkGMmzlZXL2nQe9E9erufZedkHphR5KZV9vgdfwAAIMcCdlAFrg==
   </data>
  </layer>
  <layer id="4" name="fgd_1" width="35" height="35" locked="1">

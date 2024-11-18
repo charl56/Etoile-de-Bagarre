@@ -63,9 +63,11 @@ androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtim
 firebase-database-ktx = { group = "com.google.firebase", name = "firebase-database-ktx", version.ref = "firebaseDatabaseKtx" }
 firebase-auth-ktx = { module = "com.google.firebase:firebase-auth-ktx" }
 
+
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+
 ksp= {id="com.google.devtools.ksp", version.ref="ksp"}
 gms = {id="com.google.gms.google-services", version.ref="gms"}
 firebase-crashlytics = {id="com.google.firebase.crashlytics", version.ref="firebaseCrashlytics"}
