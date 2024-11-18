@@ -62,6 +62,7 @@ class MoveSystem (
                     mass * (moveCmp.speed * sin - velY)
                 )
 
+                // TODO : Check if image is found, and change X direction in game
                 imageCmps.getOrNull(entity)?.let { imageCmp ->
                     if(moveCmp.cos != 0f) {
                         imageCmp.image.flipX = moveCmp.cos < 0f

@@ -66,7 +66,6 @@ class EntitySpawnSystem (
                         setScaling(Scaling.fill)
                         setSize(relativeSize.x, relativeSize.y )
 
-
                         if (type == "Player" ) {
                             if (entity.id == actualPlayerIndex) {       // Set position with pos get from the server of this player
                                 setPosition(websocket.player.value?.x ?: location.x,websocket.player.value?.y ?: location.y)

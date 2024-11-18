@@ -120,18 +120,18 @@ fun HomeScreen (
                     Button(
                         onClick = {
                             if(currentUser != null) {
-//                                gameViewModel.launchGame(context, navController)
-                                coroutineScope.launch {
-                                    HandlePlay().handlePlayButtonClick(
-                                        context = context,
-                                        navController = navController,
-                                        isInWaitingRoom = isInWaitingRoom,
-                                        webSocket = webSocket,
-                                        gameViewModel = gameViewModel,
-                                        currentPlayer = currentUser!!,
-                                        isWebSocketAvailable = isWebSocketAvailable
-                                    )
-                                }
+                                gameViewModel.launchGame(context, navController)
+//                                coroutineScope.launch {
+//                                    HandlePlay().handlePlayButtonClick(
+//                                        context = context,
+//                                        navController = navController,
+//                                        isInWaitingRoom = isInWaitingRoom,
+//                                        webSocket = webSocket,
+//                                        gameViewModel = gameViewModel,
+//                                        currentPlayer = currentUser!!,
+//                                        isWebSocketAvailable = isWebSocketAvailable
+//                                    )
+//                                }
                             } else {
                                 Toast.makeText(context, "${R.string.homeScreen_error_connectMatchMaking}", Toast.LENGTH_SHORT).show()
                             }
