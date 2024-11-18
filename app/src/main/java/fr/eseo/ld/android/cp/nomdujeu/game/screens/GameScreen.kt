@@ -13,11 +13,14 @@ import fr.eseo.ld.android.cp.nomdujeu.game.event.MapChangeEvent
 import fr.eseo.ld.android.cp.nomdujeu.game.event.fire
 import fr.eseo.ld.android.cp.nomdujeu.game.input.PlayerKeyboardInputProcessor
 import fr.eseo.ld.android.cp.nomdujeu.game.system.AnimationSystem
+import fr.eseo.ld.android.cp.nomdujeu.game.system.AttackSystem
 import fr.eseo.ld.android.cp.nomdujeu.game.system.CameraSystem
 import fr.eseo.ld.android.cp.nomdujeu.game.system.CollisionDespawnSystem
 import fr.eseo.ld.android.cp.nomdujeu.game.system.CollisionSpawnSystem
+import fr.eseo.ld.android.cp.nomdujeu.game.system.DeadSystem
 import fr.eseo.ld.android.cp.nomdujeu.game.system.DebugSystem
 import fr.eseo.ld.android.cp.nomdujeu.game.system.EntitySpawnSystem
+import fr.eseo.ld.android.cp.nomdujeu.game.system.LifeSystem
 import fr.eseo.ld.android.cp.nomdujeu.game.system.MoveSystem
 import fr.eseo.ld.android.cp.nomdujeu.game.system.PhysicSystem
 import fr.eseo.ld.android.cp.nomdujeu.game.system.RenderSystem
@@ -58,6 +61,9 @@ class GameScreen : KtxScreen {
             add<CollisionSpawnSystem>()
             add<CollisionDespawnSystem>()
             add<MoveSystem>()
+            add<AttackSystem>()
+            add<DeadSystem>()
+            add<LifeSystem>()
             add<PhysicSystem>()
             add<AnimationSystem>()
             add<CameraSystem>()

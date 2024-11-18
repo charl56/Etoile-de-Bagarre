@@ -22,6 +22,9 @@ import ktx.log.logger
 import ktx.math.component1
 import ktx.math.component2
 
+val Fixture.entity: Entity
+    get() = body.userData as Entity
+
 @AllOf([PhysicComponent::class, ImageComponent::class])
 class PhysicSystem(
     private val phWorld : World,
@@ -73,9 +76,6 @@ class PhysicSystem(
             )
         }
     }
-
-    private val Fixture.entity: Entity
-        get() = body.userData as Entity
 
     override fun beginContact(contact: Contact) {
         val entityA: Entity = contact.fixtureA.entity
