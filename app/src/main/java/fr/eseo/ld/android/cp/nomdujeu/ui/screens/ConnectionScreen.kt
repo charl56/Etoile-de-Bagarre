@@ -44,16 +44,18 @@ import fr.eseo.ld.android.cp.nomdujeu.GoogleAuthClient
 import fr.eseo.ld.android.cp.nomdujeu.R
 import fr.eseo.ld.android.cp.nomdujeu.ui.navigation.NomDuJeuScreens
 import fr.eseo.ld.android.cp.nomdujeu.viewmodels.AuthenticationViewModel
+import fr.eseo.ld.android.cp.nomdujeu.viewmodels.PlayerViewModel
 import kotlinx.coroutines.launch
 
 
 @Composable
 fun ConnectionScreen(
     navController: NavController,
-    authenticationViewModel: AuthenticationViewModel
+    authenticationViewModel: AuthenticationViewModel,
+    playerViewModel: PlayerViewModel
 ) {
     val context = LocalContext.current
-    val googleAuthClient = GoogleAuthClient(context)
+    val googleAuthClient = GoogleAuthClient(context, playerViewModel)
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -83,6 +85,7 @@ fun ConnectionScreen(
                     val success = googleAuthClient.signIn()
                     if (success){
                         navController.navigate(NomDuJeuScreens.HOME_SCREEN.id)
+                        println("Google Sign In Success")
                     }
                 }
             }

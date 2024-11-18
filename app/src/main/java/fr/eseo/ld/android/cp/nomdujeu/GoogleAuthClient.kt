@@ -1,6 +1,7 @@
 package fr.eseo.ld.android.cp.nomdujeu
 
 import android.content.Context
+import androidx.compose.runtime.collectAsState
 import androidx.credentials.ClearCredentialStateRequest
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
@@ -11,11 +12,14 @@ import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
+import fr.eseo.ld.android.cp.nomdujeu.model.Player
+import fr.eseo.ld.android.cp.nomdujeu.viewmodels.PlayerViewModel
 import kotlinx.coroutines.tasks.await
 import kotlin.coroutines.cancellation.CancellationException
 
 class GoogleAuthClient(
     private val context: Context,
+    private val playerViewModel: PlayerViewModel
 ) {
     private val tag = "GoogleAuthClient: "
 
@@ -84,8 +88,15 @@ class GoogleAuthClient(
                 val authResult = firebaseAuth.signInWithCredential(authCredential).await()
                 val user = authResult.user
 
-                return user != null
-
+                if (user != null) {
+                    createPlayerIfNew(user.email, user.displayName)
+                    println(tag + "name user: ${user.displayName}")
+                    println(tag + "email user: ${user.email}")
+                    println(tag + "photo user: ${user.photoUrl}")
+                    println(tag + "user signed: $user")
+                    return true
+                }
+                return false
 
             } catch (e: GoogleIdTokenParsingException) {
                 println(tag + "GoogleIdTokenParsingException : ${e.message}")
@@ -97,6 +108,14 @@ class GoogleAuthClient(
             return false
 
         }
+    }
+
+    private fun createPlayerIfNew(email: String?, displayName: String?) {
+        playerViewModel.getPlayerByEmail(email!!)
+        println(tag + "player")
+        println(tag + "email: $email")
+        println(tag + "displayName: $displayName")
+        playerViewModel.addUser(email, displayName!!)
     }
 
 }
