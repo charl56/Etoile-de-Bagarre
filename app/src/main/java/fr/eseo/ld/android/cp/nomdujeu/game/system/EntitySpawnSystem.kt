@@ -1,6 +1,7 @@
 package fr.eseo.ld.android.cp.nomdujeu.game.system
 
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
+import com.badlogic.gdx.math.MathUtils.random
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.BodyDef
 import com.badlogic.gdx.physics.box2d.World
@@ -13,11 +14,17 @@ import com.github.quillraven.fleks.ComponentMapper
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
 import fr.eseo.ld.android.cp.nomdujeu.game.AndroidLauncher.Companion.UNIT_SCALE
+import fr.eseo.ld.android.cp.nomdujeu.game.actor.FlipImage
 import fr.eseo.ld.android.cp.nomdujeu.game.component.AnimationComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.component.AnimationModel
 import fr.eseo.ld.android.cp.nomdujeu.game.component.AnimationType
+import fr.eseo.ld.android.cp.nomdujeu.game.component.CollisionComponent
+import fr.eseo.ld.android.cp.nomdujeu.game.component.DEFAULT_SPEED
+import fr.eseo.ld.android.cp.nomdujeu.game.component.EnemyPlayerComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.component.ImageComponent
+import fr.eseo.ld.android.cp.nomdujeu.game.component.MoveComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.component.PhysicComponent.Companion.physicCmpFromImage
+import fr.eseo.ld.android.cp.nomdujeu.game.component.PlayerComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.component.SpawnCfg
 import fr.eseo.ld.android.cp.nomdujeu.game.component.SpawnComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.event.MapChangeEvent
@@ -42,6 +49,10 @@ class EntitySpawnSystem (
     private val cacheSizes = mutableMapOf<AnimationModel, Vector2>()
 
 
+    // Set the actual player to the a random player entity
+    // TODO : Change this to really assign the player to the player entity
+    private var actualPlayerIndex = random.nextInt(4)
+
     override fun onTickEntity(entity: Entity) {
 
         with(spawnCmps[entity]) {
@@ -49,24 +60,56 @@ class EntitySpawnSystem (
             val relativeSize = size(cfg.model)
 
             world.entity {
-                    val imageCmp = add<ImageComponent>{
-                        image = Image().apply{
-                            setScaling(Scaling.fill)
-                            setSize(relativeSize.x, relativeSize.y )
-                            setPosition(lication.x , lication.y)        // Lication : the name is write like this in the lib
-                        }
+                val imageCmp = add<ImageComponent>{
+                    image = FlipImage().apply{
+                        setScaling(Scaling.fill)
+                        setSize(relativeSize.x, relativeSize.y )
+                        setPosition(lication.x , lication.y)        // Lication : the name is write like this in the lib
+                    }
+                }
+
+                add<AnimationComponent>{
+                    nextAnimation(cfg.model, AnimationType.WALK)
+                }
+
+                physicCmpFromImage(phWorld, imageCmp.image, cfg.bodyType) {
+                    phCmp, width, height ->
+
+                    val w = width * cfg.physicScaling.x
+                    val h = height * cfg.physicScaling.y
+
+                    // hit box
+                    box(w, h, cfg.physicOffset) {
+                        isSensor = cfg.bodyType != BodyDef.BodyType.StaticBody
                     }
 
-                    add<AnimationComponent>{
-                        nextAnimation(cfg.model, AnimationType.IDLE)
+                    // collision box
+                    if (cfg.bodyType != BodyDef.BodyType.StaticBody){
+                        val collHeight = h * 0.4f
+                        val collOffset = vec2().apply { set(cfg.physicOffset) }
+                        collOffset.y -= h * 0.5f - collHeight * 0.5f
+                        box(w, h * 0.4f, collOffset)
                     }
+                }
 
-                    physicCmpFromImage(phWorld, imageCmp.image, BodyDef.BodyType.DynamicBody) {
-                        phCmp, width, height ->
-                        box(width, height) {
-                            isSensor = false
-                        }
+                if (cfg.speedScaling > 0f) {
+                    add<MoveComponent> {
+                        speed = DEFAULT_SPEED * cfg.speedScaling
                     }
+                }
+
+                if (type == "Player"){
+                    if (entity.id == actualPlayerIndex){
+                        add<PlayerComponent>()
+                    } else {
+                        add<EnemyPlayerComponent>()
+                    }
+                }
+
+                if(cfg.bodyType != BodyDef.BodyType.StaticBody){
+                    add<CollisionComponent>()
+                }
+
             }
         }
         world.remove(entity)
@@ -76,7 +119,11 @@ class EntitySpawnSystem (
         println("spawnCfg Type : $type")
 
         when (type) {
-            "Player" -> SpawnCfg(AnimationModel.PLAYER)
+            "Player" -> SpawnCfg(
+                AnimationModel.PLAYER,
+                physicScaling = vec2(0.3f,0.3f),
+                physicOffset = vec2(0f, -10f * UNIT_SCALE)
+            )
             else -> gdxError("Unknown entity type $type")
         }
     }
