@@ -9,15 +9,14 @@ const { joinWaitingRoom, leaveWaitingRoom, updatePlayerData, onHit } = require('
 
 // Connecting to websocket. With ws war, we can know who is connected
 wss.on('connection', (ws, req) => {
-    console.log('New connection:', req.socket.remoteAddress);
 
     ws.on('message', (message) => {
         try {
-            console.log('Received message:', message);
+            // console.log('Received message:', message);
             const msg = JSON.parse(message);
             switch (msg.type) {
                 case 'joinWaitingRoom':
-                    joinWaitingRoom(ws)
+                    joinWaitingRoom(ws, msg.playerId)
                     break;
 
                 case 'leaveWaitingRoom':

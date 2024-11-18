@@ -13,7 +13,6 @@ import fr.eseo.ld.android.cp.nomdujeu.game.component.PhysicComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.event.MapChangeEvent
 import fr.eseo.ld.android.cp.nomdujeu.game.event.fire
 import fr.eseo.ld.android.cp.nomdujeu.game.input.PlayerJoystickInputProcessor
-import fr.eseo.ld.android.cp.nomdujeu.game.input.PlayerKeyboardInputProcessor
 import fr.eseo.ld.android.cp.nomdujeu.game.system.AnimationSystem
 import fr.eseo.ld.android.cp.nomdujeu.game.system.CameraSystem
 import fr.eseo.ld.android.cp.nomdujeu.game.system.CollisionDespawnSystem
@@ -110,7 +109,11 @@ class GameScreen : KtxScreen {
         } catch (e: Exception) {
             log.error(e) { "Error while disposing game world" }
         }
-        joystickInputProcessor.dispose()
+        try {
+            joystickInputProcessor.dispose()
+        } catch (e: Exception) {
+            log.error(e) { "Error while disposing joystick input processor" }
+        }
     }
 
     companion object {

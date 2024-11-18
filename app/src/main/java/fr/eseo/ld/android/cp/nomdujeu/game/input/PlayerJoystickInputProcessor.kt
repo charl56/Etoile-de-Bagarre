@@ -47,7 +47,6 @@ class PlayerJoystickInputProcessor(
         joystickKnob = Circle(baseX, baseY, knobRadius)
 
         Gdx.input.inputProcessor = this
-
     }
 
     override fun touchCancelled(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {

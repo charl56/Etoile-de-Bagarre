@@ -1,13 +1,11 @@
 package fr.eseo.ld.android.cp.nomdujeu.game.system
 
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
-import com.badlogic.gdx.math.MathUtils.random
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.BodyDef
 import com.badlogic.gdx.physics.box2d.World
 import com.badlogic.gdx.scenes.scene2d.Event
 import com.badlogic.gdx.scenes.scene2d.EventListener
-import com.badlogic.gdx.scenes.scene2d.ui.Image
 import com.badlogic.gdx.utils.Scaling
 import com.github.quillraven.fleks.AllOf
 import com.github.quillraven.fleks.ComponentMapper
@@ -28,6 +26,7 @@ import fr.eseo.ld.android.cp.nomdujeu.game.component.PlayerComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.component.SpawnCfg
 import fr.eseo.ld.android.cp.nomdujeu.game.component.SpawnComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.event.MapChangeEvent
+import fr.eseo.ld.android.cp.nomdujeu.service.WebSocket
 import ktx.app.gdxError
 import ktx.box2d.box
 import ktx.math.vec2
@@ -48,10 +47,11 @@ class EntitySpawnSystem (
     private val cacheCfgs = mutableMapOf<String, SpawnCfg>()
     private val cacheSizes = mutableMapOf<AnimationModel, Vector2>()
 
-
-    // Set the actual player to the a random player entity
-    // TODO : Change this to really assign the player to the player entity
-    private var actualPlayerIndex = random.nextInt(4)
+    // Set actual player to index 0 entity
+    private var actualPlayerIndex: Int = 0
+    // Index in enemy list
+    private var enemiesIndex: Int = 0
+    private var websocket = WebSocket.getInstance();
 
     override fun onTickEntity(entity: Entity) {
 
@@ -60,11 +60,27 @@ class EntitySpawnSystem (
             val relativeSize = size(cfg.model)
 
             world.entity {
+                // Add image of this entity
                 val imageCmp = add<ImageComponent>{
                     image = FlipImage().apply{
                         setScaling(Scaling.fill)
                         setSize(relativeSize.x, relativeSize.y )
-                        setPosition(lication.x , lication.y)        // Lication : the name is write like this in the lib
+
+
+                        if (type == "Player" ) {
+                            if (entity.id == actualPlayerIndex) {       // Set position with pos get from the server of this player
+                                setPosition(websocket.player.value?.x ?: location.x,websocket.player.value?.y ?: location.y)
+                            } else {                                    // Set positions of enemies players
+                                try {
+                                    setPosition(websocket.players.value[enemiesIndex].x, websocket.players.value[enemiesIndex].y)
+                                }
+                                catch (e: Exception){ // If we can't spawn enemy (no more enemy to spawn), set position to 0,0
+                                    println("No more enemy to spawn, ${e}")
+                                }
+                            }
+                        } else {        // If not player, spawn image at image position
+                            setPosition(location.x , location.y)
+                        }
                     }
                 }
 
@@ -93,11 +109,19 @@ class EntitySpawnSystem (
                 }
 
                 if (cfg.speedScaling > 0f) {
-                    add<MoveComponent> {
-                        speed = DEFAULT_SPEED * cfg.speedScaling
+                    if (entity.id == actualPlayerIndex) {
+                        add<MoveComponent> {
+                            speed = DEFAULT_SPEED * cfg.speedScaling
+                        }
+                    } else {
+                        add<MoveComponent> {        // Add id for enemies
+                            speed = DEFAULT_SPEED * cfg.speedScaling
+                            playerId = websocket.players.value.getOrNull(enemiesIndex)?.id ?: ""
+                        }
                     }
                 }
 
+                // Add Player or EnemyPlayer this entity
                 if (type == "Player"){
                     if (entity.id == actualPlayerIndex){
                         add<PlayerComponent>()
@@ -111,6 +135,9 @@ class EntitySpawnSystem (
                 }
 
             }
+
+            enemiesIndex++
+
         }
         world.remove(entity)
     }
@@ -147,7 +174,7 @@ class EntitySpawnSystem (
                     world.entity {
                         add<SpawnComponent>{
                             this.type = type
-                            this.lication.set(mapObj.x * UNIT_SCALE, mapObj.y * UNIT_SCALE)
+                            this.location.set(mapObj.x * UNIT_SCALE, mapObj.y * UNIT_SCALE)
                         }
                     }
                 }

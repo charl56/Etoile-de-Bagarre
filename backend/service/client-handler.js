@@ -1,7 +1,8 @@
 const { rooms, MAX_PLAYERS, findAvailableRoom, getPlayerIndex, broadcast } = require('./room-manager');
+const spanwPositions = require('../data/spawn-positions.json');
 
 // When a player join a room
-function joinWaitingRoom(ws) {
+function joinWaitingRoom(ws, playerId) {
     // Add to a room, if available, else create new room
     const roomId = findAvailableRoom();
     ws.roomId = roomId;
@@ -10,17 +11,23 @@ function joinWaitingRoom(ws) {
     room.players.set(ws, ws);
 
     // Set player position in list
-    room.players.get(ws).listPosition = getPlayerIndex(roomId, ws);
+    room.players.get(ws).id = playerId;
 
-    // When a player come in a room, notifiy all players in the room
+    room.players.get(ws).x = spanwPositions[getPlayerIndex(roomId, ws)].x;
+    room.players.get(ws).y = spanwPositions[getPlayerIndex(roomId, ws)].y;
+
+    // When a player come in a room, notifiy all players in the room ( room.players.get(ws) == client )
     room.players.forEach((_, client) => {
-        const message = JSON.stringify({ type: 'playerCount', count: room.players.size, listPosition: getPlayerIndex(roomId, client) });
+        const message = JSON.stringify({ type: 'playerCount', count: room.players.size, spawnPositionX: client.x, spawnPositionY: client.y });
         client.send(message);
     })
+
+    broadcast(roomId);  // Is used to send enemys spawn position
 
     // Then check if room is ready
     if (room.players.size === MAX_PLAYERS) {
         room.isFull = true;
+        room.isStarted = true;
         room.players.forEach((_, client) => client.send(JSON.stringify({ type: 'gameStart' })));
 
         // Each room have their own interval loop
@@ -56,8 +63,12 @@ function leaveWaitingRoom(ws) {
     } else {
         // Notify all players in the room
         room.players.forEach((_, client) => {
-            client.listPosition = getPlayerIndex(ws.roomId, client);    // Update value of position in list
-            const message = JSON.stringify({ type: 'playerCount', count: room.players.size, listPosition: client.listPosition });
+            if(!room.isStarted){
+                client.x = spanwPositions[getPlayerIndex(ws.roomId, ws)].x;
+                client.y = spanwPositions[getPlayerIndex(ws.roomId, ws)].y;
+            }
+        
+            const message = JSON.stringify({ type: 'playerCount', count: room.players.size, spawnPositionX: client.x, spawnPositionY: client.y });
             client.send(message);
         });
     }
@@ -67,9 +78,9 @@ function leaveWaitingRoom(ws) {
 // 1 player send his data to update in liste of room
 function updatePlayerData(data, ws) {
     try {
-        var room = getRoomById(ws.roomId);
+        const room = getRoomById(ws.roomId);
         const parsedData = JSON.parse(data);
-        console.log("updata data of a player ", parsedData)
+
         // Check if player is in the room
         if (room.players.has(ws)) {
             // Get the player object from the room, to update its attributes
@@ -77,13 +88,13 @@ function updatePlayerData(data, ws) {
 
             // Update
             player.id = parsedData.id || player.id;
-            player.pseudo = parsedData.pseudo || player.pseudo;
             player.x = parsedData.x || player.x;
             player.y = parsedData.y || player.y;
             player.kills = parsedData.kills || player.kills;
             player.life = parsedData.life || player.life;
             player.isAlive = parsedData.isAlive !== undefined ? parsedData.isAlive : player.isAlive;
             // Data direct update in the list of the room
+
         }
     } catch (error) {
         console.error("Error parsing or updating player data:", error);
@@ -95,7 +106,7 @@ function onHit(ws, data) {  // data {victimId: playerId, shooterId: playerId, da
     try {
         const room = getRoomById(ws.roomId);
         const parsedData = JSON.parse(data);
-        console.log("onHit", parsedData)
+        // console.log("onHit", parsedData)
 
         if (room && room.players.has(ws)) {
             // Pointeur ? être sur que quand on modifie une var victim ou shooter, cela met a jour dans la liste
@@ -106,7 +117,7 @@ function onHit(ws, data) {  // data {victimId: playerId, shooterId: playerId, da
                 victim.life -= parsedData.damage;
                 if (victim.life <= 0) {
                     victim.isAlive = false;
-                    console.log("victime is dead", data)
+                    // console.log("victime is dead", data)
 
                     if (shooter) {
                         shooter.kills = (shooter.kills || 0) + 1;

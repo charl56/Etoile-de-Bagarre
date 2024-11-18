@@ -5,7 +5,6 @@ import io.ktor.client.plugins.websocket.*
 import io.ktor.websocket.*
 import kotlinx.coroutines.flow.*
 import fr.eseo.ld.android.cp.nomdujeu.model.Player
-import fr.eseo.ld.android.cp.nomdujeu.repository.FirestoreRepository
 import fr.eseo.ld.android.cp.nomdujeu.viewmodels.GameViewModel
 import fr.eseo.ld.android.cp.nomdujeu.viewmodels.PlayerViewModel
 import io.ktor.client.request.url
@@ -53,11 +52,10 @@ class WebSocket private constructor() {
     val gameStarted: StateFlow<Boolean> = _gameStarted.asStateFlow()
 
     var session: DefaultClientWebSocketSession? = null
-    val incomingMessages: Channel<String> = Channel()
 
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
-    //    var wsUrl = "10.0.2.2:5025"      // Local emulator android
+//        var wsUrl = "10.0.2.2:5025"      // Local emulator android
     var wsUrl = "172.24.1.37/ws-edb/"     // Server IP
 
 
@@ -122,15 +120,16 @@ class WebSocket private constructor() {
                 // Update player count, display in home screen
                 "playerCount" -> {
                     _playerCount.value = jsonObject["count"]?.jsonPrimitive?.int ?: 0  // Update nb of player in waiting room
-                    _player.value?.let { _player.value = it.copy(listPosition = jsonObject["listPosition"]?.jsonPrimitive?.int ?: 0) }  // Update index of position in the list
+                    _player.value?.let {
+                        _player.value = it.copy(
+                            x = jsonObject["spawnPositionX"]?.jsonPrimitive?.float ?: 0.00f,
+                            y = jsonObject["spawnPositionY"]?.jsonPrimitive?.float ?: 0.00f
+                        )
+                    }
                 }
                 "gameStart" -> {
                     _gameStarted.value = true
-                    coroutineScope.launch {
-                        updatePlayerData(null)
-                    }
                 }
-                // TODO : Pour récupérer les données. Deopuis le jeu on appelle : WebSocket.getInstance().players, à chaque tick
                 "updatePlayersData" -> {
                     if (!_gameStarted.value) return
                     processPlayersUpdate(jsonObject)
@@ -151,9 +150,9 @@ class WebSocket private constructor() {
     // Function to send message to server, when player is in waiting room
     suspend fun joinAndWait(currentPlayer: Player) {
         val message = Json.encodeToString(mapOf(
-            "type" to "joinWaitingRoom"
+            "type" to "joinWaitingRoom",
+            "playerId" to currentPlayer.id
         ))
-        println(message);
         sendMessage(message);
     }
 
@@ -167,10 +166,11 @@ class WebSocket private constructor() {
     }
 
 
+
     // Function to convert data receive list of players, in koltin obj for list in client side
     fun processPlayersUpdate(jsonObject: JsonObject ) {
-
         val newPlayers = jsonObject["players"]?.jsonArray?.mapNotNull { playerJson ->
+
             val player = playerJson.jsonObject
             val id = player["id"]?.jsonPrimitive?.content ?: return@mapNotNull null
 
@@ -187,26 +187,25 @@ class WebSocket private constructor() {
                 }
                 return@mapNotNull null
             }
-
+            // Else update
             Player(
                 id = id,
-                pseudo = player["pseudo"]?.jsonPrimitive?.content ?: "",
                 x = player["x"]?.jsonPrimitive?.content?.toFloatOrNull() ?: 0f,
                 y = player["y"]?.jsonPrimitive?.content?.toFloatOrNull() ?: 0f,
                 life = player["life"]?.jsonPrimitive?.content?.toIntOrNull() ?: 0,
                 isAlive = player["isAlive"]?.jsonPrimitive?.content?.toBoolean() ?: false,
-                listPosition = player["listPosition"]?.jsonPrimitive?.content?.toIntOrNull() ?: 0
             )
-
-            // TODO : if players are dead, remove entity from game
+            // TODO : if this enemy player is dead, remove entity from world
 
         } ?: emptyList()
 
-        newPlayers.forEach { updateOrAddPlayer(it) }
+        newPlayers.forEach { updateOrAddPlayers(it) }
     }
 
     // Function to update a player in the list, when we get data of all players from server
-    fun updateOrAddPlayer(newPlayer: Player) {
+    fun updateOrAddPlayers(newPlayer: Player) {
+
+
         _players.value = _players.value.toMutableList().apply {
             val existingIndex = indexOfFirst { it.id == newPlayer.id }
             if (existingIndex != -1) {
@@ -219,61 +218,26 @@ class WebSocket private constructor() {
 
 
 
-    /* ===================================================================================================
-       Cette fonction doit être appelée à l'endroit où grâce au joystick, la position du joueur se déplace
-       pour envoyer la position du joueur au serveur, a chaque fois tick/frame
-        TODO : Replacer _player par le parametres player, une fois appelée depuis le joystick
-        TODO : Ensuite enlever le while, on garde juste la création du message et l'envoie
-        TODO : On pourra enlever le suspend aussi
-       TODO : Enlever ce commentaire une fois la fonction implémentée
-       ================================================================================================== */
-    // Send data player during game
-    suspend fun updatePlayerData(player: Player?) {
-
-// TODO : use this when function will be call by game loop
-//        player?.let{ p ->
-//            val encodedPlayer = Json.encodeToString(mapOf(
-//                "id" to p.id,
-//                "pseudo" to p.pseudo,
-//                "x" to p.x.toString(),
-//                "y" to p.y.toString(),
-//                "kills" to p.kills.toString(),
-//                "life" to p.life.toString(),
-//                "isAlive" to p.isAlive.toString(),
-//                "listPosition" to p.listPosition.toString()
-//            ))
-//            val message = Json.encodeToString(mapOf(
-//                "type" to "updatePlayerData",
-//                "data" to encodedPlayer
-//            ))
-//            coroutineScope.launch {
-//                sendMessage(message)
-//            }
-//        }
-
-        // TODO : remove this and while function, when function will be call by game loop
-        val encodedPlayer = Json.encodeToString(mapOf(
-            "id" to _player.value?.id,
-            "pseudo" to _player.value?.pseudo,
-            "x" to _player.value?.x.toString(),
-            "y" to _player.value?.y.toString(),
-            "kills" to _player.value?.kills.toString(),
-            "life" to _player.value?.life.toString(),
-            "isAlive" to _player.value?.isAlive.toString(),
-            "listPosition" to _player.value?.listPosition.toString()
-        ))
-
-        // Remove while, set up for tests
-        while (System.currentTimeMillis() - System.currentTimeMillis() < 10_000 && _gameStarted.value) {
+    // Send position player during game, call by MoveSystem, where new player position is set each tick
+    fun updatePlayerData(x: Float, y: Float) {
+        _player.value = _player.value?.copy(x = x, y = y)
+        player?.let{ p ->
+            val encodedPlayer = Json.encodeToString(mapOf(
+                "id" to _player.value?.id,
+                "pseudo" to _player.value?.pseudo,
+                "x" to _player.value?.x.toString(),
+                "y" to _player.value?.y.toString(),
+                "kills" to _player.value?.kills.toString(),
+                "life" to _player.value?.life.toString(),
+                "isAlive" to _player.value?.isAlive.toString(),
+            ))
             val message = Json.encodeToString(mapOf(
                 "type" to "updatePlayerData",
                 "data" to encodedPlayer
             ))
-            sendMessage(message);
-
-            // Remove thread sleep, set up for tests
-            Thread.sleep(100)
-
+            coroutineScope.launch {
+                sendMessage(message)
+            }
         }
     }
 

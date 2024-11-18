@@ -36,7 +36,7 @@ class GameViewModel : ViewModel() {
             // TODO : à supprimer, permet de lancer endGame après 10 sec
             handler.postDelayed({
                 endGame()
-            }, 40000)
+            }, 20000)
         }
     }
 

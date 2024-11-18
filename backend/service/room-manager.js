@@ -22,7 +22,7 @@ function findAvailableRoom() {
 }
 
 // Get index of player in a room
-function getPlayerIndex(roomId, playerId) {
+function getPlayerIndex(roomId, ws) {
     const room = rooms.get(roomId);
     if (!room) {
         return -1; // If room not found
@@ -30,7 +30,7 @@ function getPlayerIndex(roomId, playerId) {
 
     let index = 0;
     for (let [id, player] of room.players.entries()) {
-        if (id === playerId) {
+        if (id === ws) {
             return index; // If player found
         }
         index++;
@@ -52,7 +52,7 @@ const broadcast = (roomId) => {
     })
 
 
-    if(alivePlayers === 1){
+    if(alivePlayers === 1 && room.isStarted){
         room.players.forEach((player) => {
             player.send(JSON.stringify({ type: 'endGame', winner: player.pseudo, kills: player.kills, id: player.id }));
         });
@@ -70,12 +70,11 @@ const broadcast = (roomId) => {
             kills: player.kills,
             life: player.life,
             isAlive: player.isAlive,
-            listPosition: player.listPosition
         }));
 
     // Create a message containing all players' data
     const message = JSON.stringify({ type: 'updatePlayersData', players: playersData });
-    console.log("send data of all player to one player ", message)
+    // console.log("send data of all player for each player ", message)
 
     // Send this message to each player in the room
     room.players.forEach((_, client) => client.send(message));
