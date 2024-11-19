@@ -7,14 +7,14 @@
    <image source="../player/idle_00.png" width="48" height="48"/>
   </tile>
  </tileset>
- <layer id="2" name="water" width="35" height="35" locked="1">
+ <layer id="2" name="water" width="35" height="35">
   <data encoding="base64" compression="zlib">
-   eJzt0rEJADAIBVH3H9Ad3CK9hNiI38AVr7AJhybMLAAAQDtf0ABkfqFsec2T3fnNqmVyN+qW6g4b/lJuU3YAAP51AGp1WOE=
+   eJzt07EJACAMRNHsP6A7ZAsrQa4wlV6EX7zWfDRmRCQA4Dtj06nF3eOe37UFWPS/OvdUZ59abnfrmVXLy7txt1Tv0GGXtM3ZAQD41wS3oVhJ
   </data>
  </layer>
- <layer id="1" name="island" width="35" height="35" locked="1">
+ <layer id="1" name="island" width="35" height="35">
   <data encoding="base64" compression="zlib">
-   eJztl8ENgzAMRR11Ho6doVJHQOLUcbpF1SV6YgvEChzoDE2kRrRWY+LEJkWKxLsQAo9vE5QJAKYdczYA9oCZOe9i5D0GWDAQ5+Xm3YSzGAgor+b9DtwsuQ6Ul8efT8km1SGG2Gw0HWJ9tnJY88HfRkmfpqAL7uXqUl2qC4/R0pr/cPn1b9qTy9GOdx9clerj6C0d4z53YuwE394PRiYpdaJcqDFM6F9dwiWUDccF988T1muS6+L662AWOD2V49Kj5zpwn/trJJ1S9jaaThJ7Fe5aoOkisWaH1ryt6yXpkZOPlkeKi1SPULWKRSuTii4v4vfhMg==
+   eJztl9EJgzAQhi90Hh87Q6EjCD51nG5RSnfok1tIV/ChnaEJNKihOXPJnUlA8HsxRj//OyMZAWCsmLMC0Ae8ifMuit9jgAkFYV5m3o05iwEB82p+70DNkuqAeVns+ZhsYh1CCM1G0iHUZyuHNR/328jp02R0cXuZw+UxY3dZupRSo5L6pXaXl6ZVZbj8+zfV5HLU492Mq1B9DL2mI9znjoydYOn9JGQSUyfMBRtz8f2rc7j4sqG4uP3zgfWapLqY/jqoCUpPpbj0znMNbp/bazidYvY2kk4cexXqWiDpwrFm+9a8revF6ZGSj5RHjAtXj2C1CkUqkx1ZvtZ43+I=
   </data>
  </layer>
  <objectgroup id="5" name="entities" locked="1">
