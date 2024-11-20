@@ -3,10 +3,15 @@ package fr.eseo.ld.android.cp.nomdujeu.service
 import io.ktor.client.*
 import io.ktor.client.plugins.websocket.*
 import io.ktor.websocket.*
+import io.ktor.client.engine.cio.*
+import javax.net.ssl.X509TrustManager
+import java.security.cert.X509Certificate
+
 import kotlinx.coroutines.flow.*
 import fr.eseo.ld.android.cp.nomdujeu.model.Player
 import fr.eseo.ld.android.cp.nomdujeu.viewmodels.GameViewModel
 import fr.eseo.ld.android.cp.nomdujeu.viewmodels.PlayerViewModel
+import io.ktor.client.network.sockets.ConnectTimeoutException
 import io.ktor.client.request.url
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.CoroutineScope
@@ -16,6 +21,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.*
+import java.net.UnknownHostException
+import javax.net.ssl.SSLHandshakeException
 
 class WebSocket private constructor() {
 
@@ -32,11 +39,18 @@ class WebSocket private constructor() {
     }
 
 
-
-
-
-    private val client = HttpClient {
+    private val client = HttpClient(CIO) {
         install(WebSockets)
+        engine {
+            https {
+                // Accept all ssl certificates
+                trustManager = object : X509TrustManager {
+                    override fun checkClientTrusted(chain: Array<X509Certificate>, authType: String) {}
+                    override fun checkServerTrusted(chain: Array<X509Certificate>, authType: String) {}
+                    override fun getAcceptedIssuers(): Array<X509Certificate> = arrayOf()
+                }
+            }
+        }
     }
 
     private val _player = MutableStateFlow<Player?>(null)
@@ -55,8 +69,9 @@ class WebSocket private constructor() {
 
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
-//        var wsUrl = "10.0.2.2:5025"      // Local emulator android
-    var wsUrl = "172.24.1.37/ws-edb/"     // Server IP
+//    var wsUrl = "ws://10.0.2.2:5025/"      // Local emulator android
+//    var wsUrl = "wss://51.254.119.241/ws-edb/"     // Server IP
+    var wsUrl = "wss://charles.studi0426.com/ws-edb/"
 
 
     // TODO refactore. Var set in ProcessEndGame, et are here to be get by endGameScreen, to show end message
@@ -84,7 +99,7 @@ class WebSocket private constructor() {
         return try {
             withTimeout(5000) { // 5s of timeout
                 session = client.webSocketSession {
-                    url("ws://${wsUrl}/")
+                    url(wsUrl)
                 }
 
                 // Function who will get messages from server
@@ -92,7 +107,12 @@ class WebSocket private constructor() {
             }
             true
         } catch (e: Exception) {
-            println("WEBSOCKET : Websocket server not available: ${e.message}")
+            when (e) {
+                is ConnectTimeoutException -> println("WEBSOCKET: Connection timed out")
+                is SSLHandshakeException -> println("WEBSOCKET: SSL handshake failed. Check your certificate.")
+                is UnknownHostException -> println("WEBSOCKET: Unknown host. Check your URL.")
+                else -> println("WEBSOCKET: Connection failed: ${e.javaClass.simpleName} - ${e.message}")
+            }
             false
         }
     }
