@@ -1,5 +1,6 @@
 package fr.eseo.ld.android.cp.nomdujeu.service
 
+import android.util.Log
 import io.ktor.client.*
 import io.ktor.client.plugins.websocket.*
 import io.ktor.websocket.*
@@ -135,7 +136,7 @@ class WebSocket private constructor() {
     private fun processMessage(message: String) {
         try {
             val jsonObject = Json.parseToJsonElement(message).jsonObject
-
+            Log.d("WebSocket", "Received message: $jsonObject")
             when (jsonObject["type"]?.jsonPrimitive?.content) {
                 // Update player count, display in home screen
                 "playerCount" -> {

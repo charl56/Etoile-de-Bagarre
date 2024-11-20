@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -23,6 +24,7 @@ class GameViewModel : ViewModel() {
 
     private var gameLaunched = false
     private val handler = Handler(Looper.getMainLooper()) // TODO : à supprimer, permet de lancer endGame après 5 sec
+    private val webSocket = WebSocket.getInstance()
 
     lateinit var navController: NavController;
 
@@ -36,21 +38,27 @@ class GameViewModel : ViewModel() {
             // TODO : à supprimer, permet de lancer endGame après 10 sec
             handler.postDelayed({
                 endGame()
-            }, 20000)
+            }, 10000)
         }
     }
 
 
     fun endGame() {
+        Log.d("GameViewModel", "endGame called")
         gameLaunched = false
-        AndroidLauncher.exitGame()
-        // Leave game room, but stay connected to websocket
-        viewModelScope.launch {
-            val webSocket = WebSocket.getInstance()
-            webSocket.leaveRoom()
-            navController.navigate(NomDuJeuScreens.END_GAME_SCREEN.id)
-        }
 
+        viewModelScope.launch {
+            // Leave game room, but stay connected to websocket
+            webSocket.leaveRoom()
+            Log.d("GameViewModel", "room leaved")
+
+            withContext(Dispatchers.Main) {
+                Log.d("GameViewModel", "Exit game")
+                AndroidLauncher.exitGame()
+                Log.d("GameViewModel", "Game exited")
+                navController.navigate(NomDuJeuScreens.END_GAME_SCREEN.id)
+            }
+        }
     }
 
 }

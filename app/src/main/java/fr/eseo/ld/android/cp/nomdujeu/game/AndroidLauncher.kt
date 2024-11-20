@@ -2,6 +2,8 @@ package fr.eseo.ld.android.cp.nomdujeu.game
 
 
 import android.os.Bundle
+import android.util.Log
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.backends.android.AndroidApplication
 import fr.eseo.ld.android.cp.nomdujeu.game.screens.GameScreen
 import ktx.app.KtxGame
@@ -34,13 +36,24 @@ class AndroidLauncher : AndroidApplication() {
         private var instance: AndroidLauncher? = null
 
         fun exitGame() {
-            instance?.ktxGame?.dispose()
-            instance?.finish() // Ferme l'activité en cours
+            instance?.let { launcher ->
+                Gdx.app.postRunnable {
+                    try {
+                        launcher.ktxGame.dispose()
+                        launcher.runOnUiThread {
+                            launcher.finish()
+                        }
+                    } catch (e: Exception) {
+                        Log.e("AndroidLauncher", "Error during exitGame: ${e.message}", e)
+                    }
+                }
+            } ?: Log.e("AndroidLauncher", "Instance is null in exitGame")
         }
     }
 
 
     override fun onDestroy() {
+        Log.d("AndroidLauncher", "onDestroy called, clearing instance")
         super.onDestroy()
         instance = null
     }

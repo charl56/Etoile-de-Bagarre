@@ -3,10 +3,10 @@ const spawnPositions = {
     2: [
         {
             x: 20,
-            y: 25
+            y: 20
         },
         {
-            x: 15,
+            x: 10,
             y: 20
         },
     ],

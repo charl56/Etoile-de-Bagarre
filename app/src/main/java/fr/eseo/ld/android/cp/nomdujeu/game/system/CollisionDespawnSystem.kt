@@ -15,10 +15,13 @@ class CollisionDespawnSystem(
     private val stage: Stage
 ) : IteratingSystem() {
     override fun onTickEntity(entity: Entity) {
-        with(tiledCmps[entity]) {
-            if (nearbyEntities.isEmpty()) {
-                stage.fire(CollisionDespawnEvent(cell))
-                world.remove(entity)
+        // Check if the entity has no nearby entities
+        if(tiledCmps.contains(entity)) {
+            with(tiledCmps[entity]) {
+                if (nearbyEntities.isEmpty()) {
+                    stage.fire(CollisionDespawnEvent(cell))
+                    world.remove(entity)
+                }
             }
         }
     }

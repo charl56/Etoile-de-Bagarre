@@ -20,6 +20,10 @@
     <string name="homeScreen_error_serverNotAvailable">Server isn\'t available now</string>
     <string name="homeScreen_startMatchMaking">Play</string>
     <string name="homeScreen_stopMatchMaking">Cancel</string>
+    <string name="homeScreen_playersCount">players</string>
+    <string name="homeScreen_playersInGame">Number of players in game</string>
+
+
 
     <!-- END GAME SCREEN -->
     <string name="endGameScreen_endGame">End of the game</string>

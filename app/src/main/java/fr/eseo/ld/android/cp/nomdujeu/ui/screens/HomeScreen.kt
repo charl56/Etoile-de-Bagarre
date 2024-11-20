@@ -1,5 +1,6 @@
 package fr.eseo.ld.android.cp.nomdujeu.ui.screens
 
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
@@ -115,7 +116,7 @@ fun HomeScreen (
                         horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         Text(
-                            text = "Nombre de joueurs dans la partie",
+                            text = stringResource(R.string.homeScreen_playersInGame),
                             style = MaterialTheme.typography.bodyLarge,
                             modifier = Modifier.padding(bottom = 16.dp)
                         )
@@ -126,9 +127,9 @@ fun HomeScreen (
                                 RadioButton(
                                     selected = selectedPlayerCount.value == count,
                                     onClick = { selectedPlayerCount.value = count },
-                                    enabled = isWebSocketAvailable.value
+                                    enabled = (isWebSocketAvailable.value && !isInWaitingRoom.value) // Enable choice only if server is available and not in waiting room
                                 )
-                                Text(text = "$count joueurs")
+                                Text(text = "$count ${stringResource(R.string.homeScreen_playersCount)}")
                             }
                         }
                     }

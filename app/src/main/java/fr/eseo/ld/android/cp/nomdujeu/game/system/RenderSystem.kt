@@ -58,7 +58,12 @@ class RenderSystem (
     }
 
     override fun onTickEntity(entity: Entity) {
-        imageCmps[entity].image.toFront()
+        // Check if the image is already in the stage and if so bring it to the front
+        val imageComponent = imageCmps[entity]
+        if (imageComponent.image.stage != null &&
+            imageComponent.image.stage.actors.size > 0) {
+            imageComponent.image.toFront()
+        }
     }
 
     override fun handle(event: Event?): Boolean {

@@ -88,7 +88,10 @@ class PhysicComponent {
 
         override fun onComponentRemoved(entity: Entity, component: PhysicComponent) {
             val body = component.body
-            body.world.destroyBody(body)
+            // Safely check if body is valid before destroying
+            if (body.world != null) {
+                body.world.destroyBody(body)
+            }
             body.userData = null
         }
     }

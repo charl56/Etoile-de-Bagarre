@@ -36,6 +36,7 @@ class GameScreen : KtxScreen {
     private val textureAtlas = TextureAtlas("graphics/gameTextures.atlas")
     private var currentMap : TiledMap? = null
     private lateinit var joystickInputProcessor: PlayerJoystickInputProcessor
+    private var disposed = false
 
     // Create physic world with no gravity
     private val phWorld = createWorld(gravity = vec2()).apply {
@@ -101,16 +102,21 @@ class GameScreen : KtxScreen {
 
     // Stop tous les "services" du jeu
     override fun dispose() {
+        if(disposed){
+            return
+        }
+
         stage.disposeSafely()
         textureAtlas.disposeSafely()
         currentMap?.disposeSafely()
-        try {
-            eWorld.dispose()
-        } catch (e: Exception) {
-            log.error(e) { "Error while disposing game world" }
-        }
         joystickInputProcessor.disposeSafely()
-        phWorld.disposeSafely()
+
+        // Dispose eWorld first to release its dependencies on phWorld
+        eWorld?.dispose()
+        // Dispose the physics world afterwards
+        phWorld?.dispose()
+
+        disposed = true
     }
 
     companion object {
