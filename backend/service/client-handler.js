@@ -1,10 +1,13 @@
-const { rooms, MAX_PLAYERS, findAvailableRoom, getPlayerIndex, broadcast } = require('./room-manager');
-const spanwPositions = require('../data/spawn-positions.json');
+const { rooms, findAvailableRoom, getPlayerIndex, getSpawnPosition, broadcast } = require('./room-manager');
 
 // When a player join a room
-function joinWaitingRoom(ws, playerId) {
+function joinWaitingRoom(ws, playerId, roomSize) {
+    roomSize = parseInt(roomSize, 10); // String to int
+    // Validate roomSize
+    roomSize = [2, 3, 4].includes(roomSize) ? roomSize : 2; // Default to 2 if invalid
+
     // Add to a room, if available, else create new room
-    const roomId = findAvailableRoom();
+    const roomId = findAvailableRoom(roomSize);
     ws.roomId = roomId;
     var room = getRoomById(roomId);
     // Add player to room
@@ -13,19 +16,21 @@ function joinWaitingRoom(ws, playerId) {
     // Set player position in list
     room.players.get(ws).id = playerId;
 
-    room.players.get(ws).x = spanwPositions[getPlayerIndex(roomId, ws)].x;
-    room.players.get(ws).y = spanwPositions[getPlayerIndex(roomId, ws)].y;
+    const spawnIndex = getPlayerIndex(roomId, ws);
+    const spawnPosition = getSpawnPosition(roomSize, spawnIndex);
+    room.players.get(ws).x = spawnPosition.x;
+    room.players.get(ws).y = spawnPosition.y;
 
     // When a player come in a room, notifiy all players in the room ( room.players.get(ws) == client )
     room.players.forEach((_, client) => {
-        const message = JSON.stringify({ type: 'playerCount', count: room.players.size, spawnPositionX: client.x, spawnPositionY: client.y });
+        const message = JSON.stringify({ type: 'playerCount', count: room.players.size, maxPlayers: room.maxPlayers, spawnPositionX: client.x, spawnPositionY: client.y });
         client.send(message);
     })
 
     broadcast(roomId);  // Is used to send enemys spawn position
 
     // Then check if room is ready
-    if (room.players.size === MAX_PLAYERS) {
+    if (room.players.size === room.maxPlayers) {
         room.isFull = true;
         room.isStarted = true;
         room.players.forEach((_, client) => client.send(JSON.stringify({ type: 'gameStart' })));

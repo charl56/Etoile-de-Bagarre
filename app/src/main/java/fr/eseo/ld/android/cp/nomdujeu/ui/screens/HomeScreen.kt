@@ -5,6 +5,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -47,6 +48,7 @@ fun HomeScreen (
     val playerCount by webSocket.playerCount.collectAsState()       // List of players in the waiting room
     val currentUser by playerViewModel.player.collectAsState()  // Current user
     val isWebSocketAvailable = remember { mutableStateOf(false) }   // Is the websocket available
+    val selectedPlayerCount = remember { mutableStateOf(2) }        // Number of players selected for the game
 
     // Check if websocket is available
     LaunchedEffect(Unit) {
@@ -106,10 +108,35 @@ fun HomeScreen (
                             .padding(top = 16.dp)
                     )
 
+                    Row(
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .padding(8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        Text(
+                            text = "Nombre de joueurs dans la partie",
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.padding(bottom = 16.dp)
+                        )
+                        listOf(2, 3, 4).forEach { count ->
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                RadioButton(
+                                    selected = selectedPlayerCount.value == count,
+                                    onClick = { selectedPlayerCount.value = count },
+                                    enabled = isWebSocketAvailable.value
+                                )
+                                Text(text = "$count joueurs")
+                            }
+                        }
+                    }
+
                     // Loader when waiting, centered on the screen
                     if (isInWaitingRoom.value) {
                         Text(
-                            text = "${stringResource(R.string.homeScreen_waitingPlayer)} : $playerCount / 5",
+                            text = "${stringResource(R.string.homeScreen_waitingPlayer)} : $playerCount / ${selectedPlayerCount.value}",
                             modifier = Modifier
                                 .align(Alignment.BottomCenter)
                                 .padding(bottom = 16.dp)
@@ -120,18 +147,18 @@ fun HomeScreen (
                     Button(
                         onClick = {
                             if(currentUser != null) {
-                                gameViewModel.launchGame(context, navController)
-//                                coroutineScope.launch {
-//                                    HandlePlay().handlePlayButtonClick(
-//                                        context = context,
-//                                        navController = navController,
-//                                        isInWaitingRoom = isInWaitingRoom,
-//                                        webSocket = webSocket,
-//                                        gameViewModel = gameViewModel,
-//                                        currentPlayer = currentUser!!,
-//                                        isWebSocketAvailable = isWebSocketAvailable
-//                                    )
-//                                }
+//                                gameViewModel.launchGame(context, navController)
+                                coroutineScope.launch {
+                                    HandlePlay().handlePlayButtonClick(
+                                        context = context,
+                                        navController = navController,
+                                        isInWaitingRoom = isInWaitingRoom,
+                                        gameViewModel = gameViewModel,
+                                        currentPlayer = currentUser!!,
+                                        selectedPlayerCount = selectedPlayerCount.value,
+                                        isWebSocketAvailable = isWebSocketAvailable
+                                    )
+                                }
                             } else {
                                 Toast.makeText(context, "${R.string.homeScreen_error_connectMatchMaking}", Toast.LENGTH_SHORT).show()
                             }

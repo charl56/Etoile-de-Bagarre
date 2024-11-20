@@ -12,6 +12,7 @@ import com.github.quillraven.fleks.World
 import fr.eseo.ld.android.cp.nomdujeu.game.component.MoveComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.component.PlayerComponent
 import ktx.app.KtxInputAdapter
+import ktx.assets.disposeSafely
 
 class PlayerJoystickInputProcessor(
     world: World,
@@ -151,9 +152,9 @@ class PlayerJoystickInputProcessor(
 
     }
 
-    fun dispose() {
-        baseTexture.dispose()
-        knobTexture.dispose()
-        batch.dispose()
+    fun disposeSafely() {
+        baseTexture.disposeSafely()
+        knobTexture.disposeSafely()
+        batch.disposeSafely()
     }
 }

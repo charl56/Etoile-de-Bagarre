@@ -60,13 +60,16 @@ class HandlePlay(
     private val dispatcherIo: CoroutineDispatcher = Dispatchers.IO,
     private val dispatcherMain: CoroutineDispatcher = Dispatchers.Main
 ) {
+
+    private val webSocket = WebSocket.getInstance()
+
     suspend fun handlePlayButtonClick(
         context: Context,
         navController: NavController,
         isInWaitingRoom: MutableState<Boolean>,
-        webSocket: WebSocket,
         gameViewModel: GameViewModel,
         currentPlayer: Player,
+        selectedPlayerCount: Int,
         isWebSocketAvailable: MutableState<Boolean>
     ) {
         if (isInWaitingRoom.value) {        // Leave the waiting room, but stay connected to websocket
@@ -89,7 +92,7 @@ class HandlePlay(
                 }
                 // The waiting start with this function
                 try {
-                    webSocket.joinAndWait(currentPlayer)
+                    webSocket.joinAndWait(currentPlayer, selectedPlayerCount)
                 } catch (e: Exception) {
                     println("WEBSOCKET: Error while joining the waiting room: ${e.message}")
                     isWebSocketAvailable.value = webSocket.checkAvailability()

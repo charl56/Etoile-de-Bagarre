@@ -168,10 +168,12 @@ class WebSocket private constructor() {
     }
 
     // Function to send message to server, when player is in waiting room
-    suspend fun joinAndWait(currentPlayer: Player) {
+    suspend fun joinAndWait(currentPlayer: Player, selectedPlayerCount: Int) {
+        println("WEBSOCKET: Joining waiting room $selectedPlayerCount")
         val message = Json.encodeToString(mapOf(
             "type" to "joinWaitingRoom",
-            "playerId" to currentPlayer.id
+            "playerId" to currentPlayer.id,
+            "roomSize" to selectedPlayerCount.toString()
         ))
         sendMessage(message);
     }

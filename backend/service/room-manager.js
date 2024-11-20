@@ -1,24 +1,71 @@
 const rooms = new Map();
-const MAX_PLAYERS = 2; // Maximum number of players in a room
+const spawnPositions = {
+    2: [
+        {
+            x: 20,
+            y: 25
+        },
+        {
+            x: 15,
+            y: 20
+        },
+    ],
+    3: [
+        {
+            x: 26,
+            y: 25
+        },
+        {
+            x: 8,
+            y: 28
+        },
+        {
+            x: 5,
+            y: 14
+        }
+    ],
+    4: [
+        {
+            x: 15,
+            y: 7
+        },
+        {
+            x: 26,
+            y: 25
+        },
+        {
+            x: 8,
+            y: 28
+        },
+        {
+            x: 5,
+            y: 14
+        }
+    ]
+}
+
 
 // Create room when no room available
-function createRoom() {
+function createRoom(size) {
     const roomId = Date.now().toString();
     rooms.set(roomId, {
         players: new Map(),
         isFull: false,
+        maxPlayers: size,
+        isStarted: false
     });
     return roomId;
+
 }
 
 // Try to find room when connecting
-function findAvailableRoom() {
+function findAvailableRoom(size) {
     for (const [roomId, room] of rooms) {
-        if (room.players.size < MAX_PLAYERS && !room.isFull) {
+        if (room.players.size < room.maxPlayers && !room.isFull && room.maxPlayers === size) {
             return roomId;
         }
     }
-    return createRoom();
+    return createRoom(size);
 }
 
 // Get index of player in a room
@@ -37,6 +84,13 @@ function getPlayerIndex(roomId, ws) {
     }
     return -1; // If player not found
 }
+
+function getSpawnPosition(roomSize, playerIndex) {
+    // Define spawn positions for different room sizes
+    return spawnPositions[roomSize][playerIndex] || {x: 0, y: 0};
+}
+
+
 
 // Send message to all players in the room
 const broadcast = (roomId) => {
@@ -81,4 +135,4 @@ const broadcast = (roomId) => {
 };
 
 
-module.exports = { rooms, MAX_PLAYERS, findAvailableRoom, getPlayerIndex, broadcast };
+module.exports = { rooms, findAvailableRoom, getPlayerIndex, getSpawnPosition, broadcast };

@@ -109,11 +109,8 @@ class GameScreen : KtxScreen {
         } catch (e: Exception) {
             log.error(e) { "Error while disposing game world" }
         }
-        try {
-            joystickInputProcessor.dispose()
-        } catch (e: Exception) {
-            log.error(e) { "Error while disposing joystick input processor" }
-        }
+        joystickInputProcessor.disposeSafely()
+        phWorld.disposeSafely()
     }
 
     companion object {

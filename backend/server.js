@@ -12,11 +12,11 @@ wss.on('connection', (ws, req) => {
 
     ws.on('message', (message) => {
         try {
-            // console.log('Received message:', message);
             const msg = JSON.parse(message);
+            console.log("ouai le message ", msg)
             switch (msg.type) {
                 case 'joinWaitingRoom':
-                    joinWaitingRoom(ws, msg.playerId)
+                    joinWaitingRoom(ws, msg.playerId, msg.roomSize)
                     break;
 
                 case 'leaveWaitingRoom':
