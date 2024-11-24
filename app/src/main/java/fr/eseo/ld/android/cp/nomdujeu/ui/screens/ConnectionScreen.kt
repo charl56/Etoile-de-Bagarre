@@ -67,8 +67,8 @@ fun ConnectionScreen(
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var username by remember { mutableStateOf("") }
-    var isSignIn by remember { mutableStateOf(googleAuthClient.isSignedIn()) }
-    var lifecycleScope = rememberCoroutineScope()
+    val isSignIn by remember { mutableStateOf(googleAuthClient.isSignedIn()) }
+    val lifecycleScope = rememberCoroutineScope()
 
     // Show toast when error message changes
     LaunchedEffect(errorMessage) {
@@ -102,11 +102,9 @@ fun ConnectionScreen(
         onUsernameChange = { username = it; authenticationViewModel.clearErrorMessage() },
         onLoginClick = {
             authenticationViewModel.loginWithEmail(email, password)
-            Log.d("Authentication", "Login clicked : " + authenticationViewModel.errorMessage.value)
         },
         onSignupClick = {
             authenticationViewModel.signupWithEmail(email, password, username)
-            navController.navigate(NomDuJeuScreens.HOME_SCREEN.id)
         },
         onGoogleSignIn = {
             if(!isSignIn){

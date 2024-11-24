@@ -47,6 +47,11 @@ class AuthenticationViewModel @Inject constructor(
             _isSignUpSuccessful.value = false
             return
         }
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            _errorMessage.value = "Please enter a valid email address."
+            _isSignUpSuccessful.value = false
+            return
+        }
         authenticationRepository.signUpWithEmail(email, password)
             .addOnCompleteListener { task ->
                 if(task.isSuccessful) {
@@ -89,7 +94,6 @@ class AuthenticationViewModel @Inject constructor(
                 _user.value = null
                 playerViewModel.setUserNull()
                 if (!task.isSuccessful) {
-                    Log.d("Authentication", "Login failed: ${task.exception?.message}")
                     _errorMessage.value = "Login failed. Please try again."
                     _isLoginSuccessful.value = false
                 }
