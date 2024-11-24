@@ -25,8 +25,12 @@ enum class AnimationModel {
 enum class AnimationType {
     IDLE,
     WALK,
+    WALK_TOP,
+    WALK_BOTTOM,
     RUN,
     ATTACK,
+    ATTACK_TOP,
+    ATTACK_BOTTOM,
     DEATH;
 
     val atlasKey: String = this.toString().lowercase()

@@ -9,8 +9,15 @@
 /.idea/assetWizardSettings.xml
 .DS_Store
 /build
+# Include apk files
+!app/build/output/debug/*.apk
+
 /captures
 .externalNativeBuild
 .cxx
 local.properties
 /org.*
+
+
+nodes_modules/
+package-lock.json

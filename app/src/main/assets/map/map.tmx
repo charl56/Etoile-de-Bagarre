@@ -7,17 +7,17 @@
    <image source="../player/idle_00.png" width="48" height="48"/>
   </tile>
  </tileset>
- <layer id="2" name="water" width="35" height="35" locked="1">
+ <layer id="2" name="water" width="35" height="35">
   <data encoding="base64" compression="zlib">
-   eJztwwENAAAMw6D6dzoXF3JIWDVVVVVVffwAkU9bLg==
+   eJzt07EJACAMRNHsP6A7ZAsrQa4wlV6EX7zWfDRmRCQA4Dtj06nF3eOe37UFWPS/OvdUZ59abnfrmVXLy7txt1Tv0GGXtM3ZAQD41wS3oVhJ
   </data>
  </layer>
  <layer id="1" name="island" width="35" height="35">
   <data encoding="base64" compression="zlib">
-   eJztl8EJhDAQRWewHhvZEhY8bWc2YheyLXiwBxMwCMFkJ/GPiWzAdxGDzz9jwixEtDyYFxOZi9bEdR/Ge8x0wCTzsutGcBZzhJhXv39DapapDjEvh7ufk02ugwRpNpoOUp+7HH75+P9GSZ++oIvfy82luTSXNL6GN9fhcnY2/bvLWX0sk2GoIJOS2YTO6hIuoWxqd7H91fEBuqdCLpP3Xovf5+4ZpFPObKPphJhVUHsBam662vOhPe/ueiE9ruSj5ZHjguqRWK2kaGXS0GUDxh3pkA==
+   eJztl9EJgzAQhi90Hh87Q6EjCD51nG5RSnfok1tIV/ChnaEJNKihOXPJnUlA8HsxRj//OyMZAWCsmLMC0Ae8ifMuit9jgAkFYV5m3o05iwEB82p+70DNkuqAeVns+ZhsYh1CCM1G0iHUZyuHNR/328jp02R0cXuZw+UxY3dZupRSo5L6pXaXl6ZVZbj8+zfV5HLU492Mq1B9DL2mI9znjoydYOn9JGQSUyfMBRtz8f2rc7j4sqG4uP3zgfWapLqY/jqoCUpPpbj0znMNbp/bazidYvY2kk4cexXqWiDpwrFm+9a8revF6ZGSj5RHjAtXj2C1CkUqkx1ZvtZ43+I=
   </data>
  </layer>
- <objectgroup id="5" name="entities">
+ <objectgroup id="5" name="entities" locked="1">
   <object id="6" name="Player" gid="530" x="93" y="332" width="48" height="48">
    <properties>
     <property name="type" value="Player"/>
@@ -41,7 +41,7 @@
  </objectgroup>
  <layer id="3" name="bgd_1" width="35" height="35" locked="1">
   <data encoding="base64" compression="zlib">
-   eJzt0rsJACAMAFFdwq2cxzndyD6k0OIQ5R4ErPK1FEmSGBPMPULs6pXpJXtH5D6y+id7EasB/+6GX+Z4nXeQJImxAI2GBe4=
+   eJzt0TEKACAIhWFbOkJX9ZzdqMFNsCmL5P9AcJKnigAAkGMmzlZXL2nQe9E9erufZedkHphR5KZV9vgdfwAAIMcCdlAFrg==
   </data>
  </layer>
  <layer id="4" name="fgd_1" width="35" height="35" locked="1">

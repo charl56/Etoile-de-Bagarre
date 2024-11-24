@@ -1,4 +1,5 @@
 plugins {
+    kotlin("plugin.serialization") version "1.9.22"
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
@@ -114,6 +115,13 @@ dependencies {
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.googleid)
     implementation(libs.firebase.auth.ktx)
+//    Ktor : don't work when set in libs.version and installed here
+    implementation("io.ktor:ktor-client-core:3.0.0")
+    implementation("io.ktor:ktor-client-cio:3.0.0")
+    implementation("io.ktor:ktor-client-websockets:3.0.0")
+    implementation("io.ktor:ktor-network-tls:3.0.0")
+    // JSON serialization
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
 
 //    LibGDX
     implementation("com.badlogicgames.gdx:gdx-backend-android:$gdxVersion")
@@ -127,6 +135,8 @@ dependencies {
     add("natives", "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-x86_64")
     implementation("com.badlogicgames.gdx:gdx:$gdxVersion")
     implementation("com.badlogicgames.gdx:gdx-box2d:$gdxVersion")
+    // Need to setup notification ervery each time
+    implementation("androidx.work:work-runtime-ktx:2.8.0")
 
     // Ktx extensions of LibGDX
     implementation("io.github.libktx:ktx-actors:$ktxVersion")

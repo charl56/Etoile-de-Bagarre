@@ -34,6 +34,7 @@ class AuthenticationViewModel @Inject constructor(
     // Update value when application is launched
     init{
         _user.value = authenticationRepository.getCurrentUser()
+
         if(_user.value == null){
             // TODO : besoin de faire qqch ici ? retour page login ? Sachant que on ne peut pas se connecter sans passer par la page de login
         }

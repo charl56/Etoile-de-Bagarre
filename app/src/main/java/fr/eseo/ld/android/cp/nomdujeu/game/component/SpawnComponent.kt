@@ -12,11 +12,11 @@ data class SpawnCfg(
     val speedScaling: Float = 1f,
     val physicScaling: Vector2 = vec2(1f, 1f),
     val physicOffset: Vector2 = vec2(0f, 0f),
-    val bodyType: BodyType= BodyType.DynamicBody
+    val bodyType: BodyType = BodyType.DynamicBody
 )
 
 // Infos for componant of entity spawning
 data class SpawnComponent (
     var type: String = "",
-    var lication: Vector2 = vec2()
+    var location: Vector2 = vec2()
 )

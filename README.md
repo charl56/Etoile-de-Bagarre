@@ -28,7 +28,7 @@
 - ...
 
 
-
-
-
-
+#### Created by
+- Tessier Cécile
+- Carreau Thomas
+- Pichou Charles
