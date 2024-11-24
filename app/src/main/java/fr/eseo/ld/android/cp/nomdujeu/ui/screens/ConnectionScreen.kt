@@ -1,5 +1,7 @@
 package fr.eseo.ld.android.cp.nomdujeu.ui.screens
 
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,7 +25,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -56,6 +60,9 @@ fun ConnectionScreen(
 ) {
     val context = LocalContext.current
     val googleAuthClient = GoogleAuthClient(context, playerViewModel)
+    val errorMessage by authenticationViewModel.errorMessage.observeAsState()
+    val isLoginSuccessful by authenticationViewModel.isLoginSuccessful.observeAsState()
+    val isSignUpSuccessful by authenticationViewModel.isSignUpSuccessful.observeAsState()
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -63,17 +70,39 @@ fun ConnectionScreen(
     var isSignIn by remember { mutableStateOf(googleAuthClient.isSignedIn()) }
     var lifecycleScope = rememberCoroutineScope()
 
+    // Show toast when error message changes
+    LaunchedEffect(errorMessage) {
+        errorMessage?.let { message ->
+            Log.d("Authentication", "Displaying error message: $message")
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+            authenticationViewModel.clearErrorMessage()
+        }
+    }
+
+    LaunchedEffect(isLoginSuccessful) {
+        if (isLoginSuccessful == true) {
+            navController.navigate(NomDuJeuScreens.HOME_SCREEN.id)
+            authenticationViewModel.clearErrorMessage()
+        }
+    }
+
+    LaunchedEffect(isSignUpSuccessful) {
+        if (isSignUpSuccessful == true) {
+            navController.navigate(NomDuJeuScreens.HOME_SCREEN.id)
+            authenticationViewModel.clearErrorMessage()
+        }
+    }
 
     ConnectionScreenContent(
         email = email,
-        onEmailChange = { email = it },
+        onEmailChange = { email = it; authenticationViewModel.clearErrorMessage() },
         password = password,
-        onPasswordChange = { password = it },
+        onPasswordChange = { password = it; authenticationViewModel.clearErrorMessage() },
         username = username,
-        onUsernameChange = { username = it },
+        onUsernameChange = { username = it; authenticationViewModel.clearErrorMessage() },
         onLoginClick = {
             authenticationViewModel.loginWithEmail(email, password)
-            navController.popBackStack()
+            Log.d("Authentication", "Login clicked : " + authenticationViewModel.errorMessage.value)
         },
         onSignupClick = {
             authenticationViewModel.signupWithEmail(email, password, username)
@@ -85,7 +114,6 @@ fun ConnectionScreen(
                     val success = googleAuthClient.signIn()
                     if (success){
                         navController.navigate(NomDuJeuScreens.HOME_SCREEN.id)
-                        println("Google Sign In Success")
                     }
                 }
             }
