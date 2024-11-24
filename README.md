@@ -1,5 +1,13 @@
 # 🎮 Android Game Project - Inspired by Brawl Stars
 
+### 🚀 Getting Started
+
+**Cloner le git :**
+
+```bash
+git clone -c http.sslVerify=false https://172.24.7.8/e5e/android/2024-2025/projects/carreau-pichou-tessier
+```
+
 ### 🛠 Project Setup
 
 1. **Open Android Studio**
