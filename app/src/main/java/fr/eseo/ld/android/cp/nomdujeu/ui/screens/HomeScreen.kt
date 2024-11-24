@@ -8,6 +8,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -24,6 +25,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -170,57 +172,54 @@ fun HomeScreenContent() {
         contentAlignment = Alignment.Center
     ) {
         Row() {
-            PlayerCard()
-            Spacer(modifier = Modifier.width(16.dp))
-            PlayerNullCard()
+            CardSelectionScreen()
         }
     }
 }
 
 
 @Composable
-fun PlayerCard() {
+fun PlayerCard(
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
     Box(
         modifier = Modifier
             .size(200.dp)
             .clip(RoundedCornerShape(25.dp))
             .border(
-                BorderStroke(2.dp, MaterialTheme.colorScheme.primary),
+                BorderStroke(2.dp, if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface),
                 shape = RoundedCornerShape(25.dp)
             )
-            .background(MaterialTheme.colorScheme.surface),
-        contentAlignment = Alignment.Center
+            .background(MaterialTheme.colorScheme.surface)
+            .clickable { onClick() }
     ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(
-                text = "Name of Character",
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(8.dp)
-            )
-            Image(
-                painter = painterResource(id = R.drawable.idle_00),
-                contentDescription = "Player card",
-                contentScale = ContentScale.Fit,
-                modifier = Modifier
-                    .size(200.dp)
-                    .clip(RoundedCornerShape(25.dp))
-            )
-        }
+        Image(
+            painter = painterResource(id = R.drawable.idle_00),
+            contentDescription = "Player card",
+            contentScale = ContentScale.Fit,
+            modifier = Modifier
+                .size(200.dp)
+                .clip(RoundedCornerShape(25.dp))
+        )
     }
 }
 
 @Composable
-fun PlayerNullCard() {
+fun PlayerNullCard(
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
     Box(
         modifier = Modifier
             .size(200.dp)
             .clip(RoundedCornerShape(25.dp))
             .border(
-                BorderStroke(2.dp, MaterialTheme.colorScheme.surface),
+                BorderStroke(2.dp, if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface),
                 shape = RoundedCornerShape(25.dp)
             )
-            .background(MaterialTheme.colorScheme.surface),
-        contentAlignment = Alignment.Center
+            .background(MaterialTheme.colorScheme.surface)
+            .clickable { onClick() }
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
             Text(
@@ -229,6 +228,23 @@ fun PlayerNullCard() {
                 modifier = Modifier.padding(8.dp)
             )
         }
+    }
+}
+
+@Composable
+fun CardSelectionScreen() {
+    var selectedCard by remember { mutableStateOf("None") }
+
+    Row{
+        PlayerCard(
+            isSelected = selectedCard == "PlayerCard",
+            onClick = { selectedCard = "PlayerCard" }
+        )
+        Spacer(modifier = Modifier.width(16.dp))
+        PlayerNullCard(
+            isSelected = selectedCard == "PlayerNullCard",
+            onClick = { selectedCard = "PlayerNullCard" }
+        )
     }
 }
 
