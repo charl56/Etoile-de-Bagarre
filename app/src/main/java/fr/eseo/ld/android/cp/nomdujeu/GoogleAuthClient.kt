@@ -55,10 +55,12 @@ class GoogleAuthClient(
     }
 
     suspend fun signOut() {
-        credentialManager.clearCredentialState(
-            ClearCredentialStateRequest()
-        )
-        firebaseAuth.signOut()
+        if(isSignedIn()){
+            credentialManager.clearCredentialState(
+                ClearCredentialStateRequest()
+            )
+            firebaseAuth.signOut()
+        }
     }
 
     private suspend fun buildCredentialRequest(): GetCredentialResponse {

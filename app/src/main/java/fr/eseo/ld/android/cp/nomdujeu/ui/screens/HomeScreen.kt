@@ -23,6 +23,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import fr.eseo.ld.android.cp.nomdujeu.GoogleAuthClient
 import fr.eseo.ld.android.cp.nomdujeu.R
 import fr.eseo.ld.android.cp.nomdujeu.service.WebSocket
 import fr.eseo.ld.android.cp.nomdujeu.ui.navigation.NomDuJeuScreens
@@ -50,6 +51,7 @@ fun HomeScreen (
     val currentUser by playerViewModel.player.collectAsState()  // Current user
     val isWebSocketAvailable = remember { mutableStateOf(false) }   // Is the websocket available
     val selectedPlayerCount = remember { mutableStateOf(2) }        // Number of players selected for the game
+    val googleAuthClient = GoogleAuthClient(context, playerViewModel)
 
     // Check if websocket is available
     LaunchedEffect(Unit) {
@@ -76,8 +78,11 @@ fun HomeScreen (
                     // Logout button at the top right
                     Button(
                         onClick = {
-                            authenticationViewModel.logout()
-                            navController.navigate(NomDuJeuScreens.CONNECTION_SCREEN.id)
+                            coroutineScope.launch {
+                                authenticationViewModel.logout()
+                                googleAuthClient.signOut()
+                                navController.navigate(NomDuJeuScreens.CONNECTION_SCREEN.id)
+                            }
                         },
                         modifier = Modifier
                             .align(Alignment.TopStart)

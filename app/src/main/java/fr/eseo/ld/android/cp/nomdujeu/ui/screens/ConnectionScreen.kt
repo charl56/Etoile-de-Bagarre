@@ -1,6 +1,5 @@
 package fr.eseo.ld.android.cp.nomdujeu.ui.screens
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -73,7 +72,6 @@ fun ConnectionScreen(
     // Show toast when error message changes
     LaunchedEffect(errorMessage) {
         errorMessage?.let { message ->
-            Log.d("Authentication", "Displaying error message: $message")
             Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
             authenticationViewModel.clearErrorMessage()
         }

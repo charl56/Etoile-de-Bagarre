@@ -1,7 +1,6 @@
 package fr.eseo.ld.android.cp.nomdujeu.viewmodels
 
 
-import android.util.Log
 import android.util.Patterns
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -34,10 +33,6 @@ class AuthenticationViewModel @Inject constructor(
     // Update value when application is launched
     init{
         _user.value = authenticationRepository.getCurrentUser()
-
-        if(_user.value == null){
-            // TODO : besoin de faire qqch ici ? retour page login ? Sachant que on ne peut pas se connecter sans passer par la page de login
-        }
     }
 
 
