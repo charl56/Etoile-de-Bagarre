@@ -22,6 +22,8 @@
     <string name="homeScreen_stopMatchMaking">Cancel</string>
     <string name="homeScreen_playersCount">players</string>
     <string name="homeScreen_playersInGame">Number of players in game</string>
+    <string name="player_image_description">Player Image</string>
+    <string name="error_loading_player_image">Error loading player image</string>
 
 
 
