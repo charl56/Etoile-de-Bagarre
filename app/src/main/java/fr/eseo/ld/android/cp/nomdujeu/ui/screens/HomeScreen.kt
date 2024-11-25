@@ -276,7 +276,7 @@ fun PlayerCard(
                 contentDescription = "Animated character",
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
-                    .size(200.dp)
+                    .size(150.dp)
                     .clip(RoundedCornerShape(25.dp))
             )
         }
@@ -379,42 +379,40 @@ fun PlayerWaitingScreen(
                 )
             }
             // Play/Cancel button at the bottom right
-            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.BottomEnd) {
-                Button(
-                    onClick = {
-                        if (currentUser != null) {
-                            //gameViewModel.launchGame(context, navController)
-                            coroutineScope.launch {
-                                HandlePlay().handlePlayButtonClick(
-                                    context = context,
-                                    navController = navController,
-                                    isInWaitingRoom = isInWaitingRoom,
-                                    gameViewModel = gameViewModel,
-                                    currentPlayer = currentUser,
-                                    selectedPlayerCount = selectedPlayerCount.value,
-                                    isWebSocketAvailable = isWebSocketAvailable
-                                )
-                            }
-                        } else {
-                            Toast.makeText(
-                                context,
-                                "${R.string.homeScreen_error_connectMatchMaking}",
-                                Toast.LENGTH_SHORT
-                            ).show()
+            Button(
+                onClick = {
+                    if (currentUser != null) {
+//                        gameViewModel.launchGame(context, navController)
+                        coroutineScope.launch {
+                            HandlePlay().handlePlayButtonClick(
+                                context = context,
+                                navController = navController,
+                                isInWaitingRoom = isInWaitingRoom,
+                                gameViewModel = gameViewModel,
+                                currentPlayer = currentUser,
+                                selectedPlayerCount = selectedPlayerCount.value,
+                                isWebSocketAvailable = isWebSocketAvailable
+                            )
                         }
-                    },
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .align(Alignment.BottomEnd),
-                    enabled = isWebSocketAvailable.value
-                ) {
-                    Text(
-                        text = if (isInWaitingRoom.value) stringResource(R.string.homeScreen_stopMatchMaking) else stringResource(
-                            R.string.homeScreen_startMatchMaking
-                        )
+                    } else {
+                        Toast.makeText(
+                            context,
+                            "${R.string.homeScreen_error_connectMatchMaking}",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                },
+                modifier = Modifier
+                    .padding(16.dp),
+                enabled = isWebSocketAvailable.value
+            ) {
+                Text(
+                    text = if (isInWaitingRoom.value) stringResource(R.string.homeScreen_stopMatchMaking) else stringResource(
+                        R.string.homeScreen_startMatchMaking
                     )
-                }
+                )
             }
+
             if (!isWebSocketAvailable.value) {
                 Text(
                     text = stringResource(R.string.homeScreen_error_serverNotAvailable),

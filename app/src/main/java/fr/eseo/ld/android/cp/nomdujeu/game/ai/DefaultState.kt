@@ -1,5 +1,6 @@
 package fr.eseo.ld.android.cp.nomdujeu.game.ai
 
+import android.util.Log
 import com.badlogic.gdx.graphics.g2d.Animation
 import fr.eseo.ld.android.cp.nomdujeu.game.component.AnimationType
 
@@ -56,12 +57,29 @@ enum class DefaultState : EntityState {
     },
 
     RESURRECT{
+        override fun enter(entity: AiEntity) {
+            entity.enableGlobalState(true)
+            entity.animation(AnimationType.DEATH, Animation.PlayMode.REVERSED, true)
+        }
 
+        override fun update(entity: AiEntity) {
+            if(entity.isAnimationDone){
+                entity.state(IDLE)
+                entity.root(false)
+            }
+        }
     };
 }
 
 enum class DefaultGlobalState : EntityState {
     CHECK_ALIVE {
-
+        override fun update(entity: AiEntity) {
+            Log.d("DEATH", "Check entity $entity is dead : ${entity.isDead}")
+            if(entity.isDead) {
+                Log.d("DEATH", "Entity $entity is dead")
+                entity.enableGlobalState(false)
+                entity.state(DefaultState.DEAD, true)
+            }
+        }
     }
 }

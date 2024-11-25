@@ -3,6 +3,7 @@ package fr.eseo.ld.android.cp.nomdujeu.game.system
 import android.util.Log
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.g2d.Animation
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.ui.Label
@@ -53,6 +54,7 @@ class LifeSystem(
         if(lifeCmp.isDead) {
             aniCmps.getOrNull(entity)?.let { aniCmp ->
                 aniCmp.nextAnimation(AnimationType.DEATH)
+                aniCmp.playMode = Animation.PlayMode.NORMAL
             }
             
             configureEntity(entity){
