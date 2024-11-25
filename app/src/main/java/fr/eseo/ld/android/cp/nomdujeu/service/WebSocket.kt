@@ -14,7 +14,6 @@ import fr.eseo.ld.android.cp.nomdujeu.viewmodels.GameViewModel
 import fr.eseo.ld.android.cp.nomdujeu.viewmodels.PlayerViewModel
 import io.ktor.client.network.sockets.ConnectTimeoutException
 import io.ktor.client.request.url
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.consumeEach
@@ -136,7 +135,7 @@ class WebSocket private constructor() {
     private fun processMessage(message: String) {
         try {
             val jsonObject = Json.parseToJsonElement(message).jsonObject
-//            Log.d("WebSocket", "Received message: $jsonObject")
+            Log.d("WebSocket", "Received message: $jsonObject")
             when (jsonObject["type"]?.jsonPrimitive?.content) {
                 // Update player count, display in home screen
                 "playerCount" -> {
@@ -170,6 +169,7 @@ class WebSocket private constructor() {
 
     // Function to send message to server, when player is in waiting room
     suspend fun joinAndWait(currentPlayer: Player, selectedPlayerCount: Int) {
+        println("WEBSOCKET: Joining waiting room $selectedPlayerCount")
         val message = Json.encodeToString(mapOf(
             "type" to "joinWaitingRoom",
             "playerId" to currentPlayer.id,
@@ -213,7 +213,6 @@ class WebSocket private constructor() {
             // Else update
             Player(
                 id = id,
-                pseudo = player["pseudo"]?.jsonPrimitive?.content ?: "",
                 x = player["x"]?.jsonPrimitive?.content?.toFloatOrNull() ?: 0f,
                 y = player["y"]?.jsonPrimitive?.content?.toFloatOrNull() ?: 0f,
                 life = player["life"]?.jsonPrimitive?.content?.toIntOrNull() ?: 0,

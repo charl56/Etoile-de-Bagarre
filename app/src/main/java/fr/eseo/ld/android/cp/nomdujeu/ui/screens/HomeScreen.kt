@@ -34,7 +34,6 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -90,7 +89,12 @@ fun HomeScreen(
     ) {
         Scaffold(
             content = { innerPadding ->
-                Column(modifier = Modifier.padding(innerPadding)) {
+                Column(
+                    modifier = Modifier
+                        .padding(innerPadding)
+                        .fillMaxSize(),
+                    verticalArrangement = Arrangement.SpaceBetween
+                ) {
                     HomeScreenTop(
                         onDeconnection = {
                             coroutineScope.launch {
@@ -101,10 +105,16 @@ fun HomeScreen(
                         },
                         pseudo = currentUser?.pseudo
                             ?: stringResource(R.string.homeScreen_pseudoLoading),
-                        numberWins = currentUser?.wins ?: 0,
-                        innerPadding = innerPadding
+                        numberWins = currentUser?.wins ?: 0
                     )
-                    HomeScreenContent()
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        HomeScreenContent()
+                    }
                     PlayerWaitingScreen(
                         selectedPlayerCount = selectedPlayerCount,
                         isWebSocketAvailable = isWebSocketAvailable,
@@ -124,21 +134,19 @@ fun HomeScreen(
 
 @Composable
 fun HomeScreenTop(
-    innerPadding: PaddingValues,
     onDeconnection: () -> Unit,
     pseudo: String,
     numberWins: Int,
 ) {
     Box(
         modifier = Modifier
-            .padding(innerPadding)
             .fillMaxWidth(),
         contentAlignment = Alignment.TopCenter
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(16.dp, 0.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -337,7 +345,7 @@ fun PlayerWaitingScreen(
     navController: NavController,
     gameViewModel: GameViewModel
 ) {
-    Box(modifier = Modifier.fillMaxWidth()) {
+    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.BottomStart) {
         Row(
             modifier = Modifier
                 .padding(16.dp, 8.dp),
@@ -429,7 +437,6 @@ fun PlayerWaitingScreen(
 fun HomeScreenPreview() {
     NomDuJeuTheme(darkTheme = false, dynamicColor = false) {
         HomeScreenTop(
-            innerPadding = PaddingValues(0.dp),
             onDeconnection = {},
             pseudo = "Pseudo",
             numberWins = 0
