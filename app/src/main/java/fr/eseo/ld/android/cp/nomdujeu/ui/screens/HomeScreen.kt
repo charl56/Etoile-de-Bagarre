@@ -374,18 +374,18 @@ fun PlayerWaitingScreen(
             Button(
                 onClick = {
                     if (currentUser != null) {
-                        gameViewModel.launchGame(context, navController)
-//                        coroutineScope.launch {
-//                            HandlePlay().handlePlayButtonClick(
-//                                context = context,
-//                                navController = navController,
-//                                isInWaitingRoom = isInWaitingRoom,
-//                                gameViewModel = gameViewModel,
-//                                currentPlayer = currentUser,
-//                                selectedPlayerCount = selectedPlayerCount.value,
-//                                isWebSocketAvailable = isWebSocketAvailable
-//                            )
-//                        }
+//                        gameViewModel.launchGame(context, navController)
+                        coroutineScope.launch {
+                            HandlePlay().handlePlayButtonClick(
+                                context = context,
+                                navController = navController,
+                                isInWaitingRoom = isInWaitingRoom,
+                                gameViewModel = gameViewModel,
+                                currentPlayer = currentUser,
+                                selectedPlayerCount = selectedPlayerCount.value,
+                                isWebSocketAvailable = isWebSocketAvailable
+                            )
+                        }
                     } else {
                         Toast.makeText(
                             context,
