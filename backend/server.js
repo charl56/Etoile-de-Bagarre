@@ -33,7 +33,7 @@ wss.on('connection', (ws, req) => {
                     break;
                     
                 // TODO
-                case 'onReceiveHot':
+                case 'onReceiveHit':
                     break;
 
                 // Add other case if needed

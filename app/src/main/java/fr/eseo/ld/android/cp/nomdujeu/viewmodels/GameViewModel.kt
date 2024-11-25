@@ -44,18 +44,14 @@ class GameViewModel : ViewModel() {
 
 
     fun endGame() {
-        Log.d("GameViewModel", "endGame called")
         gameLaunched = false
 
         viewModelScope.launch {
             // Leave game room, but stay connected to websocket
             webSocket.leaveRoom()
-            Log.d("GameViewModel", "room leaved")
 
             withContext(Dispatchers.Main) {
-                Log.d("GameViewModel", "Exit game")
                 AndroidLauncher.exitGame()
-                Log.d("GameViewModel", "Game exited")
                 navController.navigate(NomDuJeuScreens.END_GAME_SCREEN.id)
             }
         }

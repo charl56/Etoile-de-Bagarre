@@ -111,8 +111,9 @@ function onHit(ws, data) {  // data {victimId: playerId, shooterId: playerId, da
     try {
         const room = getRoomById(ws.roomId);
         const parsedData = JSON.parse(data);
-        // console.log("onHit", parsedData)
+         console.log("onHit", parsedData)
 
+        // If room existe and player who do request is inside
         if (room && room.players.has(ws)) {
             // Pointeur ? être sur que quand on modifie une var victim ou shooter, cela met a jour dans la liste
             const victim = getPlayerById(room, parsedData.victimId);
@@ -127,7 +128,7 @@ function onHit(ws, data) {  // data {victimId: playerId, shooterId: playerId, da
                     if (shooter) {
                         shooter.kills = (shooter.kills || 0) + 1;
                     }
-                    // TODO : renvoyer le message a tous les joueurs ???
+
                     const message = JSON.stringify({ type: 'isDead', shooterId: parsedData.shooter.id, victimId: parsedData.victim.id });
                     room.players.forEach((_, client) => client.send(message));
                 }

@@ -265,7 +265,7 @@ class WebSocket private constructor() {
     }
 
     // TODO : call this function when we attack, and detect enemy collision
-    suspend fun onHitEnemy(victimId: Int, shooterId: Int, damage: Int){
+    fun onHitEnemy(victimId: Int, shooterId: Int, damage: Int){
         val data = Json.encodeToString(mapOf(
             "victimId" to victimId,
             "shooterId" to shooterId,
@@ -277,7 +277,9 @@ class WebSocket private constructor() {
             "data" to data
         ))
 
-        sendMessage(message);
+        coroutineScope.launch {
+            sendMessage(message)
+        }
     }
 
 
@@ -291,7 +293,6 @@ class WebSocket private constructor() {
             // TODO : remove entity from game
         }
         // Don't need to update shooter kills, it's done in backend
-
     }
 
     // When the game is finish, server send message et execute this
