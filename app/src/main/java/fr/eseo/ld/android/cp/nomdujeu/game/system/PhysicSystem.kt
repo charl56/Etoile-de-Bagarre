@@ -22,6 +22,9 @@ import ktx.log.logger
 import ktx.math.component1
 import ktx.math.component2
 
+val Fixture.entity: Entity
+    get() = body.userData as Entity
+
 @AllOf([PhysicComponent::class, ImageComponent::class])
 class PhysicSystem(
     private val phWorld : World,
@@ -74,9 +77,6 @@ class PhysicSystem(
         }
     }
 
-    private val Fixture.entity: Entity
-        get() = body.userData as Entity
-
     override fun beginContact(contact: Contact) {
         val entityA: Entity = contact.fixtureA.entity
         val entityB: Entity = contact.fixtureB.entity
@@ -121,7 +121,7 @@ class PhysicSystem(
 
     override fun preSolve(contact: Contact, oldManifold: Manifold?) {
         // Enable collisions between entities with dynamic bodies only (player and enemies)
-        contact.isEnabled = ( contact.fixtureA.isDynamicBody() || contact.fixtureB.isDynamicBody() )
+        contact.isEnabled = ( contact.fixtureA.isDynamicBody().xor(contact.fixtureB.isDynamicBody()) )
     }
 
     // Not used
