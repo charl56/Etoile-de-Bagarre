@@ -57,7 +57,9 @@ fun EndGameScreen(
         Scaffold(
             content = {innerPadding ->
                 Box(
-                    modifier = Modifier.padding(innerPadding).fillMaxSize(),
+                    modifier = Modifier
+                        .padding(innerPadding)
+                        .fillMaxSize(),
                 ) {
                     Column {
                         EndGameTopBar(innerPadding, endString)
@@ -68,8 +70,8 @@ fun EndGameScreen(
                         navController.navigate(NomDuJeuScreens.HOME_SCREEN.id)
                     },
                         modifier = Modifier
-                                .align(Alignment.BottomEnd)
-                                .padding(16.dp)
+                            .align(Alignment.BottomEnd)
+                            .padding(16.dp)
 
                     ) {
                         Text(text = "${stringResource(R.string.endGameScreen_exit)}")
@@ -82,14 +84,17 @@ fun EndGameScreen(
 
 @Composable
 fun EndGameTopBar(innerPadding: PaddingValues, endString: String){
-    Box(modifier = Modifier.padding(innerPadding).fillMaxWidth().background(
-        brush = Brush.linearGradient(
-            colors = listOf(
-                MaterialTheme.colorScheme.secondary,
-                MaterialTheme.colorScheme.primary
+    Box(modifier = Modifier
+        .padding(innerPadding)
+        .fillMaxWidth()
+        .background(
+            brush = Brush.linearGradient(
+                colors = listOf(
+                    MaterialTheme.colorScheme.secondary,
+                    MaterialTheme.colorScheme.primary
+                )
             )
-        )
-    )){
+        )){
         Text(
             text = endString,
             modifier = Modifier.align(Alignment.TopCenter),
@@ -101,11 +106,18 @@ fun EndGameTopBar(innerPadding: PaddingValues, endString: String){
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun PlayerRankingScreen(webSocket: WebSocket) {
+    // current player
+    val player by webSocket.player.collectAsState(null)
+    // other players
     val players by webSocket.players.collectAsState(emptyList())
-    val sortedPlayers = players.sortedByDescending { it.kills }
+    val combinedPlayers = mutableListOf<Player>().apply {
+        addAll(players)
+        player?.let { add(it) }
+    }
+    val sortedPlayers = combinedPlayers.sortedWith(compareByDescending<Player> { it.life }.thenByDescending { it.kills })
 
-    Log.d("EndGameScreen", "Players: $players")
-    Log.d("EndGameScreen", "Player count: ${players.size} - ${webSocket.playerCount.value}")
+    Log.d("EndGameScreen", "Players: $combinedPlayers")
+    Log.d("EndGameScreen", "Player count: ${combinedPlayers.size} - ${webSocket.playerCount.value}")
 
     Column(
         modifier = Modifier
@@ -113,7 +125,7 @@ fun PlayerRankingScreen(webSocket: WebSocket) {
             .padding(16.dp)
     ) {
         Text(
-            text = "Classement",
+            text = stringResource(R.string.ranking),
             style = MaterialTheme.typography.titleLarge,
             modifier = Modifier
                 .padding(bottom = 16.dp)
@@ -136,8 +148,8 @@ fun TableHeader() {
             .padding(16.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(text = "Rank", style = MaterialTheme.typography.bodyLarge)
-        Text(text = "Pseudo", style = MaterialTheme.typography.bodyLarge)
+        Text(text = stringResource(R.string.rank), style = MaterialTheme.typography.bodyLarge)
+        Text(text = stringResource(R.string.pseudo), style = MaterialTheme.typography.bodyLarge)
     }
 }
 

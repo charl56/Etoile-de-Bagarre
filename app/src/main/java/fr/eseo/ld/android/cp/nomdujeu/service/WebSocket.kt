@@ -213,6 +213,7 @@ class WebSocket private constructor() {
             // Else update
             Player(
                 id = id,
+                pseudo = player["pseudo"]?.jsonPrimitive?.content ?: "",
                 x = player["x"]?.jsonPrimitive?.content?.toFloatOrNull() ?: 0f,
                 y = player["y"]?.jsonPrimitive?.content?.toFloatOrNull() ?: 0f,
                 life = player["life"]?.jsonPrimitive?.content?.toIntOrNull() ?: 0,
@@ -301,6 +302,7 @@ class WebSocket private constructor() {
         winner = jsonObject["winnerPseudo"]?.jsonPrimitive?.content ?: ""
         kills = jsonObject["winnerKills"]?.jsonPrimitive?.content ?: ""
 
+        println("ouai la victoire est a ${_player.value?.id} avec $id kills")
         if (id == _player.value?.id) {
             playerViewModel.addWinToPlayerWithId(id);
         }
