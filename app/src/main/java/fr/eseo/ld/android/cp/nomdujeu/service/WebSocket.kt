@@ -89,6 +89,8 @@ class WebSocket private constructor() {
         this.gameViewModel = gameViewModel;
     }
 
+
+
     fun setPlayer(player: Player) {
         _player.value = player
     }
@@ -211,9 +213,6 @@ class WebSocket private constructor() {
             // Else update
             Player(
                 id = id,
-                pseudo = player["pseudo"]?.jsonPrimitive?.content ?: "",
-                kills = player["kills"]?.jsonPrimitive?.content?.toIntOrNull() ?: 0,
-                email = player["email"]?.jsonPrimitive?.content ?: "",
                 x = player["x"]?.jsonPrimitive?.content?.toFloatOrNull() ?: 0f,
                 y = player["y"]?.jsonPrimitive?.content?.toFloatOrNull() ?: 0f,
                 life = player["life"]?.jsonPrimitive?.content?.toIntOrNull() ?: 0,
@@ -249,7 +248,6 @@ class WebSocket private constructor() {
             val encodedPlayer = Json.encodeToString(mapOf(
                 "id" to _player.value?.id,
                 "pseudo" to _player.value?.pseudo,
-                "email" to _player.value?.email,
                 "x" to _player.value?.x.toString(),
                 "y" to _player.value?.y.toString(),
                 "kills" to _player.value?.kills.toString(),
