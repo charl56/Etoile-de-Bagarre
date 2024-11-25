@@ -213,6 +213,7 @@ class WebSocket private constructor() {
             // Else update
             Player(
                 id = id,
+                pseudo = player["pseudo"]?.jsonPrimitive?.content ?: "",
                 x = player["x"]?.jsonPrimitive?.content?.toFloatOrNull() ?: 0f,
                 y = player["y"]?.jsonPrimitive?.content?.toFloatOrNull() ?: 0f,
                 life = player["life"]?.jsonPrimitive?.content?.toIntOrNull() ?: 0,
