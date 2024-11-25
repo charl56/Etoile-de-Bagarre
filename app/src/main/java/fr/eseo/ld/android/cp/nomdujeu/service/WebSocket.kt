@@ -44,7 +44,7 @@ class WebSocket private constructor() {
         install(WebSockets)
         engine {
             https {
-                // Accept all ssl certificates
+                // Accept all ssl certificates, useful for self-signed certificates or invalid certificates
                 trustManager = object : X509TrustManager {
                     override fun checkClientTrusted(chain: Array<X509Certificate>, authType: String) {}
                     override fun checkServerTrusted(chain: Array<X509Certificate>, authType: String) {}
