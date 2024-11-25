@@ -98,18 +98,28 @@ const broadcast = (roomId) => {
     if (!room) return;
 
     // detect when to end the game : 1 player alive
-    var alivePlayers;
+    var alivePlayers = 0;
     room.players.forEach((player) => {
+        
         if(player.isAlive){
             alivePlayers++
         }
     })
 
 
-    if(alivePlayers === 1 && room.isStarted){
+    if (alivePlayers === 1 && room.isStarted) {
+        let winner;
         room.players.forEach((player) => {
-            player.send(JSON.stringify({ type: 'endGame', winner: player.pseudo, kills: player.kills, id: player.id }));
+            if (player.isAlive) {
+                winner = player;
+            }
         });
+
+        if (winner) {
+            room.players.forEach((player) => {
+                player.send(JSON.stringify({ type: 'endGame', winnerId: winner.id, winnerPseudo: winner.pseudo, winnerKills: winner.kills }));
+            });
+        }
         return;
     }
 

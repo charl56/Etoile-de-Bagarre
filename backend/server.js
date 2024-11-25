@@ -1,6 +1,5 @@
 const WebSocket = require('ws');
 const http = require('http');
-const url = require('url');
 
 const server = http.createServer();
 const wss = new WebSocket.Server({ server });
@@ -13,10 +12,10 @@ wss.on('connection', (ws, req) => {
     ws.on('message', (message) => {
         try {
             const msg = JSON.parse(message);
-            console.log("ouai le message ", msg)
+            // console.log("ouai le message ", msg)
             switch (msg.type) {
                 case 'joinWaitingRoom':
-                    joinWaitingRoom(ws, msg.playerId, msg.roomSize)
+                    joinWaitingRoom(ws, msg.playerId, msg.roomSize, msg.pseudo)
                     break;
 
                 case 'leaveWaitingRoom':
@@ -27,15 +26,10 @@ wss.on('connection', (ws, req) => {
                     updatePlayerData(msg.data, ws)
                     break;
 
-                // TODO
                 case 'onHit':
                     onHit(ws, msg.data)
                     break;
                     
-                // TODO
-                case 'onReceiveHit':
-                    break;
-
                 // Add other case if needed
             }
         } catch (error) {

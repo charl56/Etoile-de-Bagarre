@@ -14,6 +14,7 @@ import fr.eseo.ld.android.cp.nomdujeu.game.component.ImageComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.component.LifeComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.component.PhysicComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.system.EntitySpawnSystem.Companion.HIT_BOX_SENSOR
+import fr.eseo.ld.android.cp.nomdujeu.service.WebSocket
 import ktx.box2d.query
 import ktx.math.component1
 import ktx.math.component2
@@ -26,6 +27,8 @@ class AttackSystem(
     private val lifeCmps: ComponentMapper<LifeComponent>,
     private val phWorld : World
 ) : IteratingSystem() {
+
+    private val webSocket: WebSocket = WebSocket.getInstance()
 
     override fun onTickEntity(entity: Entity) {
         val attackCmp = attackCmps[entity]
@@ -87,8 +90,9 @@ class AttackSystem(
 
                 configureEntity(fixtureEntity) {
                     lifeCmps.getOrNull(it)?.let { lifeCmp ->
-                        Log.d("DEBUG", "Dealing ${attackCmp.damage} of damage to entity $fixtureEntity")
-                        lifeCmp.takeDamage += attackCmp.damage * MathUtils.random(0.9f, 1.1f)
+                        lifeCmp.takeDamage += attackCmp.damage * MathUtils.random(0.9f, 1.1f).toInt()
+                        Log.d("DEBUG", "Dealing ${lifeCmp.takeDamage} of damage to entity $fixtureEntity")
+                        webSocket?.onHitEnemy(lifeCmp.playerId, lifeCmp.takeDamage.toInt())
                     }
                 }
 

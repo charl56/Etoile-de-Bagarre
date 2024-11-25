@@ -1,7 +1,7 @@
 const { rooms, findAvailableRoom, getPlayerIndex, getSpawnPosition, broadcast } = require('./room-manager');
 
 // When a player join a room
-function joinWaitingRoom(ws, playerId, roomSize) {
+function joinWaitingRoom(ws, playerId, roomSize, pseudo) {
     roomSize = parseInt(roomSize, 10); // String to int
     // Validate roomSize
     roomSize = [2, 3, 4].includes(roomSize) ? roomSize : 2; // Default to 2 if invalid
@@ -18,9 +18,13 @@ function joinWaitingRoom(ws, playerId, roomSize) {
 
     const spawnIndex = getPlayerIndex(roomId, ws);
     const spawnPosition = getSpawnPosition(roomSize, spawnIndex);
+    // Set spawn position and life
     room.players.get(ws).x = spawnPosition.x;
-    room.players.get(ws).y = spawnPosition.y;
-
+    room.players.get(ws).y = spawnPosition.y;       
+    room.players.get(ws).life = 100;
+    room.players.get(ws).isAlive = true;
+    room.players.get(ws).pseudo = pseudo;
+    
     // When a player come in a room, notifiy all players in the room ( room.players.get(ws) == client )
     room.players.forEach((_, client) => {
         const message = JSON.stringify({ type: 'playerCount', count: room.players.size, maxPlayers: room.maxPlayers, spawnPositionX: client.x, spawnPositionY: client.y });
@@ -69,8 +73,10 @@ function leaveWaitingRoom(ws) {
         // Notify all players in the room
         room.players.forEach((_, client) => {
             if(!room.isStarted){
-                client.x = spanwPositions[getPlayerIndex(ws.roomId, ws)].x;
-                client.y = spanwPositions[getPlayerIndex(ws.roomId, ws)].y;
+
+                const spanwPosition = getSpawnPosition(getPlayerIndex(ws.roomId, ws))
+                client.x = spanwPosition.x;
+                client.y = spanwPosition.y;
             }
         
             const message = JSON.stringify({ type: 'playerCount', count: room.players.size, spawnPositionX: client.x, spawnPositionY: client.y });
@@ -111,7 +117,6 @@ function onHit(ws, data) {  // data {victimId: playerId, shooterId: playerId, da
     try {
         const room = getRoomById(ws.roomId);
         const parsedData = JSON.parse(data);
-         console.log("onHit", parsedData)
 
         // If room existe and player who do request is inside
         if (room && room.players.has(ws)) {
@@ -121,15 +126,15 @@ function onHit(ws, data) {  // data {victimId: playerId, shooterId: playerId, da
 
             if (victim && victim.isAlive) {
                 victim.life -= parsedData.damage;
+
                 if (victim.life <= 0) {
                     victim.isAlive = false;
-                    // console.log("victime is dead", data)
 
                     if (shooter) {
                         shooter.kills = (shooter.kills || 0) + 1;
                     }
 
-                    const message = JSON.stringify({ type: 'isDead', shooterId: parsedData.shooter.id, victimId: parsedData.victim.id });
+                    const message = JSON.stringify({ type: 'isDead', shooterId: parsedData.shooterId, victimId: parsedData.victimId });
                     room.players.forEach((_, client) => client.send(message));
                 }
             }

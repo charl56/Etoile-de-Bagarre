@@ -49,8 +49,10 @@ class FirestoreRepository @Inject constructor(
     fun addWinToPlayerWithId(playerId : String) {
         playersCollection.document(playerId).get().addOnSuccessListener {
             val player = it.toObject(Player::class.java)
+            println("WEBSOO : ${player?.wins}")
             player?.let {
                 val updatedPlayer = it.copy(wins = it.wins + 1)
+                println("WEBSOO : ${updatedPlayer.wins}")
                 playersCollection.document(playerId).set(updatedPlayer)
             }
         }
