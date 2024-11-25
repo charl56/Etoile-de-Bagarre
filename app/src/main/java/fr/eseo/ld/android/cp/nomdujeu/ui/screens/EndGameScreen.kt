@@ -114,7 +114,7 @@ fun PlayerRankingScreen(webSocket: WebSocket) {
         addAll(players)
         player?.let { add(it) }
     }
-    val sortedPlayers = combinedPlayers.sortedWith(compareByDescending<Player> { it.life }.thenByDescending { it.kills })
+    val sortedPlayers = combinedPlayers.sortedWith(compareByDescending<Player> { it.kills }.thenByDescending { it.life })
 
     Log.d("EndGameScreen", "Players: $combinedPlayers")
     Log.d("EndGameScreen", "Player count: ${combinedPlayers.size} - ${webSocket.playerCount.value}")
@@ -150,6 +150,7 @@ fun TableHeader() {
     ) {
         Text(text = stringResource(R.string.rank), style = MaterialTheme.typography.bodyLarge)
         Text(text = stringResource(R.string.pseudo), style = MaterialTheme.typography.bodyLarge)
+        Text(text = stringResource(R.string.kills), style = MaterialTheme.typography.bodyLarge)
     }
 }
 
@@ -173,6 +174,10 @@ fun PlayerRankingItem(rank: Int, player: Player) {
             )
             Text(
                 text = player.pseudo,
+                style = MaterialTheme.typography.bodyLarge
+            )
+            Text(
+                text = player.kills.toString(),
                 style = MaterialTheme.typography.bodyLarge
             )
         }

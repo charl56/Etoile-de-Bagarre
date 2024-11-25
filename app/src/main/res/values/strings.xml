@@ -31,13 +31,16 @@
     <string name="endGameScreen_endGame">End of the game</string>
     <string name="endGameScreen_replay">Replay</string>
     <string name="endGameScreen_exit">Exit</string>
+    <string name="ranking">Ranking</string>
+    <string name="rank">Rank</string>
+    <string name="pseudo">Pseudo</string>
+    <string name="kills">Kills</string>
+
 
 
 
     <!-- NOTIFICATION -->
     <string name="channel_name">Notification channel</string>
     <string name="channel_description">You have a new notification</string>
-    <string name="ranking">Ranking</string>
-    <string name="rank">Rank</string>
-    <string name="pseudo">Pseudo</string>
+
 </resources>
