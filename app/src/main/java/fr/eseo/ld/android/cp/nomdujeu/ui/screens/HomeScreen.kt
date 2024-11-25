@@ -2,6 +2,7 @@ package fr.eseo.ld.android.cp.nomdujeu.ui.screens
 
 import android.content.Context
 import android.content.res.Configuration
+import android.graphics.BitmapFactory
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
@@ -29,6 +30,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -47,8 +50,10 @@ import fr.eseo.ld.android.cp.nomdujeu.viewmodels.GameViewModel
 import fr.eseo.ld.android.cp.nomdujeu.viewmodels.HandlePlay
 import fr.eseo.ld.android.cp.nomdujeu.viewmodels.PlayerViewModel
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Composable
 fun HomeScreen(
@@ -180,24 +185,40 @@ fun HomeScreenContent() {
 
 
 @Composable
+fun loadImageFromAssets(fileName: String): ImageBitmap? {
+    val context = LocalContext.current
+    var imageBitmap by remember { mutableStateOf<ImageBitmap?>(null) }
+
+    LaunchedEffect(fileName) {
+        withContext(Dispatchers.IO) {
+            val inputStream = context.assets.open(fileName)
+            val bitmap = BitmapFactory.decodeStream(inputStream)
+            imageBitmap = bitmap.asImageBitmap()
+        }
+    }
+
+    return imageBitmap
+}
+
+@Composable
 fun PlayerCard(
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
     // Define the frames for idle and attack animations
     val idleFrames = listOf(
-        R.drawable.idle_00,
-        R.drawable.idle_01,
-        R.drawable.idle_02,
-        R.drawable.idle_03,
-        R.drawable.idle_04,
-        R.drawable.idle_05
+        "player/idle_00.png",
+        "player/idle_01.png",
+        "player/idle_02.png",
+        "player/idle_03.png",
+        "player/idle_04.png",
+        "player/idle_05.png"
     )
     val attackFrames = listOf(
-        R.drawable.attack_00,
-        R.drawable.attack_01,
-        R.drawable.attack_02,
-        R.drawable.attack_03
+        "player/attack_00.png",
+        "player/attack_01.png",
+        "player/attack_02.png",
+        "player/attack_03.png"
     )
 
     // Track the current frame and animation state
@@ -219,6 +240,9 @@ fun PlayerCard(
         }
     }
 
+    // Load the current frame image from assets
+    val currentImage = loadImageFromAssets(if (isIdle) idleFrames[currentFrame] else attackFrames[currentFrame])
+
     // Display the card with the current animation frame
     Box(
         modifier = Modifier
@@ -238,14 +262,16 @@ fun PlayerCard(
                 onClick()
             }
     ) {
-        Image(
-            painter = painterResource(id = if (isIdle) idleFrames[currentFrame] else attackFrames[currentFrame]),
-            contentDescription = "Animated character",
-            contentScale = ContentScale.Fit,
-            modifier = Modifier
-                .size(200.dp)
-                .clip(RoundedCornerShape(25.dp))
-        )
+        currentImage?.let {
+            Image(
+                bitmap = it,
+                contentDescription = "Animated character",
+                contentScale = ContentScale.Fit,
+                modifier = Modifier
+                    .size(200.dp)
+                    .clip(RoundedCornerShape(25.dp))
+            )
+        }
     }
 }
 
