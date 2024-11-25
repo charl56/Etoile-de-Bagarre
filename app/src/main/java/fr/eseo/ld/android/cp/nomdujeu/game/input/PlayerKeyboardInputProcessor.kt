@@ -1,16 +1,19 @@
 package fr.eseo.ld.android.cp.nomdujeu.game.input
 
+import android.util.Log
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.github.quillraven.fleks.ComponentMapper
 import com.github.quillraven.fleks.World
+import fr.eseo.ld.android.cp.nomdujeu.game.component.AttackComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.component.MoveComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.component.PlayerComponent
 import ktx.app.KtxInputAdapter
 
 class PlayerKeyboardInputProcessor(
     world : World,
-    private val moveCmps : ComponentMapper<MoveComponent>,
+    private val moveCmps : ComponentMapper<MoveComponent> = world.mapper(),
+    private val attackCmps : ComponentMapper<AttackComponent> = world.mapper()
 ) : KtxInputAdapter {
 
     private var playerSin = 0f
@@ -45,6 +48,15 @@ class PlayerKeyboardInputProcessor(
                 }
             }
             updatePlayerMovement()
+            return true
+
+        } else if (keycode == Input.Keys.A) {
+            playerEntities.forEach {
+                with(attackCmps[it]) {
+                    doAttack = true
+                    this.startAttack()
+                }
+            }
             return true
         }
         return false

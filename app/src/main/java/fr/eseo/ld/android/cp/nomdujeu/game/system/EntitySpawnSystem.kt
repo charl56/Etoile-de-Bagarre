@@ -1,5 +1,6 @@
 package fr.eseo.ld.android.cp.nomdujeu.game.system
 
+import android.util.Log
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.BodyDef
@@ -16,10 +17,14 @@ import fr.eseo.ld.android.cp.nomdujeu.game.actor.FlipImage
 import fr.eseo.ld.android.cp.nomdujeu.game.component.AnimationComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.component.AnimationModel
 import fr.eseo.ld.android.cp.nomdujeu.game.component.AnimationType
+import fr.eseo.ld.android.cp.nomdujeu.game.component.AttackComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.component.CollisionComponent
+import fr.eseo.ld.android.cp.nomdujeu.game.component.DEFAULT_ATTACK_DAMAGE
+import fr.eseo.ld.android.cp.nomdujeu.game.component.DEFAULT_LIFE
 import fr.eseo.ld.android.cp.nomdujeu.game.component.DEFAULT_SPEED
 import fr.eseo.ld.android.cp.nomdujeu.game.component.EnemyPlayerComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.component.ImageComponent
+import fr.eseo.ld.android.cp.nomdujeu.game.component.LifeComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.component.MoveComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.component.PhysicComponent.Companion.physicCmpFromImage
 import fr.eseo.ld.android.cp.nomdujeu.game.component.PlayerComponent
@@ -92,10 +97,13 @@ class EntitySpawnSystem (
 
                     val w = width * cfg.physicScaling.x
                     val h = height * cfg.physicScaling.y
+                    phCmp.offset.set(cfg.physicOffset)
+                    phCmp.size.set(w, h)
 
                     // hit box
                     box(w, h, cfg.physicOffset) {
                         isSensor = cfg.bodyType != BodyDef.BodyType.StaticBody
+                        userData = HIT_BOX_SENSOR
                     }
 
                     // collision box
@@ -120,11 +128,28 @@ class EntitySpawnSystem (
                     }
                 }
 
+                if(cfg.canAttack){
+                    add<AttackComponent>{
+                        damage = DEFAULT_ATTACK_DAMAGE * cfg.attackScaling
+                        maxDelay = cfg.attackDelay
+                        extraRange = cfg.attackExtraRange
+                    }
+                }
+
+                if(cfg.lifeScaling > 0f){
+                    add<LifeComponent>{
+                        maxLife = DEFAULT_LIFE * cfg.lifeScaling
+                        life = maxLife
+                    }
+                }
+
                 // Add Player or EnemyPlayer this entity
                 if (type == "Player"){
                     if (entity.id == actualPlayerIndex){
+                        Log.d("DEBUG", "Player entity is $entity")
                         add<PlayerComponent>()
                     } else {
+                        Log.d("DEBUG", "Enemy entity is $entity")
                         add<EnemyPlayerComponent>()
                     }
                 }
@@ -147,6 +172,8 @@ class EntitySpawnSystem (
         when (type) {
             "Player" -> SpawnCfg(
                 AnimationModel.PLAYER,
+                attackExtraRange = 0.6f,
+                attackScaling = 1.25f,
                 physicScaling = vec2(0.3f,0.3f),
                 physicOffset = vec2(0f, -10f * UNIT_SCALE)
             )
@@ -181,5 +208,9 @@ class EntitySpawnSystem (
             }
         }
         return false
+    }
+
+    companion object {
+        const val HIT_BOX_SENSOR = "HitBox"
     }
 }
