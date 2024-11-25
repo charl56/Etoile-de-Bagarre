@@ -17,7 +17,7 @@ class NomDuJeuHiltApp : Application() {
 
     private fun scheduleDailyNotification() {
         val workRequest = PeriodicWorkRequestBuilder<NotificationWorker>(1, TimeUnit.HOURS)
-            .setInitialDelay(20, TimeUnit.MINUTES)
+            .setInitialDelay(1, TimeUnit.MINUTES)
             .build()
 
         WorkManager.getInstance(this).enqueueUniquePeriodicWork(

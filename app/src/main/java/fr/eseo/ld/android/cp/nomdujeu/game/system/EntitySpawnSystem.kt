@@ -74,7 +74,9 @@ class EntitySpawnSystem (
                         if (type == "Player" ) {
                             if (entity.id == actualPlayerIndex) {       // Set position with pos get from the server of this player
                                 setPosition(websocket.player.value?.x ?: location.x,websocket.player.value?.y ?: location.y)
-                            } else {                                    // Set positions of enemies players
+
+                            // Set positions of enemies players
+                            } else {
                                 try {
                                     setPosition(websocket.players.value[enemiesIndex].x, websocket.players.value[enemiesIndex].y)
                                 }
@@ -121,8 +123,9 @@ class EntitySpawnSystem (
                             speed = DEFAULT_SPEED * cfg.speedScaling
                         }
                     } else {
-                        add<MoveComponent> {        // Add id for enemies
+                        add<MoveComponent> {
                             speed = DEFAULT_SPEED * cfg.speedScaling
+                            // Add id for enemies to know who is moving
                             playerId = websocket.players.value.getOrNull(enemiesIndex)?.id ?: ""
                         }
                     }
@@ -138,7 +141,7 @@ class EntitySpawnSystem (
 
                 if(cfg.lifeScaling > 0f){
                     add<LifeComponent>{
-                        // Add playerId to know who is attacked. We add to compoennt et not to this entity, because we can't add attribute to this entity
+                        // Add playerId to know who is attacked. We add to component, not to this entity, because we can't add attribute to this entity
                         playerId = websocket.players.value.getOrNull(enemiesIndex)?.id ?: ""
                         maxLife = DEFAULT_LIFE * cfg.lifeScaling
                         life = maxLife
