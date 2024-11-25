@@ -116,8 +116,7 @@ class EntitySpawnSystem (
 
                 if(cfg.lifeScaling > 0f){
                     add<LifeComponent>{
-//                        maxLife = DEFAULT_LIFE * cfg.lifeScaling
-                        maxLife = 1f
+                        maxLife = DEFAULT_LIFE * cfg.lifeScaling
                         life = maxLife
                     }
                 }
