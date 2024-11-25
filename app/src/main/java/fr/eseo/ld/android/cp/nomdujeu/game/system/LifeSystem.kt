@@ -12,6 +12,8 @@ import com.github.quillraven.fleks.ComponentMapper
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
 import com.github.quillraven.fleks.NoneOf
+import fr.eseo.ld.android.cp.nomdujeu.game.component.AnimationComponent
+import fr.eseo.ld.android.cp.nomdujeu.game.component.AnimationType
 import fr.eseo.ld.android.cp.nomdujeu.game.component.DeadComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.component.EnemyPlayerComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.component.FloatingTextComponent
@@ -27,7 +29,8 @@ class LifeSystem(
     private val deadCmps : ComponentMapper<DeadComponent>,
     private val playerCmps : ComponentMapper<PlayerComponent>,
     private val enemyPlayerCmps : ComponentMapper<EnemyPlayerComponent>,
-    private val physicCmps : ComponentMapper<PhysicComponent>
+    private val physicCmps : ComponentMapper<PhysicComponent>,
+    private val aniCmps : ComponentMapper<AnimationComponent>
 ) : IteratingSystem() {
 
     private val damageFont = BitmapFont(Gdx.files.internal("damage/damage.fnt"))
@@ -48,6 +51,10 @@ class LifeSystem(
         }
 
         if(lifeCmp.isDead) {
+            aniCmps.getOrNull(entity)?.let { aniCmp ->
+                aniCmp.nextAnimation(AnimationType.DEATH)
+            }
+            
             configureEntity(entity){
                 deadCmps.add(it){
                     if (it in playerCmps || it in enemyPlayerCmps) {

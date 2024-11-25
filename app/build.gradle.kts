@@ -135,6 +135,7 @@ dependencies {
     add("natives", "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-x86_64")
     implementation("com.badlogicgames.gdx:gdx:$gdxVersion")
     implementation("com.badlogicgames.gdx:gdx-box2d:$gdxVersion")
+    implementation("com.badlogicgames.gdx:gdx-ai:$aiVersion")
     // Need to setup notification ervery each time
     implementation("androidx.work:work-runtime-ktx:2.8.0")
 

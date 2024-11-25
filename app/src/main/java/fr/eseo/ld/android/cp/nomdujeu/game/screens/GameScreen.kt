@@ -12,6 +12,7 @@ import fr.eseo.ld.android.cp.nomdujeu.game.component.FloatingTextComponent.Compa
 import fr.eseo.ld.android.cp.nomdujeu.game.component.ImageComponent.Companion.ImageComponentListener
 import fr.eseo.ld.android.cp.nomdujeu.game.component.PhysicComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.component.PlayerInfoComponent
+import fr.eseo.ld.android.cp.nomdujeu.game.component.StateComponent.Companion.StateComponentListener
 import fr.eseo.ld.android.cp.nomdujeu.game.event.MapChangeEvent
 import fr.eseo.ld.android.cp.nomdujeu.game.event.fire
 import fr.eseo.ld.android.cp.nomdujeu.game.input.PlayerJoystickInputProcessor
@@ -30,6 +31,7 @@ import fr.eseo.ld.android.cp.nomdujeu.game.system.MoveSystem
 import fr.eseo.ld.android.cp.nomdujeu.game.system.PhysicSystem
 import fr.eseo.ld.android.cp.nomdujeu.game.system.PlayerInfoSystem
 import fr.eseo.ld.android.cp.nomdujeu.game.system.RenderSystem
+import fr.eseo.ld.android.cp.nomdujeu.game.system.StateSystem
 import ktx.app.KtxScreen
 import ktx.assets.disposeSafely
 import ktx.box2d.createWorld
@@ -65,6 +67,7 @@ class GameScreen : KtxScreen {
             add<ImageComponentListener>()
             add<PhysicComponent.PhysicComponentListener>()
             add<FloatingTextComponentListener>()
+            add<StateComponentListener>()
             add<PlayerInfoComponent.Companion.PlayerInfoComponentListener>()
 
         }
@@ -79,6 +82,7 @@ class GameScreen : KtxScreen {
             add<LifeSystem>()
             add<PhysicSystem>()
             add<AnimationSystem>()
+            add<StateSystem>()
             add<CameraSystem>()
             add<FloatingTextSystem>()
             add<PlayerInfoSystem>()
@@ -101,6 +105,7 @@ class GameScreen : KtxScreen {
         gameStage.fire(MapChangeEvent(currentMap!!))
 
         // Add input processor to the stage
+        PlayerKeyboardInputProcessor(eWorld, eWorld.mapper())
         joystickInputProcessor = PlayerJoystickInputProcessor(eWorld)
     }
 

@@ -8,6 +8,7 @@ import com.github.quillraven.fleks.AllOf
 import com.github.quillraven.fleks.ComponentMapper
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
+import fr.eseo.ld.android.cp.nomdujeu.game.component.AnimationComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.component.AttackComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.component.AttackState
 import fr.eseo.ld.android.cp.nomdujeu.game.component.ImageComponent
@@ -25,6 +26,7 @@ class AttackSystem(
     private val physicCmps: ComponentMapper<PhysicComponent>,
     private val imageCmps: ComponentMapper<ImageComponent>,
     private val lifeCmps: ComponentMapper<LifeComponent>,
+    private val animationCmps: ComponentMapper<AnimationComponent>,
     private val phWorld : World
 ) : IteratingSystem() {
 
@@ -98,7 +100,10 @@ class AttackSystem(
 
                 return@query true
             }
+        }
 
+        val isDone = animationCmps.getOrNull(entity)?.isAnimationDone ?: true
+        if (isDone) {
             attackCmp.state = AttackState.READY
         }
     }

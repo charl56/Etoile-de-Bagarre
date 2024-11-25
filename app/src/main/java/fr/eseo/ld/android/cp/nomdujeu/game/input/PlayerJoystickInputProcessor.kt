@@ -94,7 +94,6 @@ class PlayerJoystickInputProcessor(
                 playerEntities.forEach {
                     with(attackCmps[it]) {
                         doAttack = true
-                        startAttack()
                     }
                 }
             }

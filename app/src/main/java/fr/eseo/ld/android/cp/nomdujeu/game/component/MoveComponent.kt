@@ -9,4 +9,5 @@ data class MoveComponent(
     var cos : Float = 0f,
     var sin : Float = 0f,
     var cosSin: Vector2 = vec2(),
-    )
+    var rooted: Boolean = false
+)
