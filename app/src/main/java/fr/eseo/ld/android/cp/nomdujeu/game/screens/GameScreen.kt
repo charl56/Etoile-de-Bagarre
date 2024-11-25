@@ -11,6 +11,7 @@ import com.github.quillraven.fleks.world
 import fr.eseo.ld.android.cp.nomdujeu.game.component.FloatingTextComponent.Companion.FloatingTextComponentListener
 import fr.eseo.ld.android.cp.nomdujeu.game.component.ImageComponent.Companion.ImageComponentListener
 import fr.eseo.ld.android.cp.nomdujeu.game.component.PhysicComponent
+import fr.eseo.ld.android.cp.nomdujeu.game.component.PlayerInfoComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.event.MapChangeEvent
 import fr.eseo.ld.android.cp.nomdujeu.game.event.fire
 import fr.eseo.ld.android.cp.nomdujeu.game.input.PlayerJoystickInputProcessor
@@ -27,6 +28,7 @@ import fr.eseo.ld.android.cp.nomdujeu.game.system.FloatingTextSystem
 import fr.eseo.ld.android.cp.nomdujeu.game.system.LifeSystem
 import fr.eseo.ld.android.cp.nomdujeu.game.system.MoveSystem
 import fr.eseo.ld.android.cp.nomdujeu.game.system.PhysicSystem
+import fr.eseo.ld.android.cp.nomdujeu.game.system.PlayerInfoSystem
 import fr.eseo.ld.android.cp.nomdujeu.game.system.RenderSystem
 import ktx.app.KtxScreen
 import ktx.assets.disposeSafely
@@ -63,6 +65,8 @@ class GameScreen : KtxScreen {
             add<ImageComponentListener>()
             add<PhysicComponent.PhysicComponentListener>()
             add<FloatingTextComponentListener>()
+            add<PlayerInfoComponent.Companion.PlayerInfoComponentListener>()
+
         }
 
         systems {
@@ -77,6 +81,7 @@ class GameScreen : KtxScreen {
             add<AnimationSystem>()
             add<CameraSystem>()
             add<FloatingTextSystem>()
+            add<PlayerInfoSystem>()
             add<RenderSystem>()
             add<DebugSystem>()
         }

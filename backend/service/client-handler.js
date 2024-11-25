@@ -132,9 +132,7 @@ function onHit(ws, data) {  // data {victimId: playerId, shooterId: playerId, da
                     victim.isAlive = false;
 
                     if (shooter) {
-                        console.log("before shooter.kills", shooter.kills)
                         shooter.kills = Number(shooter.kills || 0) + 1;
-                        console.log("after shooter.kills", shooter.kills)
                     }
 
                     const message = JSON.stringify({ type: 'isDead', shooterId: parsedData.shooterId, victimId: parsedData.victimId });
