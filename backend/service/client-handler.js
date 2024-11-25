@@ -12,6 +12,7 @@ function joinWaitingRoom(ws, playerId, roomSize, pseudo) {
     var room = getRoomById(roomId);
     // Add player to room
     room.players.set(ws, ws);
+    room.roomSize = roomSize;
 
     // Set player position in list
     room.players.get(ws).id = playerId;
@@ -22,6 +23,7 @@ function joinWaitingRoom(ws, playerId, roomSize, pseudo) {
     room.players.get(ws).x = spawnPosition.x;
     room.players.get(ws).y = spawnPosition.y;       
     room.players.get(ws).life = 100;
+    room.players.get(ws).kills = 0;
     room.players.get(ws).isAlive = true;
     room.players.get(ws).pseudo = pseudo;
     
@@ -73,8 +75,7 @@ function leaveWaitingRoom(ws) {
         // Notify all players in the room
         room.players.forEach((_, client) => {
             if(!room.isStarted){
-
-                const spanwPosition = getSpawnPosition(getPlayerIndex(ws.roomId, ws))
+                const spanwPosition = getSpawnPosition(room.roomSize, getPlayerIndex(ws.roomId, ws))
                 client.x = spanwPosition.x;
                 client.y = spanwPosition.y;
             }
@@ -131,7 +132,9 @@ function onHit(ws, data) {  // data {victimId: playerId, shooterId: playerId, da
                     victim.isAlive = false;
 
                     if (shooter) {
-                        shooter.kills = (shooter.kills || 0) + 1;
+                        console.log("before shooter.kills", shooter.kills)
+                        shooter.kills = Number(shooter.kills || 0) + 1;
+                        console.log("after shooter.kills", shooter.kills)
                     }
 
                     const message = JSON.stringify({ type: 'isDead', shooterId: parsedData.shooterId, victimId: parsedData.victimId });

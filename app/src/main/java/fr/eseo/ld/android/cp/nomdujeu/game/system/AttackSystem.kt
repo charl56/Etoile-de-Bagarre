@@ -90,7 +90,7 @@ class AttackSystem(
 
                 configureEntity(fixtureEntity) {
                     lifeCmps.getOrNull(it)?.let { lifeCmp ->
-                        lifeCmp.takeDamage += attackCmp.damage * MathUtils.random(0.9f, 1.1f).toInt()
+                        lifeCmp.takeDamage += (attackCmp.damage * MathUtils.random(0.9f, 1.1f)).toInt()
                         Log.d("DEBUG", "Dealing ${lifeCmp.takeDamage} of damage to entity $fixtureEntity")
                         webSocket?.onHitEnemy(lifeCmp.playerId, lifeCmp.takeDamage.toInt())
                     }

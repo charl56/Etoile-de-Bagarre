@@ -136,7 +136,7 @@ class WebSocket private constructor() {
     private fun processMessage(message: String) {
         try {
             val jsonObject = Json.parseToJsonElement(message).jsonObject
-            Log.d("WebSocket", "Received message: $jsonObject")
+//            Log.d("WebSocket", "Received message: $jsonObject")
             when (jsonObject["type"]?.jsonPrimitive?.content) {
                 // Update player count, display in home screen
                 "playerCount" -> {
@@ -170,7 +170,6 @@ class WebSocket private constructor() {
 
     // Function to send message to server, when player is in waiting room
     suspend fun joinAndWait(currentPlayer: Player, selectedPlayerCount: Int) {
-        println("WEBSOCKET: Joining waiting room $selectedPlayerCount")
         val message = Json.encodeToString(mapOf(
             "type" to "joinWaitingRoom",
             "playerId" to currentPlayer.id,
@@ -214,6 +213,7 @@ class WebSocket private constructor() {
             // Else update
             Player(
                 id = id,
+                pseudo = player["pseudo"]?.jsonPrimitive?.content ?: "",
                 x = player["x"]?.jsonPrimitive?.content?.toFloatOrNull() ?: 0f,
                 y = player["y"]?.jsonPrimitive?.content?.toFloatOrNull() ?: 0f,
                 life = player["life"]?.jsonPrimitive?.content?.toIntOrNull() ?: 0,
@@ -302,7 +302,6 @@ class WebSocket private constructor() {
         winner = jsonObject["winnerPseudo"]?.jsonPrimitive?.content ?: ""
         kills = jsonObject["winnerKills"]?.jsonPrimitive?.content ?: ""
 
-        println("ouai la victoire est a ${_player.value?.id} avec $id kills")
         if (id == _player.value?.id) {
             playerViewModel.addWinToPlayerWithId(id);
         }
