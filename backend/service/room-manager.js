@@ -87,7 +87,7 @@ function getPlayerIndex(roomId, ws) {
 
 function getSpawnPosition(roomSize, playerIndex) {
     // Define spawn positions for different room sizes
-    return spawnPositions[roomSize][playerIndex] || {x: 0, y: 0};
+    return spawnPositions[roomSize][playerIndex] || { x: 0, y: 0 };
 }
 
 
@@ -100,8 +100,8 @@ const broadcast = (roomId) => {
     // detect when to end the game : 1 player alive
     var alivePlayers = 0;
     room.players.forEach((player) => {
-        
-        if(player.isAlive){
+
+        if (player.isAlive) {
             alivePlayers++
         }
     })
@@ -119,6 +119,11 @@ const broadcast = (roomId) => {
             room.players.forEach((player) => {
                 player.send(JSON.stringify({ type: 'endGame', winnerId: winner.id, winnerPseudo: winner.pseudo, winnerKills: winner.kills }));
             });
+
+            if (room.updateInterval) {
+                clearInterval(room.updateInterval);
+                delete room.updateInterval;
+            }
         }
         return;
     }
