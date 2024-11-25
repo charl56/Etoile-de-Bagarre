@@ -185,7 +185,7 @@ fun PlayerCard(
 ) {
     Box(
         modifier = Modifier
-            .size(200.dp)
+            .size(150.dp)
             .clip(RoundedCornerShape(25.dp))
             .border(
                 BorderStroke(2.dp, if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface),
@@ -212,7 +212,7 @@ fun PlayerNullCard(
 ) {
     Box(
         modifier = Modifier
-            .size(200.dp)
+            .size(150.dp)
             .clip(RoundedCornerShape(25.dp))
             .border(
                 BorderStroke(2.dp, if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface),

@@ -23,7 +23,6 @@ import kotlinx.coroutines.withContext
 class GameViewModel : ViewModel() {
 
     private var gameLaunched = false
-    private val handler = Handler(Looper.getMainLooper()) // TODO : à supprimer, permet de lancer endGame après 5 sec
     private val webSocket = WebSocket.getInstance()
 
     lateinit var navController: NavController;
@@ -34,11 +33,6 @@ class GameViewModel : ViewModel() {
             context.startActivity(intent)
             gameLaunched = true
             this.navController = navController
-
-            // TODO : à supprimer, permet de lancer endGame après 10 sec
-            handler.postDelayed({
-                endGame()
-            }, 60000)
         }
     }
 

@@ -174,7 +174,8 @@ class WebSocket private constructor() {
         val message = Json.encodeToString(mapOf(
             "type" to "joinWaitingRoom",
             "playerId" to currentPlayer.id,
-            "roomSize" to selectedPlayerCount.toString()
+            "roomSize" to selectedPlayerCount.toString(),
+            "pseudo" to _player.value?.pseudo
         ))
         sendMessage(message);
     }
@@ -264,12 +265,12 @@ class WebSocket private constructor() {
         }
     }
 
-    // TODO : call this function when we attack, and detect enemy collision
-    fun onHitEnemy(victimId: Int, shooterId: Int, damage: Int){
+    // Call this function when we attack, and detect enemy collision
+    fun onHitEnemy(victimId: String, damage: Int){
         val data = Json.encodeToString(mapOf(
             "victimId" to victimId,
-            "shooterId" to shooterId,
-            "damage" to damage
+            "shooterId" to _player.value?.id,
+            "damage" to damage.toString()
         ))
 
         val message = Json.encodeToString(mapOf(
@@ -289,7 +290,7 @@ class WebSocket private constructor() {
         val victimId = jsonObject["victimId"]?.jsonPrimitive?.content ?: ""
 
         if(victimId == _player.value?.id){
-            println("t mort")
+            println("WEBSO : t mort")
             // TODO : remove entity from game
         }
         // Don't need to update shooter kills, it's done in backend
@@ -297,9 +298,9 @@ class WebSocket private constructor() {
 
     // When the game is finish, server send message et execute this
     fun processEndGame(jsonObject: JsonObject) {
-        winner = jsonObject["winner"]?.jsonPrimitive?.content ?: ""
-        kills = jsonObject["kills"]?.jsonPrimitive?.content ?: ""
-        var id = jsonObject["id"]?.jsonPrimitive?.content ?: ""
+        var id = jsonObject["winnerId"]?.jsonPrimitive?.content ?: ""
+        winner = jsonObject["winnerPseudo"]?.jsonPrimitive?.content ?: ""
+        kills = jsonObject["winnerKills"]?.jsonPrimitive?.content ?: ""
 
         if (id == _player.value?.id) {
             playerViewModel.addWinToPlayerWithId(id);

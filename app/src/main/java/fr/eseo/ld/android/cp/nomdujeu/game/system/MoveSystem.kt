@@ -31,25 +31,24 @@ class MoveSystem (
         val mass = physicCmp.body.mass
         val (velX, velY) = physicCmp.body.linearVelocity
 
-
         // Check if this entity is enemy or this player
-        var isInEnemyPlayerEntities = false
+        var isEnemyPlayerEntities = false
         enemyPlayerEntities.forEach {
             if (it.id == entity.id) {
-                isInEnemyPlayerEntities = true
+                isEnemyPlayerEntities = true
                 return@forEach
             }
         }
 
 
-        if(isInEnemyPlayerEntities){
+        if(isEnemyPlayerEntities){
 
             // We get player position, in player list with id
-            val player = webSocket.players?.value?.find { it.id == moveCmp.playerId }
+            val enemy = webSocket.players?.value?.find { it.id == moveCmp.playerId }
 
             // Where enemy want to go, and where he is
-            val targetX = player?.x ?: 0f
-            val targetY = player?.y ?: 0f
+            val targetX = enemy?.x ?: 0f
+            val targetY = enemy?.y ?: 0f
             val (sourceX, sourceY) = physicCmp.body.position
 
             with(moveCmps[entity]) {
