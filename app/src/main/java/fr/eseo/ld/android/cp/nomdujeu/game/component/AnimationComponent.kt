@@ -1,6 +1,5 @@
 package fr.eseo.ld.android.cp.nomdujeu.game.component
 
-import android.util.Log
 import com.badlogic.gdx.graphics.g2d.Animation
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 
