@@ -9,6 +9,7 @@ import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
 import com.github.quillraven.fleks.ComponentMapper
 import com.github.quillraven.fleks.World
+import fr.eseo.ld.android.cp.nomdujeu.game.component.AttackComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.component.MoveComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.component.PlayerComponent
 import ktx.app.KtxInputAdapter
@@ -16,145 +17,199 @@ import ktx.assets.disposeSafely
 
 class PlayerJoystickInputProcessor(
     world: World,
-    private val moveCmps: ComponentMapper<MoveComponent>,
-    private val camera: OrthographicCamera,
+    private val moveCmps: ComponentMapper<MoveComponent> = world.mapper(),
+    private val attackCmps : ComponentMapper<AttackComponent> = world.mapper(),
 ) : KtxInputAdapter {
 
     private val playerEntities = world.family(allOf = arrayOf(PlayerComponent::class))
-    private val joystickBase: Circle;
-    private val joystickKnob: Circle;
 
-    private val joystickVector = Vector2()
-    private var touching = false
-    private val tempVector3 = Vector3()
-
+    // UI Components
+    private val batch = SpriteBatch()
     private val baseTexture = Texture("joystick/joystick_base.png")
     private val knobTexture = Texture("joystick/joystick_knob.png")
+    private val attackButtonTexture = Texture("joystick/cibler.png")
 
-    private val batch = SpriteBatch()
+    // Touch handling
+    private val touchPointers = mutableMapOf<Int, TouchInfo>()
+    private val tempVector = Vector3()
+
+    // Joystick state
+    private var playerSin = 0f
+    private var playerCos = 0f
+
+    // UI Elements in screen coordinates
+    private val joystickBase: Circle
+    private val joystickKnob: Circle
+    private val attackButton: Circle
+
 
     init {
-        val baseRadius = 1.4f
-        val knobRadius = baseRadius * 0.5f // Half of the base radius
-
-        // Quick init, but then it be placed with updateJoystickBasePosition() function
-        val cameraBottomLeftX = camera.position.x - camera.viewportWidth / 2
-        val cameraBottomLeftY = camera.position.y - camera.viewportHeight / 2
-        val margin = baseRadius * 1.2f
-        val baseX = cameraBottomLeftX + margin
-        val baseY = cameraBottomLeftY + margin
-
-        joystickBase = Circle(baseX, baseY, baseRadius)
-        joystickKnob = Circle(baseX, baseY, knobRadius)
-
         Gdx.input.inputProcessor = this
+
+        // Initialize UI elements in screen coordinates
+        val screenWidth = Gdx.graphics.width.toFloat()
+        val screenHeight = Gdx.graphics.height.toFloat()
+
+        val baseRadius = screenWidth * 0.05f // 05% of screen width
+        val knobRadius = baseRadius * 0.5f
+        val margin = baseRadius * 1.2f
+
+        joystickBase = Circle(margin + baseRadius, margin + baseRadius, baseRadius)
+        joystickKnob = Circle(joystickBase.x, joystickBase.y, knobRadius)
+
+        attackButton = Circle(
+            screenWidth - margin - baseRadius,
+            margin + baseRadius,
+            baseRadius
+        )
     }
 
-    override fun touchCancelled(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        TODO("Not yet implemented")
+    private data class TouchInfo(
+        var touchType: TouchType,
+        var originalX: Float,
+        var originalY: Float
+    )
+
+    private enum class TouchType {
+        JOYSTICK, ATTACK_BUTTON, NONE
     }
 
-    // Detect when touch, but not drag
+    override fun touchCancelled(screenX: Int, screenY: Int, pointer: Int, button: Int) = false
+
+    // Detect when we touch screen
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        tempVector3.set(screenX.toFloat(), screenY.toFloat(), 0f)
-        camera.unproject(tempVector3)
+        val touchX = screenX.toFloat()
+        val touchY = Gdx.graphics.height - screenY.toFloat() // Flip Y coordinate
 
-        if (joystickBase.contains(tempVector3.x, tempVector3.y)) {
-            touching = true
-            updateJoystickPosition(tempVector3.x, tempVector3.y)
+        val touchType = when {
+            isInCircle(touchX, touchY, joystickBase) -> TouchType.JOYSTICK
+            isInCircle(touchX, touchY, attackButton) -> TouchType.ATTACK_BUTTON
+            else -> TouchType.NONE
         }
+
+        touchPointers[pointer] = TouchInfo(touchType, touchX, touchY)
+
+        when (touchType) {
+            TouchType.ATTACK_BUTTON -> {
+                playerEntities.forEach {
+                    with(attackCmps[it]) {
+                        doAttack = true
+                        startAttack()
+                    }
+                }
+            }
+            TouchType.JOYSTICK -> {
+                updateJoystickPosition(touchX, touchY)
+            }
+            else -> return false
+        }
+
         return true
     }
 
     // Detect when we drag on screen
     override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
-        if (touching) {
-            tempVector3.set(screenX.toFloat(), screenY.toFloat(), 0f)
-            camera.unproject(tempVector3)
-            updateJoystickPosition(tempVector3.x, tempVector3.y)
+        val touchInfo = touchPointers[pointer] ?: return false
+        if (touchInfo.touchType == TouchType.JOYSTICK) {
+            val touchX = screenX.toFloat()
+            val touchY = Gdx.graphics.height - screenY.toFloat()
+            updateJoystickPosition(touchX, touchY)
         }
-
         return true
     }
 
+    // Detect when we release the screen
     override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        if (touching) {
-            touching = false
+        val touchInfo = touchPointers.remove(pointer) ?: return false
+        if (touchInfo.touchType == TouchType.JOYSTICK) {
             resetJoystick()
         }
         return true
     }
 
-    // Replace the joystick to the center
-    private fun resetJoystick() {
-        joystickKnob.setPosition(joystickBase.x, joystickBase.y)
-        joystickVector.setZero()
+    // Move joystick knob to the touch position
+    private fun updateJoystickPosition(screenX: Float, screenY: Float) {
+        val deltaX = screenX - joystickBase.x
+        val deltaY = screenY - joystickBase.y
+        val length = Vector2(deltaX, deltaY).len()
+
+        if (length > joystickBase.radius) {
+            playerCos = deltaX / length
+            playerSin = deltaY / length
+
+            joystickKnob.x = joystickBase.x + playerCos * joystickBase.radius
+            joystickKnob.y = joystickBase.y + playerSin * joystickBase.radius
+        } else {
+            playerCos = deltaX / joystickBase.radius
+            playerSin = deltaY / joystickBase.radius
+
+            joystickKnob.x = screenX
+            joystickKnob.y = screenY
+        }
+
         updatePlayerMovement()
     }
 
-    private fun updatePlayerMovement() {
-        val moveX =  joystickVector.x / joystickBase.radius
-        val moveY = joystickVector.y / joystickBase.radius
+    // Replace joystick center when release the screen
+    private fun resetJoystick() {
+        playerCos = 0f
+        playerSin = 0f
+        joystickKnob.setPosition(joystickBase.x, joystickBase.y)
+        updatePlayerMovement()
+    }
 
+    // Update player movement
+    private fun updatePlayerMovement() {
         playerEntities.forEach { player ->
             with(moveCmps[player]) {
-                cos = moveX
-                sin = moveY
+                cos = playerCos
+                sin = playerSin
             }
         }
     }
 
-    private fun updateJoystickPosition(x: Float, y: Float) {
-        joystickVector.set(x - joystickBase.x, y - joystickBase.y)
-        if (joystickVector.len() > joystickBase.radius) {
-            joystickVector.nor().scl(joystickBase.radius)
-        }
-        joystickKnob.setPosition(
-            joystickBase.x + joystickVector.x,
-            joystickBase.y + joystickVector.y
-        )
-        updatePlayerMovement()
-    }
-
-    private fun updateJoystickBasePosition() {
-        val cameraBottomLeftX = camera.position.x - camera.viewportWidth / 2
-        val cameraBottomLeftY = camera.position.y - camera.viewportHeight / 2
-
-        val marginX = joystickBase.radius * 2f
-        val marginY = joystickBase.radius * 2f
-        val baseX = cameraBottomLeftX + marginX
-        val baseY = cameraBottomLeftY + marginY
-
-        joystickBase.setPosition(baseX, baseY)
-        if (!touching) {
-            joystickKnob.setPosition(baseX, baseY)
-        }
+    private fun isInCircle(x: Float, y: Float, circle: Circle): Boolean {
+        val dx = x - circle.x
+        val dy = y - circle.y
+        return dx * dx + dy * dy <= circle.radius * circle.radius
     }
 
 
     fun render() {
-        updateJoystickBasePosition()
-        batch.projectionMatrix = camera.combined
         batch.begin()
-        batch.draw(baseTexture,
+        // Draw joystick base
+        batch.draw(
+            baseTexture,
             joystickBase.x - joystickBase.radius,
             joystickBase.y - joystickBase.radius,
             joystickBase.radius * 2,
             joystickBase.radius * 2
         )
-        batch.draw(knobTexture,
+
+        // Draw joystick knob
+        batch.draw(
+            knobTexture,
             joystickKnob.x - joystickKnob.radius,
             joystickKnob.y - joystickKnob.radius,
             joystickKnob.radius * 2,
             joystickKnob.radius * 2
         )
-        batch.end()
 
+        // Draw attack button
+        batch.draw(
+            attackButtonTexture,
+            attackButton.x - attackButton.radius,
+            attackButton.y - attackButton.radius,
+            attackButton.radius * 2,
+            attackButton.radius * 2
+        )
+        batch.end()
     }
 
     fun disposeSafely() {
         baseTexture.disposeSafely()
         knobTexture.disposeSafely()
+        attackButtonTexture.disposeSafely()
         batch.disposeSafely()
     }
 }

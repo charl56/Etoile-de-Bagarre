@@ -295,6 +295,7 @@ fun PlayerWaitingScreen(
             // Play/Cancel button at the bottom right
             Button(
                 onClick = {
+//                    gameViewModel.launchGame(context, navController)
                     if (currentUser != null) {
                         coroutineScope.launch {
                             HandlePlay().handlePlayButtonClick(

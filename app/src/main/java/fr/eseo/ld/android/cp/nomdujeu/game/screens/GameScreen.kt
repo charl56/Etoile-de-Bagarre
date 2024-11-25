@@ -14,6 +14,7 @@ import fr.eseo.ld.android.cp.nomdujeu.game.component.PhysicComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.event.MapChangeEvent
 import fr.eseo.ld.android.cp.nomdujeu.game.event.fire
 import fr.eseo.ld.android.cp.nomdujeu.game.input.PlayerJoystickInputProcessor
+import fr.eseo.ld.android.cp.nomdujeu.game.input.PlayerKeyboardInputProcessor
 import fr.eseo.ld.android.cp.nomdujeu.game.system.AnimationSystem
 import fr.eseo.ld.android.cp.nomdujeu.game.system.AttackSystem
 import fr.eseo.ld.android.cp.nomdujeu.game.system.CameraSystem
@@ -95,8 +96,7 @@ class GameScreen : KtxScreen {
         gameStage.fire(MapChangeEvent(currentMap!!))
 
         // Add input processor to the stage
-//        PlayerKeyboardInputProcessor(eWorld, eWorld.mapper())
-        joystickInputProcessor = PlayerJoystickInputProcessor(eWorld, eWorld.mapper(), gameStage.camera as OrthographicCamera)
+        joystickInputProcessor = PlayerJoystickInputProcessor(eWorld)
     }
 
 
