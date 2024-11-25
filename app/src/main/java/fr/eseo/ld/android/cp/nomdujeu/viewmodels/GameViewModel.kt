@@ -36,9 +36,9 @@ class GameViewModel : ViewModel() {
             this.navController = navController
 
 //            // TODO : à supprimer, permet de lancer endGame après 10 sec
-            /*handler.postDelayed({
-                endGame()
-            }, 10000)*/
+//            handler.postDelayed({
+//                endGame()
+//            }, 10000)
         }
     }
 
