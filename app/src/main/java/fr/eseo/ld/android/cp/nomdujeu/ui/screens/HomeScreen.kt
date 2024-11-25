@@ -47,6 +47,7 @@ import fr.eseo.ld.android.cp.nomdujeu.viewmodels.GameViewModel
 import fr.eseo.ld.android.cp.nomdujeu.viewmodels.HandlePlay
 import fr.eseo.ld.android.cp.nomdujeu.viewmodels.PlayerViewModel
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -183,20 +184,63 @@ fun PlayerCard(
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
+    // Define the frames for idle and attack animations
+    val idleFrames = listOf(
+        R.drawable.idle_00,
+        R.drawable.idle_01,
+        R.drawable.idle_02,
+        R.drawable.idle_03,
+        R.drawable.idle_04,
+        R.drawable.idle_05
+    )
+    val attackFrames = listOf(
+        R.drawable.attack_00,
+        R.drawable.attack_01,
+        R.drawable.attack_02,
+        R.drawable.attack_03
+    )
+
+    // Track the current frame and animation state
+    var currentFrame by remember { mutableStateOf(0) }
+    var isIdle by remember { mutableStateOf(true) }
+
+    // Frame duration
+    val frameDuration = 100L
+
+    // Handle animation state and frame updates
+    LaunchedEffect(isIdle) {
+        while (true) {
+            delay(frameDuration)
+            currentFrame = (currentFrame + 1) % (if (isIdle) idleFrames.size else attackFrames.size)
+            if (!isIdle && currentFrame == attackFrames.size - 1) {
+                isIdle = true
+                currentFrame = 0
+            }
+        }
+    }
+
+    // Display the card with the current animation frame
     Box(
         modifier = Modifier
-            .size(200.dp)
+            .size(150.dp)
             .clip(RoundedCornerShape(25.dp))
             .border(
-                BorderStroke(2.dp, if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface),
+                BorderStroke(
+                    2.dp,
+                    if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
+                ),
                 shape = RoundedCornerShape(25.dp)
             )
             .background(MaterialTheme.colorScheme.surface)
-            .clickable { onClick() }
+            .clickable {
+                isIdle = false
+                currentFrame = 0
+                onClick()
+            }
     ) {
         Image(
-            painter = painterResource(id = R.drawable.idle_00),
-            contentDescription = "Player card",
+            painter = painterResource(id = if (isIdle) idleFrames[currentFrame] else attackFrames[currentFrame]),
+            contentDescription = "Animated character",
             contentScale = ContentScale.Fit,
             modifier = Modifier
                 .size(200.dp)
@@ -212,16 +256,23 @@ fun PlayerNullCard(
 ) {
     Box(
         modifier = Modifier
-            .size(200.dp)
+            .size(150.dp)
             .clip(RoundedCornerShape(25.dp))
             .border(
-                BorderStroke(2.dp, if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface),
+                BorderStroke(
+                    2.dp,
+                    if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
+                ),
                 shape = RoundedCornerShape(25.dp)
             )
             .background(MaterialTheme.colorScheme.surface)
-            .clickable { onClick() }
+            .clickable { onClick() },
+        contentAlignment = Alignment.Center
     ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
             Text(
                 text = "New characters will be available soon.",
                 style = MaterialTheme.typography.bodyLarge,
@@ -233,9 +284,9 @@ fun PlayerNullCard(
 
 @Composable
 fun CardSelectionScreen() {
-    var selectedCard by remember { mutableStateOf("None") }
+    var selectedCard by remember { mutableStateOf("PlayerCard") }
 
-    Row{
+    Row {
         PlayerCard(
             isSelected = selectedCard == "PlayerCard",
             onClick = { selectedCard = "PlayerCard" }
@@ -243,7 +294,7 @@ fun CardSelectionScreen() {
         Spacer(modifier = Modifier.width(16.dp))
         PlayerNullCard(
             isSelected = selectedCard == "PlayerNullCard",
-            onClick = { selectedCard = "PlayerNullCard" }
+            onClick = {}
         )
     }
 }
@@ -260,11 +311,12 @@ fun PlayerWaitingScreen(
     navController: NavController,
     gameViewModel: GameViewModel
 ) {
-    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.BottomStart) {
+    Box(modifier = Modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier
                 .padding(16.dp, 8.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
                 text = stringResource(R.string.homeScreen_playersInGame),
@@ -293,37 +345,41 @@ fun PlayerWaitingScreen(
                 )
             }
             // Play/Cancel button at the bottom right
-            Button(
-                onClick = {
-                    if (currentUser != null) {
-                        coroutineScope.launch {
-                            HandlePlay().handlePlayButtonClick(
-                                context = context,
-                                navController = navController,
-                                isInWaitingRoom = isInWaitingRoom,
-                                gameViewModel = gameViewModel,
-                                currentPlayer = currentUser,
-                                selectedPlayerCount = selectedPlayerCount.value,
-                                isWebSocketAvailable = isWebSocketAvailable
-                            )
+            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.BottomEnd) {
+                Button(
+                    onClick = {
+                        if (currentUser != null) {
+                            //gameViewModel.launchGame(context, navController)
+                            coroutineScope.launch {
+                                HandlePlay().handlePlayButtonClick(
+                                    context = context,
+                                    navController = navController,
+                                    isInWaitingRoom = isInWaitingRoom,
+                                    gameViewModel = gameViewModel,
+                                    currentPlayer = currentUser,
+                                    selectedPlayerCount = selectedPlayerCount.value,
+                                    isWebSocketAvailable = isWebSocketAvailable
+                                )
+                            }
+                        } else {
+                            Toast.makeText(
+                                context,
+                                "${R.string.homeScreen_error_connectMatchMaking}",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
-                    } else {
-                        Toast.makeText(
-                            context,
-                            "${R.string.homeScreen_error_connectMatchMaking}",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                },
-                modifier = Modifier
-                    .padding(16.dp),
-                enabled = isWebSocketAvailable.value
-            ) {
-                Text(
-                    text = if (isInWaitingRoom.value) stringResource(R.string.homeScreen_stopMatchMaking) else stringResource(
-                        R.string.homeScreen_startMatchMaking
+                    },
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .align(Alignment.BottomEnd),
+                    enabled = isWebSocketAvailable.value
+                ) {
+                    Text(
+                        text = if (isInWaitingRoom.value) stringResource(R.string.homeScreen_stopMatchMaking) else stringResource(
+                            R.string.homeScreen_startMatchMaking
+                        )
                     )
-                )
+                }
             }
             if (!isWebSocketAvailable.value) {
                 Text(
