@@ -61,6 +61,9 @@ class EntitySpawnSystem (
 
     // Set actual player to index 0 entity
     private var actualPlayerIndex: Int = 0
+
+    private var isPlayerSet: Boolean = false
+
     // Index in enemy list
     private var enemiesIndex: Int = 0
     private var websocket = WebSocket.getInstance();
@@ -79,6 +82,11 @@ class EntitySpawnSystem (
                         setSize(relativeSize.x, relativeSize.y )
 
                         if (type == "Player" ) {
+                            if(!isPlayerSet){
+                                actualPlayerIndex = entity.id
+                                isPlayerSet = true
+                            }
+
                             if (entity.id == actualPlayerIndex) {       // Set position with pos get from the server of this player
                                 setPosition(websocket.player.value?.x ?: location.x,websocket.player.value?.y ?: location.y)
 
@@ -171,12 +179,16 @@ class EntitySpawnSystem (
                     if (entity.id == actualPlayerIndex){
                         Log.d("DEBUG", "Player entity is $entity")
                         add<PlayerComponent>()
+                        add<StateComponent> {
+                            isCurrentPlayer = true
+                            playerId = websocket.players.value.getOrNull(enemiesIndex)?.id ?: ""
+                        }
                     } else {
                         Log.d("DEBUG", "Enemy entity is $entity")
                         add<EnemyPlayerComponent>()
                     }
 
-                    add<StateComponent>()
+
                 }
 
                 if(cfg.bodyType != BodyDef.BodyType.StaticBody){

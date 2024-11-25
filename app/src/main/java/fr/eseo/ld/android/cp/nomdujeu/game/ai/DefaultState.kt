@@ -7,6 +7,7 @@ import fr.eseo.ld.android.cp.nomdujeu.game.component.AnimationType
 enum class DefaultState : EntityState {
     IDLE {
         override fun enter(entity: AiEntity) {
+            Log.d("ANIMATION", "Idle : ${DefaultState.valueOf("idle".uppercase())}")
             entity.animation(AnimationType.IDLE)
         }
 
@@ -74,9 +75,7 @@ enum class DefaultState : EntityState {
 enum class DefaultGlobalState : EntityState {
     CHECK_ALIVE {
         override fun update(entity: AiEntity) {
-            Log.d("DEATH", "Check entity $entity is dead : ${entity.isDead}")
             if(entity.isDead) {
-                Log.d("DEATH", "Entity $entity is dead")
                 entity.enableGlobalState(false)
                 entity.state(DefaultState.DEAD, true)
             }
