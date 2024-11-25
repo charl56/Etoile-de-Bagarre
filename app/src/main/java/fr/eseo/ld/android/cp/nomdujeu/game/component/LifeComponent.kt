@@ -7,5 +7,5 @@ data class LifeComponent(
     var takeDamage : Float = 0f
 ) {
     val isDead : Boolean
-        get() = life <= 0
+        get() = life <= 0f
 }

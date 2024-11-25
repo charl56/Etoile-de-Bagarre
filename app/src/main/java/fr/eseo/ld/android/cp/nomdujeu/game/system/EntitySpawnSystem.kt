@@ -30,6 +30,7 @@ import fr.eseo.ld.android.cp.nomdujeu.game.component.PhysicComponent.Companion.p
 import fr.eseo.ld.android.cp.nomdujeu.game.component.PlayerComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.component.SpawnCfg
 import fr.eseo.ld.android.cp.nomdujeu.game.component.SpawnComponent
+import fr.eseo.ld.android.cp.nomdujeu.game.component.StateComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.event.MapChangeEvent
 import fr.eseo.ld.android.cp.nomdujeu.service.WebSocket
 import ktx.app.gdxError
@@ -152,6 +153,8 @@ class EntitySpawnSystem (
                         Log.d("DEBUG", "Enemy entity is $entity")
                         add<EnemyPlayerComponent>()
                     }
+
+                    add<StateComponent>()
                 }
 
                 if(cfg.bodyType != BodyDef.BodyType.StaticBody){
