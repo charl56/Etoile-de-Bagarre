@@ -2,6 +2,7 @@ package fr.eseo.ld.android.cp.nomdujeu.ui.screens
 
 import android.content.Context
 import android.content.res.Configuration
+import android.graphics.BitmapFactory
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
@@ -29,6 +30,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -47,7 +50,10 @@ import fr.eseo.ld.android.cp.nomdujeu.viewmodels.GameViewModel
 import fr.eseo.ld.android.cp.nomdujeu.viewmodels.HandlePlay
 import fr.eseo.ld.android.cp.nomdujeu.viewmodels.PlayerViewModel
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Composable
 fun HomeScreen(
@@ -179,29 +185,93 @@ fun HomeScreenContent() {
 
 
 @Composable
+fun loadImageFromAssets(fileName: String): ImageBitmap? {
+    val context = LocalContext.current
+    var imageBitmap by remember { mutableStateOf<ImageBitmap?>(null) }
+
+    LaunchedEffect(fileName) {
+        withContext(Dispatchers.IO) {
+            val inputStream = context.assets.open(fileName)
+            val bitmap = BitmapFactory.decodeStream(inputStream)
+            imageBitmap = bitmap.asImageBitmap()
+        }
+    }
+
+    return imageBitmap
+}
+
+@Composable
 fun PlayerCard(
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
+    // Define the frames for idle and attack animations
+    val idleFrames = listOf(
+        "player/idle_00.png",
+        "player/idle_01.png",
+        "player/idle_02.png",
+        "player/idle_03.png",
+        "player/idle_04.png",
+        "player/idle_05.png"
+    )
+    val attackFrames = listOf(
+        "player/attack_00.png",
+        "player/attack_01.png",
+        "player/attack_02.png",
+        "player/attack_03.png"
+    )
+
+    // Track the current frame and animation state
+    var currentFrame by remember { mutableStateOf(0) }
+    var isIdle by remember { mutableStateOf(true) }
+
+    // Frame duration
+    val frameDuration = 100L
+
+    // Handle animation state and frame updates
+    LaunchedEffect(isIdle) {
+        while (true) {
+            delay(frameDuration)
+            currentFrame = (currentFrame + 1) % (if (isIdle) idleFrames.size else attackFrames.size)
+            if (!isIdle && currentFrame == attackFrames.size - 1) {
+                isIdle = true
+                currentFrame = 0
+            }
+        }
+    }
+
+    // Load the current frame image from assets
+    val currentImage = loadImageFromAssets(if (isIdle) idleFrames[currentFrame] else attackFrames[currentFrame])
+
+    // Display the card with the current animation frame
     Box(
         modifier = Modifier
             .size(150.dp)
             .clip(RoundedCornerShape(25.dp))
             .border(
-                BorderStroke(2.dp, if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface),
+                BorderStroke(
+                    2.dp,
+                    if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
+                ),
                 shape = RoundedCornerShape(25.dp)
             )
             .background(MaterialTheme.colorScheme.surface)
-            .clickable { onClick() }
+            .clickable {
+                isIdle = false
+                currentFrame = 0
+                onClick()
+            }
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.idle_00),
-            contentDescription = "Player card",
-            contentScale = ContentScale.Fit,
-            modifier = Modifier
-                .size(200.dp)
-                .clip(RoundedCornerShape(25.dp))
-        )
+        currentImage?.let {
+            Image(
+                bitmap = it,
+                contentDescription = "Animated character",
+                contentScale = ContentScale.Fit,
+                modifier = Modifier
+                    .size(200.dp)
+                    .clip(RoundedCornerShape(25.dp))
+            )
+        }
     }
 }
 
@@ -215,13 +285,20 @@ fun PlayerNullCard(
             .size(150.dp)
             .clip(RoundedCornerShape(25.dp))
             .border(
-                BorderStroke(2.dp, if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface),
+                BorderStroke(
+                    2.dp,
+                    if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
+                ),
                 shape = RoundedCornerShape(25.dp)
             )
             .background(MaterialTheme.colorScheme.surface)
-            .clickable { onClick() }
+            .clickable { onClick() },
+        contentAlignment = Alignment.Center
     ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
             Text(
                 text = "New characters will be available soon.",
                 style = MaterialTheme.typography.bodyLarge,
@@ -233,9 +310,9 @@ fun PlayerNullCard(
 
 @Composable
 fun CardSelectionScreen() {
-    var selectedCard by remember { mutableStateOf("None") }
+    var selectedCard by remember { mutableStateOf("PlayerCard") }
 
-    Row{
+    Row {
         PlayerCard(
             isSelected = selectedCard == "PlayerCard",
             onClick = { selectedCard = "PlayerCard" }
@@ -243,7 +320,7 @@ fun CardSelectionScreen() {
         Spacer(modifier = Modifier.width(16.dp))
         PlayerNullCard(
             isSelected = selectedCard == "PlayerNullCard",
-            onClick = { selectedCard = "PlayerNullCard" }
+            onClick = {}
         )
     }
 }
@@ -260,11 +337,12 @@ fun PlayerWaitingScreen(
     navController: NavController,
     gameViewModel: GameViewModel
 ) {
-    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.BottomStart) {
+    Box(modifier = Modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier
                 .padding(16.dp, 8.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
                 text = stringResource(R.string.homeScreen_playersInGame),
@@ -293,38 +371,41 @@ fun PlayerWaitingScreen(
                 )
             }
             // Play/Cancel button at the bottom right
-            Button(
-                onClick = {
-//                    gameViewModel.launchGame(context, navController)
-                    if (currentUser != null) {
-                        coroutineScope.launch {
-                            HandlePlay().handlePlayButtonClick(
-                                context = context,
-                                navController = navController,
-                                isInWaitingRoom = isInWaitingRoom,
-                                gameViewModel = gameViewModel,
-                                currentPlayer = currentUser,
-                                selectedPlayerCount = selectedPlayerCount.value,
-                                isWebSocketAvailable = isWebSocketAvailable
-                            )
+            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.BottomEnd) {
+                Button(
+                    onClick = {
+                        if (currentUser != null) {
+                            //gameViewModel.launchGame(context, navController)
+                            coroutineScope.launch {
+                                HandlePlay().handlePlayButtonClick(
+                                    context = context,
+                                    navController = navController,
+                                    isInWaitingRoom = isInWaitingRoom,
+                                    gameViewModel = gameViewModel,
+                                    currentPlayer = currentUser,
+                                    selectedPlayerCount = selectedPlayerCount.value,
+                                    isWebSocketAvailable = isWebSocketAvailable
+                                )
+                            }
+                        } else {
+                            Toast.makeText(
+                                context,
+                                "${R.string.homeScreen_error_connectMatchMaking}",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
-                    } else {
-                        Toast.makeText(
-                            context,
-                            "${R.string.homeScreen_error_connectMatchMaking}",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                },
-                modifier = Modifier
-                    .padding(16.dp),
-                enabled = isWebSocketAvailable.value
-            ) {
-                Text(
-                    text = if (isInWaitingRoom.value) stringResource(R.string.homeScreen_stopMatchMaking) else stringResource(
-                        R.string.homeScreen_startMatchMaking
+                    },
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .align(Alignment.BottomEnd),
+                    enabled = isWebSocketAvailable.value
+                ) {
+                    Text(
+                        text = if (isInWaitingRoom.value) stringResource(R.string.homeScreen_stopMatchMaking) else stringResource(
+                            R.string.homeScreen_startMatchMaking
+                        )
                     )
-                )
+                }
             }
             if (!isWebSocketAvailable.value) {
                 Text(
