@@ -383,7 +383,7 @@ fun PlayerWaitingScreen(
                 Button(
                     onClick = {
                         if (currentUser != null) {
-                            gameViewModel.launchGame(context, navController)
+                            //gameViewModel.launchGame(context, navController)
                             coroutineScope.launch {
                                 HandlePlay().handlePlayButtonClick(
                                     context = context,

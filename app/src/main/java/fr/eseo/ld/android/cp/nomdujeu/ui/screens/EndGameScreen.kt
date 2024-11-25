@@ -1,5 +1,6 @@
 package fr.eseo.ld.android.cp.nomdujeu.ui.screens
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -13,7 +14,7 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -22,12 +23,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -38,7 +35,6 @@ import fr.eseo.ld.android.cp.nomdujeu.R
 import fr.eseo.ld.android.cp.nomdujeu.model.Player
 import fr.eseo.ld.android.cp.nomdujeu.service.WebSocket
 import fr.eseo.ld.android.cp.nomdujeu.ui.navigation.NomDuJeuScreens
-import kotlinx.coroutines.launch
 
 @Composable
 fun EndGameScreen(
@@ -102,21 +98,31 @@ fun EndGameTopBar(innerPadding: PaddingValues, endString: String){
     }
 }
 
+@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun PlayerRankingScreen(webSocket: WebSocket) {
-    val players = fetchPlayers(webSocket)
+    val players by webSocket.players.collectAsState(emptyList())
     val sortedPlayers = players.sortedByDescending { it.kills }
+
+    Log.d("EndGameScreen", "Players: $players")
+    Log.d("EndGameScreen", "Player count: ${players.size} - ${webSocket.playerCount.value}")
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        Text(text = "Classement", style = MaterialTheme.typography.titleLarge, modifier = Modifier.padding(bottom = 16.dp).align(Alignment.CenterHorizontally))
+        Text(
+            text = "Classement",
+            style = MaterialTheme.typography.titleLarge,
+            modifier = Modifier
+                .padding(bottom = 16.dp)
+                .align(Alignment.CenterHorizontally)
+        )
         TableHeader()
         LazyColumn {
-            items(sortedPlayers) { player ->
-                PlayerRankingItem(player)
+            itemsIndexed(sortedPlayers) { index, player ->
+                PlayerRankingItem(index + 1, player)
             }
         }
     }
@@ -130,13 +136,13 @@ fun TableHeader() {
             .padding(16.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
+        Text(text = "Rank", style = MaterialTheme.typography.bodyLarge)
         Text(text = "Pseudo", style = MaterialTheme.typography.bodyLarge)
-        Text(text = "Kills", style = MaterialTheme.typography.bodyLarge)
     }
 }
 
 @Composable
-fun PlayerRankingItem(player: Player) {
+fun PlayerRankingItem(rank: Int, player: Player) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -149,27 +155,26 @@ fun PlayerRankingItem(player: Player) {
                 .padding(16.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(text = player.pseudo, style = MaterialTheme.typography.bodyLarge)
-            Text(text = "${player.kills} kills", style = MaterialTheme.typography.bodyLarge)
+            Text(
+                text = "$rank${getOrdinalSuffix(rank)}",
+                style = MaterialTheme.typography.bodyLarge
+            )
+            Text(
+                text = player.pseudo,
+                style = MaterialTheme.typography.bodyLarge
+            )
         }
     }
 }
 
-@Composable
-fun fetchPlayers(webSocket: WebSocket): List<Player> {
-    var players by remember { mutableStateOf(emptyList<Player>()) }
-    val coroutineScope = rememberCoroutineScope()
-
-    LaunchedEffect(Unit) {
-        coroutineScope.launch {
-            webSocket.players.collect { playerList ->
-                players = playerList
-                Log.d("EndGameScreen", "Players: $players")
-            }
-        }
+fun getOrdinalSuffix(rank: Int): String {
+    return when {
+        rank % 100 in 11..13 -> "th"
+        rank % 10 == 1 -> "st"
+        rank % 10 == 2 -> "nd"
+        rank % 10 == 3 -> "rd"
+        else -> "th"
     }
-
-    return players
 }
 
 
