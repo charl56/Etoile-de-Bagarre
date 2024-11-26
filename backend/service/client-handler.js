@@ -26,6 +26,7 @@ function joinWaitingRoom(ws, playerId, roomSize, pseudo) {
     room.players.get(ws).kills = 0;
     room.players.get(ws).isAlive = true;
     room.players.get(ws).pseudo = pseudo;
+    room.players.get(ws).nextState  = "IDLE";
     
     // When a player come in a room, notifiy all players in the room ( room.players.get(ws) == client )
     room.players.forEach((_, client) => {
@@ -145,6 +146,25 @@ function onHit(ws, data) {  // data {victimId: playerId, shooterId: playerId, da
     }
 }
 
+function updatePlayerState(data, ws) {
+    try {
+        const room = getRoomById(ws.roomId);
+        const parsedData = JSON.parse(data);
+
+        // Check if player is in the room
+        if (room.players.has(ws)) {
+
+            const player = room.players.get(ws);
+            // Update
+            player.id = parsedData.id || player.id;
+            player.nextState  = parsedData.nextState  || player.nextState ;
+        }
+    } catch (error) {
+        console.error("Error parsing or updating player data:", error);
+    }
+
+}
+
 
 function getRoomById(roomId) {
     return rooms.get(roomId);
@@ -155,4 +175,4 @@ function getPlayerById(room, playerId) {
 }
 
 
-module.exports = { joinWaitingRoom, leaveWaitingRoom, updatePlayerData, onHit };
+module.exports = { joinWaitingRoom, leaveWaitingRoom, updatePlayerData, onHit, updatePlayerState };

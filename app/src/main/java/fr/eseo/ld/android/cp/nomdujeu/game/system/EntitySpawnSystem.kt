@@ -79,20 +79,37 @@ class EntitySpawnSystem (
                         setSize(relativeSize.x, relativeSize.y )
 
                         if (type == "Player" ) {
+
+                            val skin = Skin().apply {
+                                add("default-font", BitmapFont())
+                                add("default", Label.LabelStyle(getFont("default-font"), Color.WHITE))
+                                add("default-horizontal", ProgressBar.ProgressBarStyle().apply {
+                                    background = null
+                                    knobBefore = null
+                                })
+                            }
+
                             if (entity.id == actualPlayerIndex) {       // Set position with pos get from the server of this player
                                 setPosition(websocket.player.value?.x ?: location.x,websocket.player.value?.y ?: location.y)
-
+                                add<PlayerInfoComponent> {
+                                    label = Label(websocket.player.value?.pseudo ?: "", skin)
+//                                    healthBar = ProgressBar(0f, 100f, 1f, false, skin, "default-horizontal")
+                                }
                             // Set positions of enemies players
                             } else {
                                 try {
                                     setPosition(websocket.players.value[enemiesIndex].x, websocket.players.value[enemiesIndex].y)
+                                    add<PlayerInfoComponent> {
+                                        label = Label(websocket.players.value[enemiesIndex].pseudo ?: "", skin)
+//                                        healthBar = ProgressBar(0f, 100f, 1f, false, skin, "default-horizontal")
+                                    }
                                 }
                                 catch (e: Exception){ // If we can't spawn enemy (no more enemy to spawn), set position to 0,0
                                     println("No more enemy to spawn, ${e}")
                                 }
                             }
-                        } else {        // If not player, spawn image at image position
-                            setPosition(location.x , location.y)
+                        } else {        // If not player, spawn outside map
+                            setPosition(0f , 0f)
                         }
                     }
                 }
@@ -155,16 +172,6 @@ class EntitySpawnSystem (
                     }
                 }
 
-//                add<PlayerInfoComponent> {
-//                    label = Label("PlayerName", Label.LabelStyle(BitmapFont(), Color.WHITE))
-//                    healthBar = ProgressBar(0f, 100f, 1f, false, Skin().apply {
-//                        add("default", ProgressBar.ProgressBarStyle().apply {
-//                            background = newDrawable("white", Color.RED)
-//                            knobBefore = newDrawable("white", Color.GREEN)
-//                        })
-//                    })
-//                    txtLocation.set(location.x, location.y + relativeSize.y)
-//                }
 
                 // Add Player or EnemyPlayer this entity
                 if (type == "Player"){
@@ -175,7 +182,6 @@ class EntitySpawnSystem (
                         Log.d("DEBUG", "Enemy entity is $entity")
                         add<EnemyPlayerComponent>()
                     }
-
                     add<StateComponent>()
                 }
 

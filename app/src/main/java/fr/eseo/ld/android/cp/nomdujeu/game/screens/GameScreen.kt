@@ -1,6 +1,5 @@
 package fr.eseo.ld.android.cp.nomdujeu.game.screens
 
-import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.maps.tiled.TmxMapLoader
@@ -69,7 +68,6 @@ class GameScreen : KtxScreen {
             add<FloatingTextComponentListener>()
             add<StateComponentListener>()
             add<PlayerInfoComponent.Companion.PlayerInfoComponentListener>()
-
         }
 
         systems {
