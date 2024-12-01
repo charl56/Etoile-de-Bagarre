@@ -95,6 +95,7 @@ function updatePlayerData(data, ws) {
         const parsedData = JSON.parse(data);
 
         // Check if player is in the room
+        console.log("y a des players ? ", room.players)
         if (room.players.has(ws)) {
             // Get the player object from the room, to update its attributes
             const player = room.players.get(ws);

@@ -2,8 +2,11 @@ package fr.eseo.ld.android.cp.nomdujeu.game.system
 
 import android.util.Log
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.Pixmap
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.BodyDef
 import com.badlogic.gdx.physics.box2d.World
@@ -12,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.EventListener
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.utils.Scaling
 import com.github.quillraven.fleks.AllOf
 import com.github.quillraven.fleks.ComponentMapper
@@ -42,6 +46,7 @@ import fr.eseo.ld.android.cp.nomdujeu.service.WebSocket
 import ktx.app.gdxError
 import ktx.box2d.box
 import ktx.math.vec2
+import ktx.style.get
 import ktx.tiled.layer
 import ktx.tiled.type
 import ktx.tiled.x
@@ -84,8 +89,8 @@ class EntitySpawnSystem (
                                 add("default-font", BitmapFont())
                                 add("default", Label.LabelStyle(getFont("default-font"), Color.WHITE))
                                 add("default-horizontal", ProgressBar.ProgressBarStyle().apply {
-                                    background = null
-                                    knobBefore = null
+                                    background = ColorDrawable(Color.DARK_GRAY)
+                                    knob = ColorDrawable(Color.GREEN)
                                 })
                             }
 
@@ -93,7 +98,7 @@ class EntitySpawnSystem (
                                 setPosition(websocket.player.value?.x ?: location.x,websocket.player.value?.y ?: location.y)
                                 add<PlayerInfoComponent> {
                                     label = Label(websocket.player.value?.pseudo ?: "", skin)
-//                                    healthBar = ProgressBar(0f, 100f, 1f, false, skin, "default-horizontal")
+                                    life = Label("Life : ${websocket.player.value?.life ?: 100}", skin)
                                 }
                             // Set positions of enemies players
                             } else {
@@ -101,7 +106,7 @@ class EntitySpawnSystem (
                                     setPosition(websocket.players.value[enemiesIndex].x, websocket.players.value[enemiesIndex].y)
                                     add<PlayerInfoComponent> {
                                         label = Label(websocket.players.value[enemiesIndex].pseudo ?: "", skin)
-//                                        healthBar = ProgressBar(0f, 100f, 1f, false, skin, "default-horizontal")
+                                        life = Label("Life : ${websocket.players.value[enemiesIndex].life ?: 100}", skin)
                                     }
                                 }
                                 catch (e: Exception){ // If we can't spawn enemy (no more enemy to spawn), set position to 0,0
@@ -245,3 +250,15 @@ class EntitySpawnSystem (
         const val HIT_BOX_SENSOR = "HitBox"
     }
 }
+
+
+class ColorDrawable(color: Color) : TextureRegionDrawable(
+    TextureRegion(
+        Texture(
+            Pixmap(1, 1, Pixmap.Format.RGBA8888).apply {
+                setColor(color)
+                fill()
+            }
+        )
+    )
+)
