@@ -77,7 +77,6 @@ fun HomeScreen(
     LaunchedEffect(Unit) {
         isWebSocketAvailable.value = webSocket.checkAvailability()
         playerViewModel.updateCurrentPlayerWins()
-        Log.d("WinRate", "currnet mah ? ${currentUser?.wins}")
     }
 
     BackHandler {

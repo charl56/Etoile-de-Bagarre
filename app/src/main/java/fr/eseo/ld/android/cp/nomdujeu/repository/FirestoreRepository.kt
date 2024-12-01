@@ -1,5 +1,6 @@
 package fr.eseo.ld.android.cp.nomdujeu.repository
 
+import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
 import fr.eseo.ld.android.cp.nomdujeu.model.Player
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -49,7 +50,10 @@ class FirestoreRepository @Inject constructor(
     fun addWinToPlayer() {
         currentPlayer.value?.let {
             val updatedPlayer = it.copy(wins = it.wins + 1)
-            playersCollection.document(it.id).set(updatedPlayer)
+            playersCollection.document(it.id).set(updatedPlayer).addOnSuccessListener {
+                _currentPlayer.update { updatedPlayer }
+            }
+
         }
     }
 

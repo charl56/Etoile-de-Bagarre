@@ -63,11 +63,9 @@ class PlayerViewModel @Inject constructor(
 
     fun updateCurrentPlayerWins() {
         repository.updateCurrentPlayerWins{ newWins ->
-            Log.d("WinRate", "Avant : ${_player.value?.wins}, newWins : $newWins")
             _player.value?.let {
                 _player.value = it.copy(wins = newWins)
             }
-            Log.d("WinRate", "Apres : ${_player.value?.wins}, newWins : $newWins")
         }
     }
 
