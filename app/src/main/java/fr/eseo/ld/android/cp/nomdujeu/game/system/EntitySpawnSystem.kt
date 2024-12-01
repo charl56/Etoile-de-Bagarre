@@ -42,6 +42,7 @@ import fr.eseo.ld.android.cp.nomdujeu.game.component.SpawnCfg
 import fr.eseo.ld.android.cp.nomdujeu.game.component.SpawnComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.component.StateComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.event.MapChangeEvent
+import fr.eseo.ld.android.cp.nomdujeu.model.Player
 import fr.eseo.ld.android.cp.nomdujeu.service.WebSocket
 import ktx.app.gdxError
 import ktx.box2d.box
@@ -77,13 +78,25 @@ class EntitySpawnSystem (
             val relativeSize = size(cfg.model)
 
             world.entity {
+                // Distingue player and enemies
+                var e : Player? = null
+                try{
+                    if(entity.id == actualPlayerIndex){
+                        e = websocket.player.value!!
+                    } else {
+                        e = websocket.players.value[enemiesIndex]
+                    }
+                } catch (e: Exception){
+                    println("No more enemy to spawn, ${e}")
+                }
+
                 // Add image of this entity
                 val imageCmp = add<ImageComponent>{
                     image = FlipImage().apply{
                         setScaling(Scaling.fill)
                         setSize(relativeSize.x, relativeSize.y )
 
-                        if (type == "Player" ) {
+                        if (type == "Player" && e != null ) {       // Check if e isn't null => it's player or enemy
 
                             val skin = Skin().apply {
                                 add("default-font", BitmapFont())
@@ -94,25 +107,12 @@ class EntitySpawnSystem (
                                 })
                             }
 
-                            if (entity.id == actualPlayerIndex) {       // Set position with pos get from the server of this player
-                                setPosition(websocket.player.value?.x ?: location.x,websocket.player.value?.y ?: location.y)
-                                add<PlayerInfoComponent> {
-                                    label = Label(websocket.player.value?.pseudo ?: "", skin)
-                                    life = Label("Life : ${websocket.player.value?.life ?: 100}", skin)
-                                }
-                            // Set positions of enemies players
-                            } else {
-                                try {
-                                    setPosition(websocket.players.value[enemiesIndex].x, websocket.players.value[enemiesIndex].y)
-                                    add<PlayerInfoComponent> {
-                                        label = Label(websocket.players.value[enemiesIndex].pseudo ?: "", skin)
-                                        life = Label("Life : ${websocket.players.value[enemiesIndex].life ?: 100}", skin)
-                                    }
-                                }
-                                catch (e: Exception){ // If we can't spawn enemy (no more enemy to spawn), set position to 0,0
-                                    println("No more enemy to spawn, ${e}")
-                                }
+                            setPosition(e.x ?: location.x,e.y ?: location.y)
+                            add<PlayerInfoComponent> {
+                                label = Label(e.pseudo ?: "", skin)
+                                life = Label("Life : ${e.life ?: 100}", skin)
                             }
+
                         } else {        // If not player, spawn outside map
                             setPosition(0f , 0f)
                         }
@@ -147,16 +147,10 @@ class EntitySpawnSystem (
                 }
 
                 if (cfg.speedScaling > 0f) {
-                    if (entity.id == actualPlayerIndex) {
-                        add<MoveComponent> {
-                            speed = DEFAULT_SPEED * cfg.speedScaling
-                        }
-                    } else {
-                        add<MoveComponent> {
-                            speed = DEFAULT_SPEED * cfg.speedScaling
-                            // Add id for enemies to know who is moving
-                            playerId = websocket.players.value.getOrNull(enemiesIndex)?.id ?: ""
-                        }
+                    add<MoveComponent> {
+                        speed = DEFAULT_SPEED * cfg.speedScaling
+                        // Add id for enemies to know who is moving
+                        playerId = websocket.players.value.getOrNull(enemiesIndex)?.id ?: ""
                     }
                 }
 
