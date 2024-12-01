@@ -5,6 +5,7 @@ import fr.eseo.ld.android.cp.nomdujeu.model.Player
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -45,15 +46,21 @@ class FirestoreRepository @Inject constructor(
         }
     }
 
+    fun addWinToPlayer() {
+        currentPlayer.value?.let {
+            val updatedPlayer = it.copy(wins = it.wins + 1)
+            playersCollection.document(it.id).set(updatedPlayer)
+        }
+    }
 
-    fun addWinToPlayerWithId(playerId : String) {
-        playersCollection.document(playerId).get().addOnSuccessListener {
-            val player = it.toObject(Player::class.java)
-            println("WEBSOO : ${player?.wins}")
-            player?.let {
-                val updatedPlayer = it.copy(wins = it.wins + 1)
-                println("WEBSOO : ${updatedPlayer.wins}")
-                playersCollection.document(playerId).set(updatedPlayer)
+    fun updateCurrentPlayerWins(callback: (Int) -> Unit) {
+        currentPlayer.value?.let { player ->
+            playersCollection.document(player.id).get().addOnSuccessListener { documentSnapshot ->
+                val updatedPlayer = documentSnapshot.toObject(Player::class.java)
+                updatedPlayer?.let {
+                    callback(it.wins)
+
+                }
             }
         }
     }
