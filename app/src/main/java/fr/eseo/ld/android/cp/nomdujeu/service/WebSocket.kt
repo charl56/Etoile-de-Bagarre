@@ -302,9 +302,8 @@ class WebSocket private constructor() {
         winner = jsonObject["winnerPseudo"]?.jsonPrimitive?.content ?: ""
         kills = jsonObject["winnerKills"]?.jsonPrimitive?.content ?: ""
 
-        println("ouai la victoire est a ${_player.value?.id} avec $id kills")
         if (id == _player.value?.id) {
-            playerViewModel.addWinToPlayerWithId(id);
+            playerViewModel.addWinToPlayer();
         }
 
         gameViewModel.endGame()

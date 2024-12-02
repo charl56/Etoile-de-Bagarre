@@ -2,8 +2,11 @@ package fr.eseo.ld.android.cp.nomdujeu.game.system
 
 import android.util.Log
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.Pixmap
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.BodyDef
 import com.badlogic.gdx.physics.box2d.World
@@ -12,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.EventListener
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.utils.Scaling
 import com.github.quillraven.fleks.AllOf
 import com.github.quillraven.fleks.ComponentMapper
@@ -38,10 +42,12 @@ import fr.eseo.ld.android.cp.nomdujeu.game.component.SpawnCfg
 import fr.eseo.ld.android.cp.nomdujeu.game.component.SpawnComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.component.StateComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.event.MapChangeEvent
+import fr.eseo.ld.android.cp.nomdujeu.model.Player
 import fr.eseo.ld.android.cp.nomdujeu.service.WebSocket
 import ktx.app.gdxError
 import ktx.box2d.box
 import ktx.math.vec2
+import ktx.style.get
 import ktx.tiled.layer
 import ktx.tiled.type
 import ktx.tiled.x
@@ -72,27 +78,43 @@ class EntitySpawnSystem (
             val relativeSize = size(cfg.model)
 
             world.entity {
+                // Distingue player and enemies
+                var e : Player? = null
+                try{
+                    if(entity.id == actualPlayerIndex){
+                        e = websocket.player.value!!
+                    } else {
+                        e = websocket.players.value[enemiesIndex]
+                    }
+                } catch (e: Exception){
+                    println("No more enemy to spawn, ${e}")
+                }
+
                 // Add image of this entity
                 val imageCmp = add<ImageComponent>{
                     image = FlipImage().apply{
                         setScaling(Scaling.fill)
                         setSize(relativeSize.x, relativeSize.y )
 
-                        if (type == "Player" ) {
-                            if (entity.id == actualPlayerIndex) {       // Set position with pos get from the server of this player
-                                setPosition(websocket.player.value?.x ?: location.x,websocket.player.value?.y ?: location.y)
+                        if (type == "Player" && e != null ) {       // Check if e isn't null => it's player or enemy
 
-                            // Set positions of enemies players
-                            } else {
-                                try {
-                                    setPosition(websocket.players.value[enemiesIndex].x, websocket.players.value[enemiesIndex].y)
-                                }
-                                catch (e: Exception){ // If we can't spawn enemy (no more enemy to spawn), set position to 0,0
-                                    println("No more enemy to spawn, ${e}")
-                                }
+                            val skin = Skin().apply {
+                                add("default-font", BitmapFont())
+                                add("default", Label.LabelStyle(getFont("default-font"), Color.WHITE))
+                                add("default-horizontal", ProgressBar.ProgressBarStyle().apply {
+                                    background = ColorDrawable(Color.DARK_GRAY)
+                                    knob = ColorDrawable(Color.GREEN)
+                                })
                             }
-                        } else {        // If not player, spawn image at image position
-                            setPosition(location.x , location.y)
+
+                            setPosition(e.x ?: location.x,e.y ?: location.y)
+                            add<PlayerInfoComponent> {
+                                label = Label(e.pseudo ?: "", skin)
+                                life = Label("Life : ${e.life ?: 100}", skin)
+                            }
+
+                        } else {        // If not player, spawn outside map
+                            setPosition(0f , 0f)
                         }
                     }
                 }
@@ -125,16 +147,10 @@ class EntitySpawnSystem (
                 }
 
                 if (cfg.speedScaling > 0f) {
-                    if (entity.id == actualPlayerIndex) {
-                        add<MoveComponent> {
-                            speed = DEFAULT_SPEED * cfg.speedScaling
-                        }
-                    } else {
-                        add<MoveComponent> {
-                            speed = DEFAULT_SPEED * cfg.speedScaling
-                            // Add id for enemies to know who is moving
-                            playerId = websocket.players.value.getOrNull(enemiesIndex)?.id ?: ""
-                        }
+                    add<MoveComponent> {
+                        speed = DEFAULT_SPEED * cfg.speedScaling
+                        // Add id for enemies to know who is moving
+                        playerId = websocket.players.value.getOrNull(enemiesIndex)?.id ?: ""
                     }
                 }
 
@@ -155,16 +171,6 @@ class EntitySpawnSystem (
                     }
                 }
 
-//                add<PlayerInfoComponent> {
-//                    label = Label("PlayerName", Label.LabelStyle(BitmapFont(), Color.WHITE))
-//                    healthBar = ProgressBar(0f, 100f, 1f, false, Skin().apply {
-//                        add("default", ProgressBar.ProgressBarStyle().apply {
-//                            background = newDrawable("white", Color.RED)
-//                            knobBefore = newDrawable("white", Color.GREEN)
-//                        })
-//                    })
-//                    txtLocation.set(location.x, location.y + relativeSize.y)
-//                }
 
                 // Add Player or EnemyPlayer this entity
                 if (type == "Player"){
@@ -175,7 +181,6 @@ class EntitySpawnSystem (
                         Log.d("DEBUG", "Enemy entity is $entity")
                         add<EnemyPlayerComponent>()
                     }
-
                     add<StateComponent>()
                 }
 
@@ -239,3 +244,15 @@ class EntitySpawnSystem (
         const val HIT_BOX_SENSOR = "HitBox"
     }
 }
+
+
+class ColorDrawable(color: Color) : TextureRegionDrawable(
+    TextureRegion(
+        Texture(
+            Pixmap(1, 1, Pixmap.Format.RGBA8888).apply {
+                setColor(color)
+                fill()
+            }
+        )
+    )
+)

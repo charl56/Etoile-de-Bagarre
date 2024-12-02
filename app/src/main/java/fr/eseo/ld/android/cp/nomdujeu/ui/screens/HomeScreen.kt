@@ -3,6 +3,7 @@ package fr.eseo.ld.android.cp.nomdujeu.ui.screens
 import android.content.Context
 import android.content.res.Configuration
 import android.graphics.BitmapFactory
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
@@ -59,7 +60,7 @@ fun HomeScreen(
     navController: NavController,
     authenticationViewModel: AuthenticationViewModel,
     gameViewModel: GameViewModel,
-    playerViewModel: PlayerViewModel
+    playerViewModel: PlayerViewModel,
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -75,6 +76,7 @@ fun HomeScreen(
 
     LaunchedEffect(Unit) {
         isWebSocketAvailable.value = webSocket.checkAvailability()
+        playerViewModel.updateCurrentPlayerWins()
     }
 
     BackHandler {

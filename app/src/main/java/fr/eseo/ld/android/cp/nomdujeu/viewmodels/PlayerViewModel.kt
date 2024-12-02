@@ -2,6 +2,7 @@ package fr.eseo.ld.android.cp.nomdujeu.viewmodels
 
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import fr.eseo.ld.android.cp.nomdujeu.model.Player
@@ -51,12 +52,21 @@ class PlayerViewModel @Inject constructor(
         }
     }
 
-    fun addWinToPlayerWithId(userId : String) {
-        repository.addWinToPlayerWithId(userId)
+    fun addWinToPlayer() {
+        repository.addWinToPlayer()
     }
 
     fun setUserNull(){
         _player.value = null
+    }
+
+
+    fun updateCurrentPlayerWins() {
+        repository.updateCurrentPlayerWins{ newWins ->
+            _player.value?.let {
+                _player.value = it.copy(wins = newWins)
+            }
+        }
     }
 
 }
