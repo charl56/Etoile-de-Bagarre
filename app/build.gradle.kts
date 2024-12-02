@@ -11,12 +11,6 @@ plugins {
 
 val appName = "nomdujeu"
 val gdxVersion = "1.12.1"
-val roboVMVersion = "2.3.12"
-val box2DLightsVersion = "1.5"
-val ashleyVersion = "1.7.3"
-val aiVersion = "1.8.2"
-val ktxVersion = "1.11.0-rc2"
-val fleksVersion = "1.6-JVM"
 
 android {
     namespace = "fr.eseo.ld.android.cp.nomdujeu"
@@ -99,7 +93,10 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.hilt.navigation)
     implementation(libs.androidx.preference)
+    implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.kotlinx.coroutines.play.services)
+    implementation(libs.kotlinx.serialization.json)
+    // Firebase
     implementation(libs.hilt.android)
     ksp(libs.hilt.ksp)
     implementation(platform(libs.firebase.bom))
@@ -115,16 +112,18 @@ dependencies {
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.googleid)
     implementation(libs.firebase.auth.ktx)
-//    Ktor : don't work when set in libs.version and installed here
-    implementation("io.ktor:ktor-client-core:3.0.0")
-    implementation("io.ktor:ktor-client-cio:3.0.0")
-    implementation("io.ktor:ktor-client-websockets:3.0.0")
-    implementation("io.ktor:ktor-network-tls:3.0.0")
-    // JSON serialization
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
-
-//    LibGDX
-    implementation("com.badlogicgames.gdx:gdx-backend-android:$gdxVersion")
+    // Ktor
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.cio)
+    implementation(libs.ktor.client.serialization)
+    implementation(libs.ktor.client.websockets)
+    implementation(libs.ktor.network.tls)
+    // LibGDX
+    implementation(libs.gdx)
+    implementation(libs.gdx.backend.android)
+    implementation(libs.gdx.box2d)
+    implementation(libs.gdx.ai)
+    // Add native extensions
     add("natives", "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a")
     add("natives", "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-arm64-v8a")
     add("natives", "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86")
@@ -133,28 +132,20 @@ dependencies {
     add("natives", "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-arm64-v8a")
     add("natives", "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-x86")
     add("natives", "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-x86_64")
-    implementation("com.badlogicgames.gdx:gdx:$gdxVersion")
-    implementation("com.badlogicgames.gdx:gdx-box2d:$gdxVersion")
-    implementation("com.badlogicgames.gdx:gdx-ai:$aiVersion")
-    // Need to setup notification ervery each time
-    implementation("androidx.work:work-runtime-ktx:2.8.0")
-
     // Ktx extensions of LibGDX
-    implementation("io.github.libktx:ktx-actors:$ktxVersion")
-    implementation("io.github.libktx:ktx-app:$ktxVersion")
-    implementation("io.github.libktx:ktx-assets:$ktxVersion")
-    implementation("io.github.libktx:ktx-box2d:$ktxVersion")
-    implementation("io.github.libktx:ktx-collections:$ktxVersion")
-    implementation("io.github.libktx:ktx-graphics:$ktxVersion")
-    implementation("io.github.libktx:ktx-log:$ktxVersion")
-    implementation("io.github.libktx:ktx-math:$ktxVersion")
-    implementation("io.github.libktx:ktx-scene2d:$ktxVersion")
-    implementation("io.github.libktx:ktx-style:$ktxVersion")
-    implementation("io.github.libktx:ktx-tiled:$ktxVersion")
-
+    implementation(libs.libktx.ktx.actors)
+    implementation(libs.libktx.ktx.app)
+    implementation(libs.libktx.ktx.assets)
+    implementation(libs.libktx.ktx.box2d)
+    implementation(libs.libktx.ktx.collections)
+    implementation(libs.libktx.ktx.graphics)
+    implementation(libs.libktx.ktx.log)
+    implementation(libs.libktx.ktx.math)
+    implementation(libs.libktx.ktx.scene2d)
+    implementation(libs.libktx.ktx.style)
+    implementation(libs.libktx.ktx.tiled)
     // FLEKS : A fast, lightweight, entity component system library written in Kotlin
-    implementation("io.github.quillraven.fleks:Fleks:$fleksVersion")
-
+    implementation(libs.io.github.quillraven.fleks)
 }
 
 // To be sure native libs are copied before start application
