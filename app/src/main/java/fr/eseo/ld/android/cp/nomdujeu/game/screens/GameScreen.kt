@@ -68,7 +68,6 @@ class GameScreen : KtxScreen {
             add<FloatingTextComponentListener>()
             add<StateComponentListener>()
             add<PlayerInfoComponent.Companion.PlayerInfoComponentListener>()
-
         }
 
         systems {

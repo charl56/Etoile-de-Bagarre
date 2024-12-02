@@ -139,6 +139,7 @@ const broadcast = (roomId) => {
             kills: player.kills,
             life: player.life,
             isAlive: player.isAlive,
+            nextState : player.nextState 
         }));
 
     // Create a message containing all players' data
