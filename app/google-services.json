@@ -1,8 +1,9 @@
 {
   "project_info": {
     "project_number": "266100145988",
+    "firebase_url": "https://nom-du-jeu-default-rtdb.europe-west1.firebasedatabase.app",
     "project_id": "nom-du-jeu",
-    "storage_bucket": "nom-du-jeu.appspot.com"
+    "storage_bucket": "nom-du-jeu.firebasestorage.app"
   },
   "client": [
     {
@@ -12,7 +13,28 @@
           "package_name": "fr.eseo.ld.android.cp.nomdujeu"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "266100145988-462r2iv0lf744r5olsnlkodoahdb75lp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "fr.eseo.ld.android.cp.nomdujeu",
+            "certificate_hash": "acf020c3e8acda8fe16f4913a28064849f096d0f"
+          }
+        },
+        {
+          "client_id": "266100145988-df2galot9umu20ei40qinmnbmhe69456.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "fr.eseo.ld.android.cp.nomdujeu",
+            "certificate_hash": "f5570bdccb7bf7a7f9fcdc5a34e3eb989934b7d0"
+          }
+        },
+        {
+          "client_id": "266100145988-ef4r1enhivm85q5s9ujeivra4sbk4ldq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDJU1j-iDRc3kwiioOzENmuYp5MbTjIB08"
@@ -20,7 +42,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "266100145988-ef4r1enhivm85q5s9ujeivra4sbk4ldq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

@@ -112,6 +112,7 @@ dependencies {
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.googleid)
     implementation(libs.firebase.auth.ktx)
+    implementation("com.google.android.gms:play-services-auth:21.2.0")
     // Ktor
     implementation(libs.ktor.client.core)
     implementation(libs.ktor.client.cio)
