@@ -160,6 +160,7 @@ class WebSocket private constructor() {
                 "onHitReceive" -> {
                     val damage = jsonObject["damage"]?.jsonPrimitive?.int ?: 0  // Update nb of player in waiting room
                     Log.d("WebSocket", "You have taken $damage damages")
+                    // TODO Add damage to this entity
                 }
                 "isDead" -> {
                     processIsDead(jsonObject)
