@@ -221,6 +221,8 @@ class WebSocket private constructor() {
             Player(
                 id = id,
                 pseudo = player["pseudo"]?.jsonPrimitive?.content ?: "",
+                kills = player["kills"]?.jsonPrimitive?.content?.toIntOrNull() ?: 0,
+                email = player["email"]?.jsonPrimitive?.content ?: "",
                 x = player["x"]?.jsonPrimitive?.content?.toFloatOrNull() ?: 0f,
                 y = player["y"]?.jsonPrimitive?.content?.toFloatOrNull() ?: 0f,
                 life = player["life"]?.jsonPrimitive?.content?.toIntOrNull() ?: 0,
@@ -312,7 +314,10 @@ class WebSocket private constructor() {
 
         if(victimId == _player.value?.id){
             println("WEBSO : t mort")
+            Log.d("WEBSO DEATH", "t mort")
+            Log.d("WEBSO DEATH", player.value.toString())
             // TODO : remove entity from game
+
         }
         // Don't need to update shooter kills, it's done in backend
     }
