@@ -144,7 +144,6 @@ const broadcast = (roomId) => {
 
     // Create a message containing all players' data
     const message = JSON.stringify({ type: 'updatePlayersData', players: playersData });
-    // console.log("send data of all player for each player ", message)
 
     // Send this message to each player in the room
     room.players.forEach((_, client) => client.send(message));

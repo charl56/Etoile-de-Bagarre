@@ -1,5 +1,6 @@
 package fr.eseo.ld.android.cp.nomdujeu.game.system
 
+import android.util.Log
 import com.badlogic.gdx.math.MathUtils
 import com.github.quillraven.fleks.AllOf
 import com.github.quillraven.fleks.ComponentMapper
@@ -28,6 +29,7 @@ class MoveSystem (
 
         val moveCmp = moveCmps[entity]
         val physicCmp = physicCmps[entity]
+        val imageCmp = imageCmps[entity]
         val mass = physicCmp.body.mass
         val (velX, velY) = physicCmp.body.linearVelocity
 
@@ -42,31 +44,33 @@ class MoveSystem (
 
 
         if(isEnemyPlayerEntities){
-
             // We get player position, in player list with id
             val enemy = webSocket.players?.value?.find { it.id == moveCmp.playerId }
+
 
             // Where enemy want to go, and where he is
             val targetX = enemy?.x ?: 0f
             val targetY = enemy?.y ?: 0f
+
             val (sourceX, sourceY) = physicCmp.body.position
 
             with(moveCmps[entity]) {
+
+                if(moveCmp.playerId != enemy?.id){
+                    return@with
+                }
+
                 val angleRad = MathUtils.atan2(targetY - sourceY, targetX - sourceX)
                 cosSin.set(MathUtils.cos(angleRad), MathUtils.sin(angleRad))
-
                 val (cos, sin) = cosSin
+
                 physicCmp.impulse.set(
                     mass * (moveCmp.speed * cos - velX),
                     mass * (moveCmp.speed * sin - velY)
                 )
 
-                // TODO : Check if image is found, and change X direction in game
-                imageCmps.getOrNull(entity)?.let { imageCmp ->
-                    if(moveCmp.cos != 0f) {
-                        imageCmp.image.flipX = moveCmp.cos < 0f
-                    }
-                }
+                imageCmp.image.flipX = cos < 0f
+
             }
 
 
