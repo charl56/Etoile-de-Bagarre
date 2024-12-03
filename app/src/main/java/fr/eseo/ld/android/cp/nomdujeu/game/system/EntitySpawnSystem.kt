@@ -184,7 +184,10 @@ class EntitySpawnSystem (
                         Log.d("DEBUG", "Enemy entity is $entity")
                         add<EnemyPlayerComponent>()
                     }
-                    add<StateComponent>()
+                    add<StateComponent> {
+                        isCurrentPlayer = entity.id == actualPlayerIndex
+                        playerId = websocket.players.value.getOrNull(enemiesIndex)?.id ?: ""
+                    }
                 }
 
                 if(cfg.bodyType != BodyDef.BodyType.StaticBody){
