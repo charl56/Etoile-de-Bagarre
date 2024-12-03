@@ -95,38 +95,7 @@ function getSpawnPosition(roomSize, playerIndex) {
 // Send message to all players in the room
 const broadcast = (roomId) => {
     const room = rooms.get(roomId);
-    if (!room) return;
-
-    // detect when to end the game : 1 player alive
-    var alivePlayers = 0;
-    room.players.forEach((player) => {
-
-        if (player.isAlive) {
-            alivePlayers++
-        }
-    })
-
-
-    if (alivePlayers === 1 && room.isStarted) {
-        let winner;
-        room.players.forEach((player) => {
-            if (player.isAlive) {
-                winner = player;
-            }
-        });
-
-        if (winner) {
-            room.players.forEach((player) => {
-                player.send(JSON.stringify({ type: 'endGame', winnerId: winner.id, winnerPseudo: winner.pseudo, winnerKills: winner.kills }));
-            });
-
-            if (room.updateInterval) {
-                clearInterval(room.updateInterval);
-                delete room.updateInterval;
-            }
-        }
-        return;
-    }
+    if (!room || !room.players) return;
 
 
     // Convert player data to an array or another suitable format
@@ -139,7 +108,7 @@ const broadcast = (roomId) => {
             kills: player.kills,
             life: player.life,
             isAlive: player.isAlive,
-            nextState : player.nextState 
+            nextState: player.nextState
         }));
 
     // Create a message containing all players' data
@@ -147,6 +116,40 @@ const broadcast = (roomId) => {
 
     // Send this message to each player in the room
     room.players.forEach((_, client) => client.send(message));
+
+
+    // detect when to end the game : 1 player alive
+    var alivePlayers = 0;
+    room.players.forEach((player) => {
+
+        if (player.isAlive) {
+            alivePlayers++
+        }
+    })
+
+    if (alivePlayers === 1 && room.isStarted) {
+        let winner;
+        room.players.forEach((player) => {
+            if (player.isAlive) {
+                winner = player;
+            }
+        });
+
+        if (winner) {
+            setTimeout(() => {
+                room.players.forEach((player) => {
+                    player.send(JSON.stringify({ type: 'endGame', winnerId: winner.id, winnerPseudo: winner.pseudo, winnerKills: winner.kills }));
+                });
+            }, 5000);
+
+            if (room.updateInterval) {
+                clearInterval(room.updateInterval);
+                delete room.updateInterval;
+            }
+        }
+        return;
+    }
+
 };
 
 

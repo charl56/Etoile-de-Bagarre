@@ -13,6 +13,7 @@ import fr.eseo.ld.android.cp.nomdujeu.game.component.PhysicComponent
 import fr.eseo.ld.android.cp.nomdujeu.service.WebSocket
 import ktx.math.component1
 import ktx.math.component2
+import kotlin.math.abs
 
 @AllOf([MoveComponent::class, PhysicComponent::class])
 class MoveSystem (
@@ -51,25 +52,47 @@ class MoveSystem (
             val targetX = enemy?.x ?: 0f
             val targetY = enemy?.y ?: 0f
 
-            val (sourceX, sourceY) = physicCmp.body.position
+            var (sourceX, sourceY) = physicCmp.body.position
+
+
 
             with(moveCmps[entity]) {
 
                 if(moveCmp.playerId != enemy?.id){
                     return@with
                 }
+//                Log.d("MoveSystemTarget", "X ${targetX};${sourceX}; Y ${targetY};${sourceY}")
+
+
+                // Si la différence entre source et target trop petite, le joueur ne bouge pas
+
+//                if(abs(sourceX - targetX) < 0.25){
+//                    sourceX = targetX
+//                }
+//
+//                if(abs(targetY - sourceY) < 0.25){
+//                    sourceY = targetY
+//                }
+
+
+//                Log.d("MoveSystem", "${(sourceX)}")
+//                Log.d("MoveSystem", "sourceX $sourceX targetX ${targetX}")
 
                 val angleRad = MathUtils.atan2(targetY - sourceY, targetX - sourceX)
                 cosSin.set(MathUtils.cos(angleRad), MathUtils.sin(angleRad))
                 val (cos, sin) = cosSin
+
+                Log.d("MoveSystem", "cos ${cos}")
+
 
                 physicCmp.impulse.set(
                     mass * (moveCmp.speed * cos - velX),
                     mass * (moveCmp.speed * sin - velY)
                 )
 
-                imageCmp.image.flipX = cos < 0f
-
+                if(abs(cos) > 0.2){
+                    imageCmp.image.flipX = cos < 0f
+                }
             }
 
 
@@ -81,6 +104,7 @@ class MoveSystem (
                     mass * (0f - velX),
                     mass * (0f - velY)
                 )
+
                 return
             }
 
@@ -90,6 +114,7 @@ class MoveSystem (
             )
 
             // Call websocket to send player position
+            Log.d("MoveSystemPosition", "position ${physicCmp.body.position.x} ; ${physicCmp.body.position.y}")
             webSocket?.updatePlayerData(physicCmp.body.position.x, physicCmp.body.position.y)
 
             imageCmps.getOrNull(entity)?.let { imageCmp ->
