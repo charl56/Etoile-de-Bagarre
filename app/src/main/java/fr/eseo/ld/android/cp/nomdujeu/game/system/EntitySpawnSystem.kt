@@ -169,7 +169,8 @@ class EntitySpawnSystem (
                     add<LifeComponent>{
                         // Add playerId to know who is attacked. We add to component, not to this entity, because we can't add attribute to this entity
                         playerId = websocket.players.value.getOrNull(enemiesIndex)?.id ?: ""
-                        maxLife = DEFAULT_LIFE * cfg.lifeScaling
+                        isCurrentPlayer = entity.id == actualPlayerIndex
+                        maxLife = (DEFAULT_LIFE * cfg.lifeScaling).toInt()
                         life = maxLife
                     }
                 }
