@@ -42,7 +42,6 @@ class MoveSystem (
             }
         }
 
-
         if(isEnemyPlayerEntities){
             // We get player position, in player list with id
             val enemy = webSocket.players?.value?.find { it.id == moveCmp.playerId }

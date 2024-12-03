@@ -1,6 +1,9 @@
 package fr.eseo.ld.android.cp.nomdujeu.service
 
 import android.util.Log
+import fr.eseo.ld.android.cp.nomdujeu.game.ai.DefaultState
+import fr.eseo.ld.android.cp.nomdujeu.game.ai.EntityState
+import fr.eseo.ld.android.cp.nomdujeu.game.component.AnimationType
 import io.ktor.client.*
 import io.ktor.client.plugins.websocket.*
 import io.ktor.websocket.*
@@ -222,8 +225,8 @@ class WebSocket private constructor() {
                 y = player["y"]?.jsonPrimitive?.content?.toFloatOrNull() ?: 0f,
                 life = player["life"]?.jsonPrimitive?.content?.toIntOrNull() ?: 0,
                 isAlive = player["isAlive"]?.jsonPrimitive?.content?.toBoolean() ?: false,
-            )
-            // TODO : if this enemy player is dead, remove entity from world
+                nextState = player["nextState"]?.jsonPrimitive?.content?.let { DefaultState.valueOf(it.uppercase()) } ?: DefaultState.IDLE)
+                // TODO : if this enemy player is dead, remove entity from world
 
         } ?: emptyList()
 
@@ -267,7 +270,22 @@ class WebSocket private constructor() {
         }
     }
 
-
+    // Send player animation during game when player change animation
+    fun updatePlayerState(state: EntityState) {
+        player?.let{ p ->
+            val encodedPlayer = Json.encodeToString(mapOf(
+                "id" to _player.value?.id,
+                "nextState" to state.toString(),
+            ))
+            val message = Json.encodeToString(mapOf(
+                "type" to "updatePlayerState",
+                "data" to encodedPlayer
+            ))
+            coroutineScope.launch {
+                sendMessage(message)
+            }
+        }
+    }
 
     // Call this function when we attack, and detect enemy collision
     fun onHitEnemy(victimId: String, damage: Int){

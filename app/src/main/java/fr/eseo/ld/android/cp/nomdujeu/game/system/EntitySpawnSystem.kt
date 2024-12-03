@@ -67,6 +67,9 @@ class EntitySpawnSystem (
 
     // Set actual player to index 0 entity
     private var actualPlayerIndex: Int = 0
+
+    private var isPlayerSet: Boolean = false
+
     // Index in enemy list
     private var enemiesIndex: Int = 0
     private var websocket = WebSocket.getInstance();

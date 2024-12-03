@@ -12,6 +12,9 @@ data class StateComponent (
     var nextState: EntityState = DefaultState.IDLE,
     val stateMachine : DefaultStateMachine<AiEntity, EntityState> = DefaultStateMachine()
 ) {
+    var isCurrentPlayer: Boolean = false
+    var playerId: String = ""
+
     companion object {
         class StateComponentListener(
             private val world: World
