@@ -6,7 +6,7 @@ import ktx.math.vec2
 
 const val DEFAULT_SPEED = 3f
 const val DEFAULT_ATTACK_DAMAGE = 15f
-const val DEFAULT_LIFE = 100f
+const val DEFAULT_LIFE = 100
 
 // Info for entity spawning that need (model, move speed, damages...)
 data class SpawnCfg(

@@ -51,8 +51,11 @@ class GameViewModel : ViewModel() {
             webSocket.leaveRoom()
 
             withContext(Dispatchers.Main) {
-                AndroidLauncher.exitGame()
-                navController.navigate(NomDuJeuScreens.END_GAME_SCREEN.id)
+
+                handler.postDelayed({
+                    AndroidLauncher.exitGame()
+                    navController.navigate(NomDuJeuScreens.END_GAME_SCREEN.id)
+                }, 5000)
             }
         }
     }
