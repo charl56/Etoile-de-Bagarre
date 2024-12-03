@@ -95,7 +95,7 @@ function updatePlayerData(data, ws) {
         const parsedData = JSON.parse(data);
 
         // Check if player is in the room
-        console.log("y a des players ? ", room.players)
+        // console.log("y a des players ? ", room.players)
         if (room.players.has(ws)) {
             // Get the player object from the room, to update its attributes
             const player = room.players.get(ws);
@@ -123,12 +123,13 @@ function onHit(ws, data) {  // data {victimId: playerId, shooterId: playerId, da
 
         // If room existe and player who do request is inside
         if (room && room.players.has(ws)) {
-            // Pointeur ? être sur que quand on modifie une var victim ou shooter, cela met a jour dans la liste
             const victim = getPlayerById(room, parsedData.victimId);
             const shooter = getPlayerById(room, parsedData.shooterId);
 
             if (victim && victim.isAlive) {
                 victim.life -= parsedData.damage;
+                const messageOnHitRecieve = JSON.stringify({ type: 'onHitRecieve', damage: parsedData.damage })
+                victim.send(messageOnHitRecieve)
 
                 if (victim.life <= 0) {
                     victim.isAlive = false;
@@ -137,8 +138,8 @@ function onHit(ws, data) {  // data {victimId: playerId, shooterId: playerId, da
                         shooter.kills = Number(shooter.kills || 0) + 1;
                     }
 
-                    const message = JSON.stringify({ type: 'isDead', shooterId: parsedData.shooterId, victimId: parsedData.victimId });
-                    room.players.forEach((_, client) => client.send(message));
+                    const messageIsDead = JSON.stringify({ type: 'isDead', shooterId: parsedData.shooterId, victimId: parsedData.victimId });
+                    room.players.forEach((_, client) => client.send(messageIsDead));
                 }
             }
         }

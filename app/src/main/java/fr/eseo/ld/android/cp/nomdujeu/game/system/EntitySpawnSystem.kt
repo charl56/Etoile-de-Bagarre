@@ -107,10 +107,10 @@ class EntitySpawnSystem (
                                 })
                             }
 
-                            setPosition(e.x ?: location.x,e.y ?: location.y)
+                            setPosition(e.x,e.y)
                             add<PlayerInfoComponent> {
                                 label = Label(e.pseudo ?: "", skin)
-                                life = Label("Life : ${e.life ?: 100}", skin)
+                                life = Label("${e.life ?: 100} HP", skin)
                             }
 
                         } else {        // If not player, spawn outside map

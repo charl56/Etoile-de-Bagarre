@@ -154,6 +154,10 @@ class WebSocket private constructor() {
                     if (!_gameStarted.value) return
                     processPlayersUpdate(jsonObject)
                 }
+                "onHitReceive" -> {
+                    val damage = jsonObject["damage"]?.jsonPrimitive?.int ?: 0  // Update nb of player in waiting room
+                    Log.d("WebSocket", "You have taken $damage damages")
+                }
                 "isDead" -> {
                     processIsDead(jsonObject)
                 }
@@ -240,8 +244,6 @@ class WebSocket private constructor() {
         }
     }
 
-
-
     // Send position player during game, call by MoveSystem, where new player position is set each tick
     fun updatePlayerData(x: Float, y: Float) {
         _player.value = _player.value?.copy(x = x, y = y)
@@ -265,6 +267,8 @@ class WebSocket private constructor() {
         }
     }
 
+
+
     // Call this function when we attack, and detect enemy collision
     fun onHitEnemy(victimId: String, damage: Int){
         val data = Json.encodeToString(mapOf(
@@ -283,7 +287,6 @@ class WebSocket private constructor() {
         }
     }
 
-
     // Is use to know when our entity need pour be remove from the game
     fun processIsDead(jsonObject: JsonObject){
         val shooterId = jsonObject["shooterId"]?.jsonPrimitive?.content ?: ""
@@ -295,6 +298,8 @@ class WebSocket private constructor() {
         }
         // Don't need to update shooter kills, it's done in backend
     }
+
+
 
     // When the game is finish, server send message et execute this
     fun processEndGame(jsonObject: JsonObject) {
@@ -312,6 +317,7 @@ class WebSocket private constructor() {
     suspend fun sendMessage(message: String) {
         session?.send(Frame.Text(message))
     }
+
 
 
     suspend fun leaveWebSocket() {
