@@ -47,7 +47,7 @@ fun NomDuJeuApp() {
         }
 
         composable(NomDuJeuScreens.CONNECTION_SCREEN.id) {
-            ConnectionScreen(navController, authenticationViewModel)
+            ConnectionScreen(navController, authenticationViewModel, playerViewModel)
         }
 
         composable(NomDuJeuScreens.HOME_SCREEN.id) {
@@ -59,7 +59,7 @@ fun NomDuJeuApp() {
         }
 
         composable(NomDuJeuScreens.END_GAME_SCREEN.id) {
-            EndGameScreen(navController, authenticationViewModel, gameViewModel)
+            EndGameScreen(navController)
         }
     }
 }

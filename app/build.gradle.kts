@@ -1,8 +1,9 @@
 plugins {
+    kotlin("plugin.serialization") version "1.9.22"
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
-    alias(libs.plugins.gms)
+    alias(libs.plugins.gms.google.services)
     alias(libs.plugins.firebase.perf)
     alias(libs.plugins.firebase.crashlytics)
     alias(libs.plugins.dagger.hilt.android)
@@ -10,16 +11,10 @@ plugins {
 
 val appName = "nomdujeu"
 val gdxVersion = "1.12.1"
-val roboVMVersion = "2.3.12"
-val box2DLightsVersion = "1.5"
-val ashleyVersion = "1.7.3"
-val aiVersion = "1.8.2"
-val ktxVersion = "1.11.0-rc2"
-val fleksVersion = "1.6-JVM"
 
 android {
     namespace = "fr.eseo.ld.android.cp.nomdujeu"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "fr.eseo.ld.android.cp.nomdujeu"
@@ -64,7 +59,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.3"
+        kotlinCompilerExtensionVersion = "1.5.9"
     }
     packaging {
         resources {
@@ -98,7 +93,10 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.hilt.navigation)
     implementation(libs.androidx.preference)
+    implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.kotlinx.coroutines.play.services)
+    implementation(libs.kotlinx.serialization.json)
+    // Firebase
     implementation(libs.hilt.android)
     ksp(libs.hilt.ksp)
     implementation(platform(libs.firebase.bom))
@@ -110,9 +108,22 @@ dependencies {
     implementation(libs.firebase.config)
     implementation(libs.firebase.messaging)
     implementation(libs.androidx.runtime.livedata)
-
-//    LibGDX
-    implementation("com.badlogicgames.gdx:gdx-backend-android:$gdxVersion")
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services.auth)
+    implementation(libs.googleid)
+    implementation(libs.firebase.auth.ktx)
+    // Ktor
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.cio)
+    implementation(libs.ktor.client.serialization)
+    implementation(libs.ktor.client.websockets)
+    implementation(libs.ktor.network.tls)
+    // LibGDX
+    implementation(libs.gdx)
+    implementation(libs.gdx.backend.android)
+    implementation(libs.gdx.box2d)
+    implementation(libs.gdx.ai)
+    // Add native extensions
     add("natives", "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a")
     add("natives", "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-arm64-v8a")
     add("natives", "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86")
@@ -121,25 +132,20 @@ dependencies {
     add("natives", "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-arm64-v8a")
     add("natives", "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-x86")
     add("natives", "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-x86_64")
-    implementation("com.badlogicgames.gdx:gdx:$gdxVersion")
-    implementation("com.badlogicgames.gdx:gdx-box2d:$gdxVersion")
-
     // Ktx extensions of LibGDX
-    implementation("io.github.libktx:ktx-actors:$ktxVersion")
-    implementation("io.github.libktx:ktx-app:$ktxVersion")
-    implementation("io.github.libktx:ktx-assets:$ktxVersion")
-    implementation("io.github.libktx:ktx-box2d:$ktxVersion")
-    implementation("io.github.libktx:ktx-collections:$ktxVersion")
-    implementation("io.github.libktx:ktx-graphics:$ktxVersion")
-    implementation("io.github.libktx:ktx-log:$ktxVersion")
-    implementation("io.github.libktx:ktx-math:$ktxVersion")
-    implementation("io.github.libktx:ktx-scene2d:$ktxVersion")
-    implementation("io.github.libktx:ktx-style:$ktxVersion")
-    implementation("io.github.libktx:ktx-tiled:$ktxVersion")
-
+    implementation(libs.libktx.ktx.actors)
+    implementation(libs.libktx.ktx.app)
+    implementation(libs.libktx.ktx.assets)
+    implementation(libs.libktx.ktx.box2d)
+    implementation(libs.libktx.ktx.collections)
+    implementation(libs.libktx.ktx.graphics)
+    implementation(libs.libktx.ktx.log)
+    implementation(libs.libktx.ktx.math)
+    implementation(libs.libktx.ktx.scene2d)
+    implementation(libs.libktx.ktx.style)
+    implementation(libs.libktx.ktx.tiled)
     // FLEKS : A fast, lightweight, entity component system library written in Kotlin
-    implementation("io.github.quillraven.fleks:Fleks:$fleksVersion")
-
+    implementation(libs.io.github.quillraven.fleks)
 }
 
 // To be sure native libs are copied before start application

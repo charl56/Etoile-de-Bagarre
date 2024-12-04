@@ -17,7 +17,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
  * - The `model` property defines the model of the animation (player, enemy, etc.).
  */
 enum class AnimationModel {
-    PLAYER, ENEMY, UNDEFINED;       // TODO : player en majuscule, et donc dossier en maj et refaire manip création du fichier gameTexture
+    PLAYER, ENEMY, UNDEFINED;
 
     val atlasKey: String = this.toString().lowercase()
 }
@@ -36,13 +36,20 @@ data class AnimationComponent (
     var model: AnimationModel = AnimationModel.UNDEFINED,
     var stateTime: Float = 0f,
     var playMode: Animation.PlayMode = Animation.PlayMode.LOOP,
-
 ) {
+
     lateinit var animation: Animation<TextureRegionDrawable>
     var nextAnimation: String = NO_ANIMATION
 
+    val isAnimationDone : Boolean
+        get() = animation.isAnimationFinished(stateTime)
+
     fun nextAnimation(model: AnimationModel, type: AnimationType){
         this.model = model
+        nextAnimation = "${model.atlasKey}/${type.atlasKey}"
+    }
+
+    fun nextAnimation(type: AnimationType){
         nextAnimation = "${model.atlasKey}/${type.atlasKey}"
     }
 

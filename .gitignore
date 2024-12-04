@@ -1,16 +1,19 @@
 *.iml
-.gradle
+/.gradle/
+/.idea/
 /local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
 .DS_Store
 /build
+
+# Include apk files
+!app/build/output/debug/*.apk
+
 /captures
 .externalNativeBuild
 .cxx
 local.properties
 /org.*
+
+
+backend/node_modules
+backend/package-lock.json

@@ -1,12 +1,46 @@
 <resources>
-    <string name="app_name">Nom Du Jeu</string>
+    <string name="app_name">Etoile de bagarre</string>
     <string name="email">Email</string>
     <string name="password">Password</string>
     <string name="login">Login</string>
     <string name="signup">Sign Up</string>
+    <string name="signinGoogle">Sign in with Google</string>
     <string name="loginTitle">Welcome back !</string>
     <string name="loginMessage">To keep connected with us please login with your personal info</string>
     <string name="signUpTitle">Hello Friend !</string>
     <string name="signUpMessage">Enter your personal details and dive into the world with us!</string>
     <string name="username">Username</string>
+
+    <!-- HOME SCREEN -->
+    <string name="homeScreen_logout">Log out</string>
+    <string name="homeScreen_pseudoLoading">Pseudo loading...</string>
+    <string name="homeScreen_wins">Win(s)</string>
+    <string name="homeScreen_waitingPlayer">Player waiting</string>
+    <string name="homeScreen_error_connectMatchMaking">Error when trying to connect to match making. Try to restart game or relog in</string>
+    <string name="homeScreen_error_serverNotAvailable">Server isn\'t available now</string>
+    <string name="homeScreen_startMatchMaking">Play</string>
+    <string name="homeScreen_stopMatchMaking">Cancel</string>
+    <string name="homeScreen_playersCount">players</string>
+    <string name="homeScreen_playersInGame">Number of players in game</string>
+    <string name="player_image_description">Player Image</string>
+    <string name="error_loading_player_image">Error loading player image</string>
+
+
+
+    <!-- END GAME SCREEN -->
+    <string name="endGameScreen_endGame">End of the game</string>
+    <string name="endGameScreen_replay">Replay</string>
+    <string name="endGameScreen_exit">Exit</string>
+    <string name="ranking">Ranking</string>
+    <string name="rank">Rank</string>
+    <string name="pseudo">Pseudo</string>
+    <string name="kills">Kills</string>
+
+
+
+
+    <!-- NOTIFICATION -->
+    <string name="channel_name">Notification channel</string>
+    <string name="channel_description">You have a new notification</string>
+
 </resources>
