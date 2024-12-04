@@ -95,7 +95,28 @@ function getSpawnPosition(roomSize, playerIndex) {
 // Send message to all players in the room
 const broadcast = (roomId) => {
     const room = rooms.get(roomId);
-    if (!room) return;
+    if (!room || !room.players) return;
+
+
+    // Convert player data to an array or another suitable format
+    const playersData = Array.from(room.players.values()).map(player => (
+        {
+            id: player.id,
+            pseudo: player.pseudo,
+            x: player.x,
+            y: player.y,
+            kills: player.kills,
+            life: player.life,
+            isAlive: player.isAlive,
+            nextState: player.nextState
+        }));
+
+    // Create a message containing all players' data
+    const message = JSON.stringify({ type: 'updatePlayersData', players: playersData });
+
+    // Send this message to each player in the room
+    room.players.forEach((_, client) => client.send(message));
+
 
     // detect when to end the game : 1 player alive
     var alivePlayers = 0;
@@ -105,7 +126,6 @@ const broadcast = (roomId) => {
             alivePlayers++
         }
     })
-
 
     if (alivePlayers === 1 && room.isStarted) {
         let winner;
@@ -128,25 +148,6 @@ const broadcast = (roomId) => {
         return;
     }
 
-
-    // Convert player data to an array or another suitable format
-    const playersData = Array.from(room.players.values()).map(player => (
-        {
-            id: player.id,
-            pseudo: player.pseudo,
-            x: player.x,
-            y: player.y,
-            kills: player.kills,
-            life: player.life,
-            isAlive: player.isAlive,
-            nextState : player.nextState 
-        }));
-
-    // Create a message containing all players' data
-    const message = JSON.stringify({ type: 'updatePlayersData', players: playersData });
-
-    // Send this message to each player in the room
-    room.players.forEach((_, client) => client.send(message));
 };
 
 

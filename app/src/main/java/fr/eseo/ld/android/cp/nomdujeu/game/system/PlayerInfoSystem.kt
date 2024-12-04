@@ -68,7 +68,6 @@ class PlayerInfoSystem(
         )
 
         // Update health progress bar
-        val lifePercentage = lifeCmps[entity].life / lifeCmps[entity].maxLife
         playerInfoCmp.life.setText("${lifeCmps[entity].life.toInt()}/${lifeCmps[entity].maxLife.toInt()} HP")
         playerInfoCmp.life.setPosition(
             adjustedX - (playerInfoCmp.life.width / 2),

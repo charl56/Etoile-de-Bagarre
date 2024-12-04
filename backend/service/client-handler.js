@@ -102,8 +102,12 @@ function updatePlayerData(data, ws) {
 
             // Update
             player.id = parsedData.id || player.id;
+            // DELETE THOMAS
             player.x = parsedData.x || player.x;
             player.y = parsedData.y || player.y;
+            //
+            player.cos = parsedData.cos || player.cos;
+            player.sin = parsedData.sin || player.sin;
             player.kills = parsedData.kills || player.kills;
             player.life = parsedData.life || player.life;
             player.isAlive = parsedData.isAlive !== undefined ? parsedData.isAlive : player.isAlive;
@@ -128,10 +132,9 @@ function onHit(ws, data) {  // data {victimId: playerId, shooterId: playerId, da
 
             if (victim && victim.isAlive) {
                 victim.life -= parsedData.damage;
-                const messageOnHitRecieve = JSON.stringify({ type: 'onHitRecieve', damage: parsedData.damage })
-                victim.send(messageOnHitRecieve)
-
+                
                 if (victim.life <= 0) {
+                    victim.life = 0;
                     victim.isAlive = false;
 
                     if (shooter) {

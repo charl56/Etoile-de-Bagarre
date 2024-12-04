@@ -13,6 +13,7 @@ import fr.eseo.ld.android.cp.nomdujeu.game.component.PhysicComponent
 import fr.eseo.ld.android.cp.nomdujeu.service.WebSocket
 import ktx.math.component1
 import ktx.math.component2
+import kotlin.math.abs
 
 @AllOf([MoveComponent::class, PhysicComponent::class])
 class MoveSystem (
@@ -46,30 +47,39 @@ class MoveSystem (
             // We get player position, in player list with id
             val enemy = webSocket.players?.value?.find { it.id == moveCmp.playerId }
 
+            if(enemy?.id != moveCmp.playerId){
+                return
+            }
 
             // Where enemy want to go, and where he is
             val targetX = enemy?.x ?: 0f
             val targetY = enemy?.y ?: 0f
 
-            val (sourceX, sourceY) = physicCmp.body.position
+            var (sourceX, sourceY) = physicCmp.body.position
 
             with(moveCmps[entity]) {
-
-                if(moveCmp.playerId != enemy?.id){
-                    return@with
-                }
 
                 val angleRad = MathUtils.atan2(targetY - sourceY, targetX - sourceX)
                 cosSin.set(MathUtils.cos(angleRad), MathUtils.sin(angleRad))
                 val (cos, sin) = cosSin
+
+                // Rooted => stop the entity. abs(targetX - sourceX) < 0.05 == distance between target and source to little, so stop entity
+                if ((abs(targetX - sourceX) < 0.05) && (abs(targetY - sourceY) < 0.05) || rooted) {
+                    physicCmp.impulse.set(
+                        mass * (0f - velX),
+                        mass * (0f - velY)
+                    )
+                    return
+                }
 
                 physicCmp.impulse.set(
                     mass * (moveCmp.speed * cos - velX),
                     mass * (moveCmp.speed * sin - velY)
                 )
 
-                imageCmp.image.flipX = cos < 0f
-
+                if(abs(cos) > 0.2){
+                    imageCmp.image.flipX = cos < 0f
+                }
             }
 
 
@@ -81,6 +91,7 @@ class MoveSystem (
                     mass * (0f - velX),
                     mass * (0f - velY)
                 )
+
                 return
             }
 
