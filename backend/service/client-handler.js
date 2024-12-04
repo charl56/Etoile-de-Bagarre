@@ -134,6 +134,7 @@ function onHit(ws, data) {  // data {victimId: playerId, shooterId: playerId, da
                 victim.life -= parsedData.damage;
                 
                 if (victim.life <= 0) {
+                    victim.life = 0;
                     victim.isAlive = false;
 
                     if (shooter) {

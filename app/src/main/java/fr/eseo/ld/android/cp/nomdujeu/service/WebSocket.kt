@@ -72,9 +72,9 @@ class WebSocket private constructor() {
 
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
-    var wsUrl = "ws://10.0.2.2:5025/"      // Local emulator android
-//    var wsUrl = "wss://51.254.119.241/ws-edb/"     // Server IP
-//    var wsUrl = "wss://charles.studi0426.com/ws-edb/"
+//    var wsUrl = "wss://51.254.119.241/ws-edb/"     // Server ESEO IP
+//    var wsUrl = "ws://10.0.2.2:5025/"      // Local emulator android
+    var wsUrl = "wss://charles.studi0426.com/ws-edb/"
 
 
     // TODO refactore. Var set in ProcessEndGame, et are here to be get by endGameScreen, to show end message

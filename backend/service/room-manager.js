@@ -136,11 +136,9 @@ const broadcast = (roomId) => {
         });
 
         if (winner) {
-            setTimeout(() => {
-                room.players.forEach((player) => {
-                    player.send(JSON.stringify({ type: 'endGame', winnerId: winner.id, winnerPseudo: winner.pseudo, winnerKills: winner.kills }));
-                });
-            }, 5000);
+            room.players.forEach((player) => {
+                player.send(JSON.stringify({ type: 'endGame', winnerId: winner.id, winnerPseudo: winner.pseudo, winnerKills: winner.kills }));
+            });
 
             if (room.updateInterval) {
                 clearInterval(room.updateInterval);

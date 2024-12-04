@@ -47,6 +47,9 @@ class MoveSystem (
             // We get player position, in player list with id
             val enemy = webSocket.players?.value?.find { it.id == moveCmp.playerId }
 
+            if(enemy?.id != moveCmp.playerId){
+                return
+            }
 
             // Where enemy want to go, and where he is
             val targetX = enemy?.x ?: 0f
@@ -54,36 +57,20 @@ class MoveSystem (
 
             var (sourceX, sourceY) = physicCmp.body.position
 
-
-
             with(moveCmps[entity]) {
-
-                if(moveCmp.playerId != enemy?.id){
-                    return@with
-                }
-//                Log.d("MoveSystemTarget", "X ${targetX};${sourceX}; Y ${targetY};${sourceY}")
-
-
-                // Si la différence entre source et target trop petite, le joueur ne bouge pas
-
-//                if(abs(sourceX - targetX) < 0.25){
-//                    sourceX = targetX
-//                }
-//
-//                if(abs(targetY - sourceY) < 0.25){
-//                    sourceY = targetY
-//                }
-
-
-//                Log.d("MoveSystem", "${(sourceX)}")
-//                Log.d("MoveSystem", "sourceX $sourceX targetX ${targetX}")
 
                 val angleRad = MathUtils.atan2(targetY - sourceY, targetX - sourceX)
                 cosSin.set(MathUtils.cos(angleRad), MathUtils.sin(angleRad))
                 val (cos, sin) = cosSin
 
-                Log.d("MoveSystem", "cos ${cos}")
-
+                // Rooted => stop the entity. abs(targetX - sourceX) < 0.05 == distance between target and source to little, so stop entity
+                if ((abs(targetX - sourceX) < 0.05) && (abs(targetY - sourceY) < 0.05) || rooted) {
+                    physicCmp.impulse.set(
+                        mass * (0f - velX),
+                        mass * (0f - velY)
+                    )
+                    return
+                }
 
                 physicCmp.impulse.set(
                     mass * (moveCmp.speed * cos - velX),
@@ -114,7 +101,6 @@ class MoveSystem (
             )
 
             // Call websocket to send player position
-            Log.d("MoveSystemPosition", "position ${physicCmp.body.position.x} ; ${physicCmp.body.position.y}")
             webSocket?.updatePlayerData(physicCmp.body.position.x, physicCmp.body.position.y)
 
             imageCmps.getOrNull(entity)?.let { imageCmp ->
