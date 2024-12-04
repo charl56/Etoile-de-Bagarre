@@ -23,15 +23,15 @@ git clone -c http.sslVerify=false https://172.24.7.8/e5e/android/2024-2025/proje
 
 ### 📚 Technologies Used
 
-- **Kotlin** - Programming language
 - **Android Studio** - IDE
 - **Gradle** - Build automation tool
-- **Jetpack Compose** - Modern UI toolkit
+- **Kotlin** - Programming language
 
+- **Jetpack Compose** - Modern UI toolkit
 - **LibGDX** - Game development framework
 - **KTX** - Kotlin extensions for LibGDX
 - **Fleks** - Entity-Component-System library for game logic
-
+- **Ktor** - For network sync betwenn server and users (Websocket)
 
 ---
 
@@ -39,7 +39,8 @@ git clone -c http.sslVerify=false https://172.24.7.8/e5e/android/2024-2025/proje
 
 - Thanks to **[Quillraven](https://www.youtube.com/playlist?list=PLTKHCDn5RKK-_mX0s8BJNz7pQecR25689)** for demonstration of LibGdx
 - Thanks to **[Quillraven](https://github.com/Quillraven/Fleks)** to create FLEKS library
-- Thanks to **[GameEndeavor](https://game-endeavor.itch.io/mystic-woods)** for game assets, free tu use in in non-commercial projects
+- Thanks to **[GameEndeavor](https://game-endeavor.itch.io/mystic-woods)** for game assets, free to use in non-commercial projects
+- For the **[font](https://craftpix.net/file-licenses/)** used in application
 
 
 ---
