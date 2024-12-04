@@ -170,7 +170,9 @@ class WebSocket private constructor() {
 
     // Function to send message to server, when player is in waiting room
     suspend fun joinAndWait(currentPlayer: Player, selectedPlayerCount: Int) {
-        println("WEBSOCKET: Joining waiting room $selectedPlayerCount")
+        // Clean enemies list (for last party for example, but we need to get list in endGame screen so we can't delete list at end of party)
+        _players.value = emptyList()
+
         val message = Json.encodeToString(mapOf(
             "type" to "joinWaitingRoom",
             "playerId" to currentPlayer.id,
