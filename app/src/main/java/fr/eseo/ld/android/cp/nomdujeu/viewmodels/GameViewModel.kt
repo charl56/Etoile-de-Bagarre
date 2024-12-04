@@ -3,9 +3,6 @@ package fr.eseo.ld.android.cp.nomdujeu.viewmodels
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.os.Handler
-import android.os.Looper
-import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -23,8 +20,6 @@ import kotlinx.coroutines.withContext
 class GameViewModel : ViewModel() {
 
     private var gameLaunched = false
-    private val handler =
-        Handler(Looper.getMainLooper()) // TODO : à supprimer, permet de lancer endGame après 5 sec
     private val webSocket = WebSocket.getInstance()
 
     lateinit var navController: NavController;
@@ -36,10 +31,6 @@ class GameViewModel : ViewModel() {
             gameLaunched = true
             this.navController = navController
 
-//            // TODO : à supprimer, permet de lancer endGame après 10 sec
-//            handler.postDelayed({
-//                endGame()
-//            }, 10000)
         }
     }
 

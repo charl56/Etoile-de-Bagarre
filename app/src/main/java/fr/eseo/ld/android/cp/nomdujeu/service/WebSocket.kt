@@ -3,7 +3,6 @@ package fr.eseo.ld.android.cp.nomdujeu.service
 import android.util.Log
 import fr.eseo.ld.android.cp.nomdujeu.game.ai.DefaultState
 import fr.eseo.ld.android.cp.nomdujeu.game.ai.EntityState
-import fr.eseo.ld.android.cp.nomdujeu.game.component.AnimationType
 import io.ktor.client.*
 import io.ktor.client.plugins.websocket.*
 import io.ktor.websocket.*
@@ -138,7 +137,6 @@ class WebSocket private constructor() {
     private fun processMessage(message: String) {
         try {
             val jsonObject = Json.parseToJsonElement(message).jsonObject
-//            Log.d("WebSocket", "Received message: $jsonObject")
             when (jsonObject["type"]?.jsonPrimitive?.content) {
                 // Update player count, display in home screen
                 "playerCount" -> {
@@ -156,11 +154,6 @@ class WebSocket private constructor() {
                 "updatePlayersData" -> {
                     if (!_gameStarted.value) return
                     processPlayersUpdate(jsonObject)
-                }
-                "onHitReceive" -> {
-                    val damage = jsonObject["damage"]?.jsonPrimitive?.int ?: 0  // Update nb of player in waiting room
-                    Log.d("WebSocket", "You have taken $damage damages")
-                    // TODO Add damage to this entity
                 }
                 "isDead" -> {
                     processIsDead(jsonObject)
@@ -210,7 +203,6 @@ class WebSocket private constructor() {
                 _player.value = _player.value?.copy(
                     life = player["life"]?.jsonPrimitive?.content?.toIntOrNull() ?: 0,
                     kills = player["kills"]?.jsonPrimitive?.content?.toIntOrNull() ?: 0)
-                // TODO : AJouter une animation au changement de vie ?
                 // Check if is alive
                 if(player["isAlive"]?.jsonPrimitive?.content?.toBoolean() == true) {
                     // TODO : delete entity when player is dead ?
@@ -229,8 +221,6 @@ class WebSocket private constructor() {
                 life = player["life"]?.jsonPrimitive?.content?.toIntOrNull() ?: 0,
                 isAlive = player["isAlive"]?.jsonPrimitive?.content?.toBoolean() ?: false,
                 nextState = player["nextState"]?.jsonPrimitive?.content?.let { DefaultState.valueOf(it.uppercase()) } ?: DefaultState.IDLE)
-                // TODO : if this enemy player is dead, remove entity from world
-
         } ?: emptyList()
 
         newPlayers.forEach { updateOrAddPlayers(it) }
@@ -314,10 +304,7 @@ class WebSocket private constructor() {
         val victimId = jsonObject["victimId"]?.jsonPrimitive?.content ?: ""
 
         if(victimId == _player.value?.id){
-            println("WEBSO : t mort")
-            Log.d("WEBSO DEATH", "t mort")
             Log.d("WEBSO DEATH", player.value.toString())
-            // TODO : remove entity from game
 
         }
         // Don't need to update shooter kills, it's done in backend
