@@ -173,11 +173,14 @@ class GameScreen : KtxScreen {
         victoryScreen.showVictory()
         joystickInputProcessor.isVisible = false
 
+        val playerInfoSystem = eWorld.systems.filterIsInstance<PlayerInfoSystem>().firstOrNull()
+        playerInfoSystem?.hidePlayerInfo()
+
         val mandatorySystems = setOf(
             AnimationSystem::class,
             CameraSystem::class,
             RenderSystem::class,
-            DebugSystem::class
+            DebugSystem::class,
         )
         eWorld.systems
             .filter { it::class !in mandatorySystems }
@@ -190,11 +193,14 @@ class GameScreen : KtxScreen {
         gameOverScreen.showGameOver()
         joystickInputProcessor.isVisible = false
 
+        val playerInfoSystem = eWorld.systems.filterIsInstance<PlayerInfoSystem>().firstOrNull()
+        playerInfoSystem?.hidePlayerInfo()
+
         val mandatorySystems = setOf(
             AnimationSystem::class,
             CameraSystem::class,
             RenderSystem::class,
-            DebugSystem::class
+            DebugSystem::class,
         )
         eWorld.systems
             .filter { it::class !in mandatorySystems }
