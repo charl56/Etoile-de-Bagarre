@@ -21,10 +21,6 @@ data class AiEntity(
     private val lifeCmps: ComponentMapper<LifeComponent> = world.mapper()
 ) {
 
-    init {
-        lifeCmps.getOrNull(entity)?.let { stateCmps[entity].stateMachine.globalState = DefaultGlobalState.CHECK_ALIVE }
-    }
-
     val wantsToAttack: Boolean
         get() = attackCmps.getOrNull(entity)?.doAttack ?: false
 
@@ -33,9 +29,6 @@ data class AiEntity(
             val moveCmp = moveCmps[entity]
             return moveCmp.cos != 0f || moveCmp.sin != 0f
         }
-
-    val isDead: Boolean
-        get() = lifeCmps[entity].isDead
 
     val isAnimationDone: Boolean
         get() = animationCmps[entity].isAnimationDone
@@ -58,16 +51,6 @@ data class AiEntity(
             nextState = next
             if (immediateChange) {
                 stateMachine.changeState(next)
-            }
-        }
-    }
-
-    fun enableGlobalState(enable: Boolean) {
-        with(stateCmps[entity]) {
-            if(enable) {
-                stateMachine.globalState = DefaultGlobalState.CHECK_ALIVE
-            }else {
-                stateMachine.globalState = null
             }
         }
     }
