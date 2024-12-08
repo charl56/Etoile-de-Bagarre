@@ -17,12 +17,10 @@ class StateSystem(
     override fun onTickEntity(entity: Entity) {
         with(stateCmps[entity]) {
 
-            // If the player is not the current player, we get the state of the enemy
-            if (!isCurrentPlayer) {
-                if (nextState != DefaultState.DEAD) {
-                    val enemy = webSocket.players?.value?.find { it.id == playerId }
-                    nextState = enemy?.nextState?: DefaultState.IDLE
-                }
+            // If the player is not the current player, we get the state of the corresponding enemy
+            if (!isCurrentPlayer && nextState != DefaultState.DEAD) {
+                val enemy = webSocket.players?.value?.find { it.id == playerId }
+                nextState = enemy?.nextState?: DefaultState.IDLE
             }
 
             // Update the state of players
