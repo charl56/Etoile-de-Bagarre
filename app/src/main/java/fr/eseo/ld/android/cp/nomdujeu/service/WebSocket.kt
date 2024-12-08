@@ -324,6 +324,7 @@ class WebSocket private constructor() {
             playerViewModel.addWinToPlayer();
         }
 
+        gameViewModel.triggerVictory(id)
         gameViewModel.endGame()
     }
 

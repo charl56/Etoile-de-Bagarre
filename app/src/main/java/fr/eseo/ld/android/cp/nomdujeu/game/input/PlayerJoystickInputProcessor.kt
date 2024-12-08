@@ -41,6 +41,9 @@ class PlayerJoystickInputProcessor(
     private val joystickKnob: Circle
     private val attackButton: Circle
 
+    // Visibility flag
+    var isVisible = true
+
 
     init {
         Gdx.input.inputProcessor = this
@@ -77,6 +80,11 @@ class PlayerJoystickInputProcessor(
 
     // Detect when we touch screen
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+
+        if (!isVisible) {
+            return false
+        }
+
         val touchX = screenX.toFloat()
         val touchY = Gdx.graphics.height - screenY.toFloat() // Flip Y coordinate
 
@@ -174,6 +182,11 @@ class PlayerJoystickInputProcessor(
 
 
     fun render() {
+
+        if (!isVisible) {
+            return
+        }
+
         batch.begin()
         // Draw joystick base
         batch.draw(

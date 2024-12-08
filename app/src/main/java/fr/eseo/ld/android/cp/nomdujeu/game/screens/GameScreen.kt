@@ -1,10 +1,14 @@
 package fr.eseo.ld.android.cp.nomdujeu.game.screens
 
+import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.maps.tiled.TmxMapLoader
 import com.badlogic.gdx.scenes.scene2d.EventListener
 import com.badlogic.gdx.scenes.scene2d.Stage
+import com.badlogic.gdx.scenes.scene2d.ui.Label
+import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.utils.viewport.ExtendViewport
 import com.github.quillraven.fleks.world
 import fr.eseo.ld.android.cp.nomdujeu.game.component.FloatingTextComponent.Companion.FloatingTextComponentListener
@@ -15,7 +19,6 @@ import fr.eseo.ld.android.cp.nomdujeu.game.component.StateComponent.Companion.St
 import fr.eseo.ld.android.cp.nomdujeu.game.event.MapChangeEvent
 import fr.eseo.ld.android.cp.nomdujeu.game.event.fire
 import fr.eseo.ld.android.cp.nomdujeu.game.input.PlayerJoystickInputProcessor
-import fr.eseo.ld.android.cp.nomdujeu.game.input.PlayerKeyboardInputProcessor
 import fr.eseo.ld.android.cp.nomdujeu.game.system.AnimationSystem
 import fr.eseo.ld.android.cp.nomdujeu.game.system.AttackSystem
 import fr.eseo.ld.android.cp.nomdujeu.game.system.CameraSystem
@@ -47,6 +50,22 @@ class GameScreen : KtxScreen {
     private var currentMap : TiledMap? = null
     private lateinit var joystickInputProcessor: PlayerJoystickInputProcessor
     private var disposed = false
+
+    private var showVictory = false
+    private var victoryTimer = 0f
+
+    private var showGameOver = false
+    private var gameOverTimer = 0f
+
+    // Police et interface utilisateur
+    private val font = BitmapFont()
+    private val skin = Skin().apply {
+        add("default-font", font)
+        add("default", Label.LabelStyle(font, Color.WHITE))
+    }
+
+    private val victoryScreen = VictoryScreen(skin)
+    private val gameOverScreen = GameOverScreen(skin)
 
     // Create physic world with no gravity
     private val phWorld = createWorld(gravity = vec2()).apply {
@@ -89,6 +108,11 @@ class GameScreen : KtxScreen {
         }
     }
 
+    init {
+        uiStage.addActor(victoryScreen)
+        uiStage.addActor(gameOverScreen)
+    }
+
     override fun show() {
         log.debug { "Game screen is shown" }
 
@@ -114,8 +138,66 @@ class GameScreen : KtxScreen {
 
     // Rendu du jeu
     override fun render(delta: Float) {
+    // Mise à jour du timer de victoire
+        if (showVictory) {
+            victoryTimer -= delta
+            if (victoryTimer <= 0f) {
+                showVictory = false
+                victoryScreen.hideVictory()
+                joystickInputProcessor.isVisible = true
+            }
+        }
+
+        if (showGameOver) {
+            gameOverTimer -= delta
+            if (gameOverTimer <= 0f) {
+                showGameOver = false
+                gameOverScreen.hideGameOver()
+                joystickInputProcessor.isVisible = true
+            }
+        }
+
+        // Mise à jour des mondes
         eWorld.update(delta.coerceAtMost(0.25f))
         joystickInputProcessor.render()
+
+        // Rendu des stages
+        gameStage.draw()
+        uiStage.act(delta)
+        uiStage.draw()
+    }
+
+    fun triggerVictory() {
+        showVictory = true
+        victoryTimer = 5f // Afficher pendant 5 secondes
+        victoryScreen.showVictory()
+        joystickInputProcessor.isVisible = false
+
+        val mandatorySystems = setOf(
+            AnimationSystem::class,
+            CameraSystem::class,
+            RenderSystem::class,
+            DebugSystem::class
+        )
+        eWorld.systems
+            .filter { it::class !in mandatorySystems }
+
+    }
+
+    fun triggerGameOver() {
+        showGameOver = true
+        gameOverTimer = 5f // Afficher pendant 5 secondes
+        gameOverScreen.showGameOver()
+        joystickInputProcessor.isVisible = false
+
+        val mandatorySystems = setOf(
+            AnimationSystem::class,
+            CameraSystem::class,
+            RenderSystem::class,
+            DebugSystem::class
+        )
+        eWorld.systems
+            .filter { it::class !in mandatorySystems }
     }
 
     // Stop tous les "services" du jeu
