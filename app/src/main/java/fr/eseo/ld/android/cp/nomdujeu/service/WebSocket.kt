@@ -300,6 +300,22 @@ class WebSocket private constructor() {
         }
     }
 
+    // Call this function when the attack input is pressed
+    fun onAttack(){
+        val data = Json.encodeToString(mapOf(
+            "shooterId" to _player.value?.id
+        ))
+
+        val message = Json.encodeToString(mapOf(
+            "type" to "onAttack",
+            "data" to data
+        ))
+
+        coroutineScope.launch {
+            sendMessage(message)
+        }
+    }
+
     // Is use to know when our entity need pour be remove from the game
     fun processIsDead(jsonObject: JsonObject){
         val shooterId = jsonObject["shooterId"]?.jsonPrimitive?.content ?: ""
@@ -311,8 +327,6 @@ class WebSocket private constructor() {
         }
         // Don't need to update shooter kills, it's done in backend
     }
-
-
 
     // When the game is finish, server send message et execute this
     fun processEndGame(jsonObject: JsonObject) {
@@ -330,8 +344,6 @@ class WebSocket private constructor() {
     suspend fun sendMessage(message: String) {
         session?.send(Frame.Text(message))
     }
-
-
 
     suspend fun leaveWebSocket() {
         session?.close()

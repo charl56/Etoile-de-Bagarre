@@ -11,6 +11,7 @@ import com.github.quillraven.fleks.World
 import fr.eseo.ld.android.cp.nomdujeu.game.component.AttackComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.component.MoveComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.component.PlayerComponent
+import fr.eseo.ld.android.cp.nomdujeu.service.WebSocket
 import ktx.app.KtxInputAdapter
 import ktx.assets.disposeSafely
 
@@ -40,6 +41,8 @@ class PlayerJoystickInputProcessor(
     private val joystickBase: Circle
     private val joystickKnob: Circle
     private val attackButton: Circle
+
+    private val webSocket = WebSocket.getInstance()
 
 
     init {
@@ -91,6 +94,7 @@ class PlayerJoystickInputProcessor(
         when (touchType) {
             TouchType.ATTACK_BUTTON -> {
                 playerEntities.forEach {
+                    webSocket.onAttack()
                     with(attackCmps[it]) {
                         doAttack = true
                     }

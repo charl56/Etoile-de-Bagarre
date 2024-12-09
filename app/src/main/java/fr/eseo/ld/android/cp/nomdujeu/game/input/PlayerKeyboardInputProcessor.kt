@@ -8,6 +8,7 @@ import com.github.quillraven.fleks.World
 import fr.eseo.ld.android.cp.nomdujeu.game.component.AttackComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.component.MoveComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.component.PlayerComponent
+import fr.eseo.ld.android.cp.nomdujeu.service.WebSocket
 import ktx.app.KtxInputAdapter
 
 class PlayerKeyboardInputProcessor(
@@ -19,6 +20,8 @@ class PlayerKeyboardInputProcessor(
     private var playerSin = 0f
     private var playerCos = 0f
     private val playerEntities = world.family(allOf = arrayOf(PlayerComponent::class))
+
+    private val webSocket = WebSocket.getInstance()
 
     init {
         Gdx.input.inputProcessor = this
@@ -52,6 +55,8 @@ class PlayerKeyboardInputProcessor(
 
         } else if (keycode == Input.Keys.A) {
             playerEntities.forEach {
+                webSocket.onAttack()
+
                 with(attackCmps[it]) {
                     doAttack = true
                 }
