@@ -33,7 +33,7 @@ git clone -c http.sslVerify=false https://172.24.7.8/e5e/android/2024-2025/proje
 - **Fleks** - Entity-Component-System library for game logic
 - **Ktor** - For network sync betwenn server and users (Websocket)
 
----
+--- 
 
 ### 📜 Credits
 
