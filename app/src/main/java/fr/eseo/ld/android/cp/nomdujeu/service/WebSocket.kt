@@ -303,6 +303,7 @@ class WebSocket private constructor() {
 
     // Call this function when we attack, and detect enemy collision
     fun onHitEnemy(victimId: String, damage: Int){
+        Log.d("WEBSO HIT", "Victim : $victimId, Damage : $damage")
         val data = Json.encodeToString(mapOf(
             "victimId" to victimId,
             "shooterId" to _player.value?.id,

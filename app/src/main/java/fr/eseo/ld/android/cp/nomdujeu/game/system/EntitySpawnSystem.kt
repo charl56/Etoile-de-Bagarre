@@ -159,6 +159,7 @@ class EntitySpawnSystem (
 
                 if(cfg.canAttack){
                     add<AttackComponent>{
+                        playerId = websocket.players.value.getOrNull(enemiesIndex)?.id ?: ""
                         damage = DEFAULT_ATTACK_DAMAGE * cfg.attackScaling
                         maxDelay = cfg.attackDelay
                         extraRange = cfg.attackExtraRange
