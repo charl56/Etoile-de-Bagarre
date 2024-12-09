@@ -95,6 +95,6 @@ ws://<adress-server>/ws-edb/
 
 2. Update backend folder on the server
 
-3. ``` docker stop [id-container] ```
+3. ``` docker stop websocket-server-container ```
 
 4. Then run build and start commands
