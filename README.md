@@ -5,7 +5,7 @@
 **Clone the git :**
 
 ```bash
-git clone -c http.sslVerify=false https://172.24.7.8/e5e/android/2024-2025/projects/carreau-pichou-tessier
+git clone -c http.sslVerify=false https://github.com/charl56/Etoile-de-Bagarre.git
 ```
 
 ### 🛠 Project Setup

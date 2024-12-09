@@ -12,6 +12,8 @@ plugins {
 val appName = "nomdujeu"
 val gdxVersion = "1.12.1"
 
+
+
 android {
     namespace = "fr.eseo.ld.android.cp.nomdujeu"
     compileSdk = 35
@@ -39,6 +41,15 @@ android {
         }
     }
 
+    applicationVariants.all { variant ->
+        variant.outputs
+            // default type don't have outputFileName field
+            .map { it as com.android.build.gradle.internal.api.ApkVariantOutputImpl }
+            .all { output ->
+                output.outputFileName = "MyAwesomeName.apk"
+                false
+            }
+    }
 
 
     sourceSets {

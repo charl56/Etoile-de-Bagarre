@@ -6,7 +6,7 @@
 /build
 
 # Include apk files
-!app/build/output/debug/*.apk
+!app/build/outputs/**/*.apk
 
 /captures
 .externalNativeBuild
