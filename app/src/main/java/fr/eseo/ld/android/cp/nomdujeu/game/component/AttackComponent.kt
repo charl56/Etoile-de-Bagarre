@@ -8,6 +8,7 @@ enum class AttackState {
 }
 
 class AttackComponent(
+    var playerId: String = "",
     var doAttack : Boolean = false,
     var state : AttackState = AttackState.READY,
     var damage : Float = 0f,

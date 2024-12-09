@@ -105,9 +105,14 @@ class AttackSystem(
 
                 configureEntity(fixtureEntity) {
                     lifeCmps.getOrNull(it)?.let { lifeCmp ->
-                        val damage = (attackCmp.damage * MathUtils.random(0.9f, 1.1f)).toInt()
-                        Log.d("DEBUG", "Dealing $damage of damage to entity $fixtureEntity")
-                        webSocket?.onHitEnemy(lifeCmp.playerId, damage)
+
+                        // attackCmp.playerId != "" > it's not actual player
+                        if(attackCmp.playerId == "") {
+                            val damage = (attackCmp.damage * MathUtils.random(0.9f, 1.1f)).toInt()
+                            Log.d("DEBUG", "Dealing $damage of damage to entity $fixtureEntity")
+                            webSocket?.onHitEnemy(lifeCmp.playerId, damage)
+                        }
+
                     }
                 }
 

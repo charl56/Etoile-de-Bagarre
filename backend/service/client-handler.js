@@ -194,7 +194,6 @@ function getPlayerById(room, playerId) {
     try {
         return Array.from(room.players.values()).find(player => player.id === playerId);
     } catch (error) {
-        console.error("Error getting player by id:", error);
         return null;
     }
 }
