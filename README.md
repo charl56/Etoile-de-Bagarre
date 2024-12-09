@@ -23,7 +23,7 @@ git clone -c http.sslVerify=false https://github.com/charl56/Etoile-de-Bagarre.g
 
 ### ⬇️ Download the APK
 
-**Go To the folder :**
+**Download apk file in the folder :**
 ``` bash
 app\build\outputs\apk\debug
 ```
