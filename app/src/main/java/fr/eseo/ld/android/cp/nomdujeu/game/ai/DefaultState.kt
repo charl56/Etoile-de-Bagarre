@@ -7,7 +7,6 @@ import fr.eseo.ld.android.cp.nomdujeu.game.component.AnimationType
 enum class DefaultState : EntityState {
     IDLE {
         override fun enter(entity: AiEntity) {
-            Log.d("ANIMATION", "Idle : ${DefaultState.valueOf("idle".uppercase())}")
             entity.animation(AnimationType.IDLE)
         }
 
