@@ -42,9 +42,6 @@ class PlayerJoystickInputProcessor(
     private val joystickKnob: Circle
     private val attackButton: Circle
 
-    private val webSocket = WebSocket.getInstance()
-
-
     init {
         Gdx.input.inputProcessor = this
 
@@ -94,7 +91,6 @@ class PlayerJoystickInputProcessor(
         when (touchType) {
             TouchType.ATTACK_BUTTON -> {
                 playerEntities.forEach {
-                    webSocket.onAttack()
                     with(attackCmps[it]) {
                         doAttack = true
                     }

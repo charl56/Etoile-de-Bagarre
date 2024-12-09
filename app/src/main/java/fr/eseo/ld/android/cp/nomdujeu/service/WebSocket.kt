@@ -222,7 +222,9 @@ class WebSocket private constructor() {
                 y = player["y"]?.jsonPrimitive?.content?.toFloatOrNull() ?: 0f,
                 life = player["life"]?.jsonPrimitive?.content?.toIntOrNull() ?: 0,
                 isAlive = player["isAlive"]?.jsonPrimitive?.content?.toBoolean() ?: false,
-                nextState = player["nextState"]?.jsonPrimitive?.content?.let { DefaultState.valueOf(it.uppercase()) } ?: DefaultState.IDLE)
+                nextState = player["nextState"]?.jsonPrimitive?.content?.let { DefaultState.valueOf(it.uppercase()) } ?: DefaultState.IDLE,
+                doAttack = player["doAttack"]?.jsonPrimitive?.content?.toBoolean() ?: false
+            )
         } ?: emptyList()
 
         newPlayers.forEach { updateOrAddPlayers(it) }
@@ -265,7 +267,7 @@ class WebSocket private constructor() {
         }
     }
 
-    // Send player animation during game when player change animation
+    // Send player state during game when player change state, call by StateSystem
     fun updatePlayerState(state: EntityState) {
         player?.let{ p ->
             val encodedPlayer = Json.encodeToString(mapOf(
@@ -274,6 +276,23 @@ class WebSocket private constructor() {
             ))
             val message = Json.encodeToString(mapOf(
                 "type" to "updatePlayerState",
+                "data" to encodedPlayer
+            ))
+            coroutineScope.launch {
+                sendMessage(message)
+            }
+        }
+    }
+
+    // Send player doAttack during game when player attack, call by AttackSystem
+    fun updatePlayerDoAttack(doAttack: Boolean) {
+        player?.let{ p ->
+            val encodedPlayer = Json.encodeToString(mapOf(
+                "id" to _player.value?.id,
+                "doAttack" to doAttack.toString(),
+            ))
+            val message = Json.encodeToString(mapOf(
+                "type" to "updatePlayerDoAttack",
                 "data" to encodedPlayer
             ))
             coroutineScope.launch {
@@ -292,22 +311,6 @@ class WebSocket private constructor() {
 
         val message = Json.encodeToString(mapOf(
             "type" to "onHit",
-            "data" to data
-        ))
-
-        coroutineScope.launch {
-            sendMessage(message)
-        }
-    }
-
-    // Call this function when the attack input is pressed
-    fun onAttack(){
-        val data = Json.encodeToString(mapOf(
-            "shooterId" to _player.value?.id
-        ))
-
-        val message = Json.encodeToString(mapOf(
-            "type" to "onAttack",
             "data" to data
         ))
 

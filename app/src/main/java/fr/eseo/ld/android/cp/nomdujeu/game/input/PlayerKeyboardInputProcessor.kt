@@ -21,8 +21,6 @@ class PlayerKeyboardInputProcessor(
     private var playerCos = 0f
     private val playerEntities = world.family(allOf = arrayOf(PlayerComponent::class))
 
-    private val webSocket = WebSocket.getInstance()
-
     init {
         Gdx.input.inputProcessor = this
     }
@@ -55,8 +53,6 @@ class PlayerKeyboardInputProcessor(
 
         } else if (keycode == Input.Keys.A) {
             playerEntities.forEach {
-                webSocket.onAttack()
-
                 with(attackCmps[it]) {
                     doAttack = true
                 }

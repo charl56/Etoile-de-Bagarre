@@ -33,6 +33,7 @@ enum class DefaultState : EntityState {
 
     ATTACK {
         override fun enter(entity: AiEntity) {
+            Log.d("STATE", "Entity entered attack state")
             entity.animation(AnimationType.ATTACK, Animation.PlayMode.NORMAL, true)
             entity.startAttack()
         }
@@ -41,8 +42,10 @@ enum class DefaultState : EntityState {
             val attackCmp = entity.attackCmp
 
             if(attackCmp.isReady && !attackCmp.doAttack) {
+                Log.d("STATE", "Entity is ready to attack but is not attacking")
                 entity.changeToPreviousState()
             }else if(attackCmp.isReady) {
+                Log.d("STATE", "Entity is attacking again")
                 // start another attack
                 entity.animation(AnimationType.ATTACK, Animation.PlayMode.NORMAL, true)
                 entity.startAttack()

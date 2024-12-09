@@ -38,7 +38,12 @@ class AttackSystem(
         val lifeCmp = lifeCmps[entity]
 
         if (lifeCmp.isCurrentPlayer) {
-            attackCmp.doAttack = webSocket.players.value.find { it.id == lifeCmp.playerId }?.doAttack ?: false
+            webSocket.updatePlayerDoAttack(attackCmp.doAttack)
+        }else{
+            val enemy = webSocket.players.value.find { it.id == lifeCmp.playerId }
+            if (enemy?.doAttack == true) {
+                attackCmp.doAttack = true
+            }
         }
 
         // Entity is ready to attack but is not attacking
@@ -48,6 +53,7 @@ class AttackSystem(
 
         // Entity is prepared to attack and wants to attack
         if (attackCmp.isPrepared && attackCmp.doAttack) {
+            Log.d("ATTACK", "Entity is prepared to attack and wants to attack")
             attackCmp.doAttack = false
             attackCmp.state = AttackState.ATTACKING
             attackCmp.delay = attackCmp.maxDelay
@@ -58,6 +64,7 @@ class AttackSystem(
 
         // Entity is attacking : dealing damage
         if (attackCmp.delay <= 0f && attackCmp.isAttacking) {
+            Log.d("ATTACK", "Entity is attacking : dealing damage")
             attackCmp.state = AttackState.DEALING_DAMAGE
 
             val image = imageCmps[entity].image
