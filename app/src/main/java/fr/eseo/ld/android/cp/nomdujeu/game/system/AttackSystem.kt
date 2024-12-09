@@ -35,13 +35,25 @@ class AttackSystem(
     override fun onTickEntity(entity: Entity) {
         val attackCmp = attackCmps[entity]
 
+        val lifeCmp = lifeCmps[entity]
+
+        if (lifeCmp.isCurrentPlayer) {
+            webSocket.updatePlayerDoAttack(attackCmp.doAttack)
+        }else{
+            val enemy = webSocket.players.value.find { it.id == lifeCmp.playerId }
+            if (enemy?.doAttack == true) {
+                attackCmp.doAttack = true
+            }
+        }
+
+        // Entity is ready to attack but is not attacking
         if (attackCmp.isReady && !attackCmp.doAttack) {
-            // Entity is ready to attack but is not attacking
             return
         }
 
+        // Entity is prepared to attack and wants to attack
         if (attackCmp.isPrepared && attackCmp.doAttack) {
-            // Entity is prepared to attack and wants to attack
+            Log.d("ATTACK", "Entity is prepared to attack and wants to attack")
             attackCmp.doAttack = false
             attackCmp.state = AttackState.ATTACKING
             attackCmp.delay = attackCmp.maxDelay
@@ -50,8 +62,9 @@ class AttackSystem(
 
         attackCmp.delay -= deltaTime
 
+        // Entity is attacking : dealing damage
         if (attackCmp.delay <= 0f && attackCmp.isAttacking) {
-            // Entity is attacking : dealing damage
+            Log.d("ATTACK", "Entity is attacking : dealing damage")
             attackCmp.state = AttackState.DEALING_DAMAGE
 
             val image = imageCmps[entity].image

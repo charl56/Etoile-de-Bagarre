@@ -11,6 +11,7 @@ import com.github.quillraven.fleks.World
 import fr.eseo.ld.android.cp.nomdujeu.game.component.AttackComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.component.MoveComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.component.PlayerComponent
+import fr.eseo.ld.android.cp.nomdujeu.service.WebSocket
 import ktx.app.KtxInputAdapter
 import ktx.assets.disposeSafely
 
