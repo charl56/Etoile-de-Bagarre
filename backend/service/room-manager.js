@@ -108,12 +108,12 @@ const broadcast = (roomId) => {
             kills: player.kills,
             life: player.life,
             isAlive: player.isAlive,
-            nextState: player.nextState
+            nextState: player.nextState,
+            doAttack: player.doAttack
         }));
 
     // Create a message containing all players' data
     const message = JSON.stringify({ type: 'updatePlayersData', players: playersData });
-
     // Send this message to each player in the room
     room.players.forEach((_, client) => client.send(message));
 

@@ -27,6 +27,7 @@ function joinWaitingRoom(ws, playerId, roomSize, pseudo) {
     room.players.get(ws).isAlive = true;
     room.players.get(ws).pseudo = pseudo;
     room.players.get(ws).nextState  = "IDLE";
+    room.players.get(ws).doAttack  = false;
     
     // When a player come in a room, notifiy all players in the room ( room.players.get(ws) == client )
     room.players.forEach((_, client) => {
@@ -102,7 +103,7 @@ function updatePlayerData(data, ws) {
 
             // Update
             player.id = parsedData.id || player.id;
-            // DELETE THOMAS
+            // DELETE THOMAS ??
             player.x = parsedData.x || player.x;
             player.y = parsedData.y || player.y;
             //
@@ -167,7 +168,21 @@ function updatePlayerState(data, ws) {
     } catch (error) {
         console.error("Error parsing or updating player data:", error);
     }
+}
 
+function updatePlayerDoAttack(data, ws) {
+    const parsedData = JSON.parse(data);
+    const id = parsedData.id
+    const doAttack = parsedData.doAttack
+    try {
+        const room = getRoomById(ws.roomId);
+        const player = getPlayerById(room, id);
+        if(player){
+            player.doAttack = doAttack
+        }
+    } catch (error) {
+        console.log("Error updating player doAttack", error)
+    }
 }
 
 
@@ -176,8 +191,13 @@ function getRoomById(roomId) {
 }
 
 function getPlayerById(room, playerId) {
-    return Array.from(room.players.values()).find(player => player.id === playerId);
+    try {
+        return Array.from(room.players.values()).find(player => player.id === playerId);
+    } catch (error) {
+        console.error("Error getting player by id:", error);
+        return null;
+    }
 }
 
 
-module.exports = { joinWaitingRoom, leaveWaitingRoom, updatePlayerData, onHit, updatePlayerState };
+module.exports = { joinWaitingRoom, leaveWaitingRoom, updatePlayerData, onHit, updatePlayerState, updatePlayerDoAttack };
