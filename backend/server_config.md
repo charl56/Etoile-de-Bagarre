@@ -10,14 +10,10 @@ This guide covers the setup of a WebSocket server on a Linux server, using Docke
 
 ## 1. SSH Connection
 
-Connect to the server using SSH. For example, using MobaXterm:
+Connect to the server using SSH. For example, using MobaXterm
 
-```bash
-sudo etudiant
-# Enter the password when prompted
-```
 
-## 2. Create Directory and Set Permissions
+## 2. Create Directory and Set Permissions (for user `etudiant` here)
 
 ```bash
 mkdir /home/etudiant/android
@@ -47,7 +43,7 @@ docker build -t websocket-server .
 To start the Docker container on port `5025`:
 
 ```bash
-docker run -p 127.0.0.1:5025:5025 -d websocket-server
+docker run -p 127.0.0.1:5025:5025 --name websocket-server-container -d websocket-server
 ```
 
 Check if the container is running:
@@ -99,6 +95,6 @@ ws://<adress-server>/ws-edb/
 
 2. Update backend folder on the server
 
-3. ``` docker stop [id-container] ```
+3. ``` docker stop websocket-server-container ```
 
 4. Then run build and start commands

@@ -13,6 +13,7 @@ import fr.eseo.ld.android.cp.nomdujeu.service.WebSocket
 import fr.eseo.ld.android.cp.nomdujeu.ui.navigation.NomDuJeuScreens
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -39,13 +40,35 @@ class GameViewModel : ViewModel() {
         gameLaunched = false
 
         viewModelScope.launch {
-            // Leave game room, but stay connected to websocket
+
+            // Quitter la room du websocket et naviguer vers l'écran de fin
             webSocket.leaveRoom()
 
-            withContext(Dispatchers.Main) {
+            delay(5000)
 
+            withContext(Dispatchers.Main) {
                 AndroidLauncher.exitGame()
                 navController.navigate(NomDuJeuScreens.END_GAME_SCREEN.id)
+            }
+        }
+    }
+
+    fun triggerVictory(winningPlayerId: String) {
+        if (webSocket.player.value?.id == winningPlayerId) {
+            viewModelScope.launch {
+                withContext(Dispatchers.Main) {
+                    AndroidLauncher.showVictoryMessage()
+                }
+            }
+        } else {
+            triggerGameOver()
+        }
+    }
+
+    private fun triggerGameOver() {
+        viewModelScope.launch {
+            withContext(Dispatchers.Main) {
+                AndroidLauncher.showGameOverMessage()
             }
         }
     }

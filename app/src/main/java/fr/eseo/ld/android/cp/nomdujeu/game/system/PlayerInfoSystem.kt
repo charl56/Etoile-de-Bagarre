@@ -75,5 +75,17 @@ class PlayerInfoSystem(
         )
     }
 
+    fun hidePlayerInfo() {
+        world.family(allOf = arrayOf(PlayerInfoComponent::class, ImageComponent::class)).forEach { entity ->
+            hidePlayerInfo(entity)
+        }
+    }
+
+    private fun hidePlayerInfo(entity: Entity) {
+        val playerInfoCmp = playerInfoCmps[entity]
+        playerInfoCmp.label.isVisible = false
+        playerInfoCmp.life.isVisible = false
+    }
+
 
 }

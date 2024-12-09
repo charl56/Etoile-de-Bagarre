@@ -7,7 +7,6 @@ import fr.eseo.ld.android.cp.nomdujeu.game.component.AnimationType
 enum class DefaultState : EntityState {
     IDLE {
         override fun enter(entity: AiEntity) {
-            Log.d("ANIMATION", "Idle : ${DefaultState.valueOf("idle".uppercase())}")
             entity.animation(AnimationType.IDLE)
         }
 
@@ -34,6 +33,7 @@ enum class DefaultState : EntityState {
 
     ATTACK {
         override fun enter(entity: AiEntity) {
+            Log.d("STATE", "Entity entered attack state")
             entity.animation(AnimationType.ATTACK, Animation.PlayMode.NORMAL, true)
             entity.startAttack()
         }
@@ -42,8 +42,10 @@ enum class DefaultState : EntityState {
             val attackCmp = entity.attackCmp
 
             if(attackCmp.isReady && !attackCmp.doAttack) {
+                Log.d("STATE", "Entity is ready to attack but is not attacking")
                 entity.changeToPreviousState()
             }else if(attackCmp.isReady) {
+                Log.d("STATE", "Entity is attacking again")
                 // start another attack
                 entity.animation(AnimationType.ATTACK, Animation.PlayMode.NORMAL, true)
                 entity.startAttack()
@@ -53,13 +55,13 @@ enum class DefaultState : EntityState {
 
     DEAD {
         override fun enter(entity: AiEntity) {
+            entity.animation(AnimationType.DEATH, Animation.PlayMode.NORMAL, true)
             entity.root(true)
         }
     },
 
     RESURRECT{
         override fun enter(entity: AiEntity) {
-            entity.enableGlobalState(true)
             entity.animation(AnimationType.DEATH, Animation.PlayMode.REVERSED, true)
         }
 
@@ -70,15 +72,4 @@ enum class DefaultState : EntityState {
             }
         }
     };
-}
-
-enum class DefaultGlobalState : EntityState {
-    CHECK_ALIVE {
-        override fun update(entity: AiEntity) {
-            if(entity.isDead) {
-                entity.enableGlobalState(false)
-                entity.state(DefaultState.DEAD, true)
-            }
-        }
-    }
 }

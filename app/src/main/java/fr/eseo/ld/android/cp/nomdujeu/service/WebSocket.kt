@@ -170,7 +170,9 @@ class WebSocket private constructor() {
 
     // Function to send message to server, when player is in waiting room
     suspend fun joinAndWait(currentPlayer: Player, selectedPlayerCount: Int) {
-        println("WEBSOCKET: Joining waiting room $selectedPlayerCount")
+        // Clean enemies list of last party. Do this here, because we need to get list in endGame screen so we can't delete list at end of party
+        _players.value = emptyList()
+
         val message = Json.encodeToString(mapOf(
             "type" to "joinWaitingRoom",
             "playerId" to currentPlayer.id,
@@ -220,7 +222,9 @@ class WebSocket private constructor() {
                 y = player["y"]?.jsonPrimitive?.content?.toFloatOrNull() ?: 0f,
                 life = player["life"]?.jsonPrimitive?.content?.toIntOrNull() ?: 0,
                 isAlive = player["isAlive"]?.jsonPrimitive?.content?.toBoolean() ?: false,
-                nextState = player["nextState"]?.jsonPrimitive?.content?.let { DefaultState.valueOf(it.uppercase()) } ?: DefaultState.IDLE)
+                nextState = player["nextState"]?.jsonPrimitive?.content?.let { DefaultState.valueOf(it.uppercase()) } ?: DefaultState.IDLE,
+                doAttack = player["doAttack"]?.jsonPrimitive?.content?.toBoolean() ?: false
+            )
         } ?: emptyList()
 
         newPlayers.forEach { updateOrAddPlayers(it) }
@@ -263,7 +267,7 @@ class WebSocket private constructor() {
         }
     }
 
-    // Send player animation during game when player change animation
+    // Send player state during game when player change state, call by StateSystem
     fun updatePlayerState(state: EntityState) {
         player?.let{ p ->
             val encodedPlayer = Json.encodeToString(mapOf(
@@ -272,6 +276,23 @@ class WebSocket private constructor() {
             ))
             val message = Json.encodeToString(mapOf(
                 "type" to "updatePlayerState",
+                "data" to encodedPlayer
+            ))
+            coroutineScope.launch {
+                sendMessage(message)
+            }
+        }
+    }
+
+    // Send player doAttack during game when player attack, call by AttackSystem
+    fun updatePlayerDoAttack(doAttack: Boolean) {
+        player?.let{ p ->
+            val encodedPlayer = Json.encodeToString(mapOf(
+                "id" to _player.value?.id,
+                "doAttack" to doAttack.toString(),
+            ))
+            val message = Json.encodeToString(mapOf(
+                "type" to "updatePlayerDoAttack",
                 "data" to encodedPlayer
             ))
             coroutineScope.launch {
@@ -310,8 +331,6 @@ class WebSocket private constructor() {
         // Don't need to update shooter kills, it's done in backend
     }
 
-
-
     // When the game is finish, server send message et execute this
     fun processEndGame(jsonObject: JsonObject) {
         var id = jsonObject["winnerId"]?.jsonPrimitive?.content ?: ""
@@ -322,14 +341,13 @@ class WebSocket private constructor() {
             playerViewModel.addWinToPlayer();
         }
 
+        gameViewModel.triggerVictory(id)
         gameViewModel.endGame()
     }
 
     suspend fun sendMessage(message: String) {
         session?.send(Frame.Text(message))
     }
-
-
 
     suspend fun leaveWebSocket() {
         session?.close()

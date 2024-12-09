@@ -4,7 +4,7 @@ const http = require('http');
 const server = http.createServer();
 const wss = new WebSocket.Server({ server });
 
-const { joinWaitingRoom, leaveWaitingRoom, updatePlayerData, onHit, updatePlayerState } = require('./service/client-handler');
+const { joinWaitingRoom, leaveWaitingRoom, updatePlayerData, onHit, updatePlayerState, updatePlayerDoAttack } = require('./service/client-handler');
 
 // Connecting to websocket. With ws war, we can know who is connected
 wss.on('connection', (ws, req) => {
@@ -32,6 +32,10 @@ wss.on('connection', (ws, req) => {
                     
                 case 'updatePlayerState':
                     updatePlayerState(msg.data, ws)
+                    break;
+
+                case 'updatePlayerDoAttack':
+                    updatePlayerDoAttack(msg.data, ws)
                     break;
 
                 // Add other case if needed

@@ -8,14 +8,17 @@ import com.github.quillraven.fleks.ComponentMapper
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
 import fr.eseo.ld.android.cp.nomdujeu.game.component.ImageComponent
+import fr.eseo.ld.android.cp.nomdujeu.game.component.PhysicComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.component.PlayerComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.event.MapChangeEvent
+import ktx.math.vec2
 import ktx.tiled.height
 import ktx.tiled.width
 
 @AllOf([PlayerComponent::class, ImageComponent::class])
 class CameraSystem(
     private val imageCmps : ComponentMapper<ImageComponent>,
+    private val phCmps : ComponentMapper<PhysicComponent>,
     stage : Stage
 ) : EventListener, IteratingSystem() {
 
@@ -25,13 +28,17 @@ class CameraSystem(
 
     override fun onTickEntity(entity: Entity) {
         with(imageCmps[entity]) {
-
             val viewWith = camera.viewportWidth / 2
             val viewHeight = camera.viewportHeight / 2
 
+            val offset = phCmps.getOrNull(entity)?.offset ?: vec2()
+
+            val imageWith = image.width / 2
+            val imageHeight = image.height / 2
+
             camera.position.set(
-                image.x.coerceIn(viewWith, maxWidth - viewWith),
-                image.y.coerceIn(viewHeight, maxHeight - viewHeight),
+                (image.x + imageWith + offset.x).coerceIn(viewWith, maxWidth - viewWith),
+                (image.y + imageHeight + offset.y).coerceIn(viewHeight, maxHeight - viewHeight),
                 camera.position.z
             )
         }

@@ -15,4 +15,5 @@ data class Player(
     val life : Int = 100,
     val isAlive : Boolean = true,
     val nextState : DefaultState = DefaultState.IDLE,
+    val doAttack : Boolean = false,
 )

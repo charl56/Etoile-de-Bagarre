@@ -11,6 +11,7 @@ import com.github.quillraven.fleks.World
 import fr.eseo.ld.android.cp.nomdujeu.game.component.AttackComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.component.MoveComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.component.PlayerComponent
+import fr.eseo.ld.android.cp.nomdujeu.service.WebSocket
 import ktx.app.KtxInputAdapter
 import ktx.assets.disposeSafely
 
@@ -40,6 +41,9 @@ class PlayerJoystickInputProcessor(
     private val joystickBase: Circle
     private val joystickKnob: Circle
     private val attackButton: Circle
+
+    // Visibility flag
+    var isVisible = true
 
 
     init {
@@ -77,6 +81,11 @@ class PlayerJoystickInputProcessor(
 
     // Detect when we touch screen
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+
+        if (!isVisible) {
+            return false
+        }
+
         val touchX = screenX.toFloat()
         val touchY = Gdx.graphics.height - screenY.toFloat() // Flip Y coordinate
 
@@ -174,6 +183,11 @@ class PlayerJoystickInputProcessor(
 
 
     fun render() {
+
+        if (!isVisible) {
+            return
+        }
+
         batch.begin()
         // Draw joystick base
         batch.draw(

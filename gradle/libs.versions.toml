@@ -19,6 +19,7 @@ androidx-preference = "1.2.1"
 kotlinx-coroutines-play-services = "1.7.3"
 kotlinx-serialization-json = "1.6.3"
 firebaseBom = "33.4.0"
+playServicesAuth = "21.2.0"
 runtimeLivedata = "1.7.3"
 firebaseDatabaseKtx = "21.0.0"
 credentialsPlayServicesAuth = "1.5.0-beta01"
@@ -102,6 +103,7 @@ libktx-ktx-style = { group = "io.github.libktx", name = "ktx-style", version.ref
 libktx-ktx-tiled = { group = "io.github.libktx", name = "ktx-tiled", version.ref = "ktx-version" }
 # Fleks : LibGdx extension
 io-github-quillraven-fleks = { group = "io.github.quillraven.fleks", name = "Fleks", version.ref = "fleks-version" }
+play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuth" }
 
 
 
