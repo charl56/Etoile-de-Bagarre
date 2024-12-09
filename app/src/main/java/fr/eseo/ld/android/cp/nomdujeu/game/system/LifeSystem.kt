@@ -3,7 +3,6 @@ package fr.eseo.ld.android.cp.nomdujeu.game.system
 import android.util.Log
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.g2d.Animation
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.ui.Label
@@ -13,15 +12,14 @@ import com.github.quillraven.fleks.ComponentMapper
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
 import com.github.quillraven.fleks.NoneOf
-import fr.eseo.ld.android.cp.nomdujeu.game.component.AnimationComponent
-import fr.eseo.ld.android.cp.nomdujeu.game.component.AnimationType
+import fr.eseo.ld.android.cp.nomdujeu.game.ai.DefaultState
 import fr.eseo.ld.android.cp.nomdujeu.game.component.DeadComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.component.EnemyPlayerComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.component.FloatingTextComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.component.LifeComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.component.PhysicComponent
 import fr.eseo.ld.android.cp.nomdujeu.game.component.PlayerComponent
-import fr.eseo.ld.android.cp.nomdujeu.model.Player
+import fr.eseo.ld.android.cp.nomdujeu.game.component.StateComponent
 import fr.eseo.ld.android.cp.nomdujeu.service.WebSocket
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
@@ -35,7 +33,7 @@ class LifeSystem(
     private val playerCmps : ComponentMapper<PlayerComponent>,
     private val enemyPlayerCmps : ComponentMapper<EnemyPlayerComponent>,
     private val physicCmps : ComponentMapper<PhysicComponent>,
-    private val aniCmps : ComponentMapper<AnimationComponent>
+    private val stateCmps : ComponentMapper<StateComponent>
 ) : IteratingSystem() {
     private val webSocket: WebSocket = WebSocket.getInstance()
 
@@ -74,9 +72,8 @@ class LifeSystem(
         }
 
         if(lifeCmp.isDead) {
-            aniCmps.getOrNull(entity)?.let { aniCmp ->
-                aniCmp.nextAnimation(AnimationType.DEATH)
-                aniCmp.playMode = Animation.PlayMode.NORMAL
+            stateCmps.getOrNull(entity)?.let { stateCmp ->
+                stateCmp.nextState = DefaultState.DEAD
             }
             
             configureEntity(entity){

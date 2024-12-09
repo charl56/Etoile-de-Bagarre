@@ -15,6 +15,7 @@ class AndroidLauncher : AndroidApplication() {
 
 
     private lateinit var ktxGame: KtxGame<KtxScreen>
+    private var gameScreen: GameScreen? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,7 +23,8 @@ class AndroidLauncher : AndroidApplication() {
 
         ktxGame = object : KtxGame<KtxScreen>() {
             override fun create() {
-                addScreen(GameScreen())
+                gameScreen = GameScreen()
+                gameScreen?.let { addScreen(it) }
                 setScreen<GameScreen>()
             }
         }
@@ -34,6 +36,16 @@ class AndroidLauncher : AndroidApplication() {
         const val UNIT_SCALE = 1/16f
 
         private var instance: AndroidLauncher? = null
+
+        //Triggers the display of the "Victory" message in GameScreen for 3 seconds.
+        fun showVictoryMessage() {
+            instance?.gameScreen?.triggerVictory()
+        }
+
+        //Triggers the display of the "Game Over" message in GameScreen.
+        fun showGameOverMessage() {
+            instance?.gameScreen?.triggerGameOver()
+        }
 
         fun exitGame() {
             instance?.let { launcher ->
