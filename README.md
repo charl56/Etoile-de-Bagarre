@@ -55,6 +55,6 @@ app\build\outputs\apk\debug
 ---
 
 #### Created by
-- Tessier Cécile
-- Carreau Thomas
-- Pichou Charles
+- TESSIER Cécile
+- CARREAU Thomas
+- PICHOU Charles
