@@ -13,6 +13,7 @@
 .cxx
 local.properties
 /org.*
+app/google-services.json
 
 backend/node_modules
 backend/package-lock.json
