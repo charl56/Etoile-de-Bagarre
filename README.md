@@ -18,7 +18,7 @@ git clone https://github.com/charl56/Etoile-de-Bagarre.git
    - You have to rename file **app/google-service.json.example** to **app/google-service.json**
    - You have to set your google API key for google connection, at **api_key.current_key**, in the file **app/google-service.json**
 
-3**Run the Game**
+3. **Run the Game**
    - Once the project is loaded, connect your Android device.
    - Hit the **Run App** button (green arrow) to launch the game on your phone.
 
